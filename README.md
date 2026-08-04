@@ -20,9 +20,9 @@ Se, durante esse caminho, alguém também se divertir explorando um universo che
 * Investigue quatro grandes conspirações através da coleta de 20 Informações únicas, capazes de alterar permanentemente o desenvolvimento da campanha.
 * Forme um grupo com 3 dos 7 personagens jogáveis, cada um com atributos, habilidades e funções distintas, incentivando diferentes composições, sinergias e estilos de jogo.
 * Explore mapas gerados proceduralmente, oferecendo novas rotas, desafios e oportunidades a cada campanha.
-* Enfrente 75 eventos aleatórios, distribuídos entre resultados positivos, negativos e ambíguos, utilizando um sistema de balanceamento para manter a imprevisibilidade sem comprometer a justiça da partida.
+* Encare 75 eventos aleatórios, distribuídos entre resultados positivos, negativos e ambíguos, utilizando um sistema de balanceamento para manter a imprevisibilidade sem comprometer a justiça da partida.
 * Derrote mais de 30 inimigos únicos, cada um com habilidades, comportamentos e padrões próprios de combate.
-* Encare uma IA baseada em prioridades e tomada de decisão contextual, permitindo que diferentes situações produzam comportamentos diferentes dos inimigos.
+* Enfrente uma IA baseada em prioridades e tomada de decisão contextual, permitindo que diferentes situações produzam comportamentos diferentes dos inimigos.
 * Administre condições persistentes como Doença, Terror, Tristeza e Maldições, que afetam combate, exploração e outros sistemas da campanha.
 * Desenvolva equipamentos através de um sistema de crafting simples, combinando itens comuns para criar versões épicas com mecânicas inéditas.
 * Progrida através do conhecimento. Descobrir a verdade é tão importante quanto vencer combates: novas Informações desbloqueiam chefes, modificam a campanha e alteram a presença de facções inimigas.
