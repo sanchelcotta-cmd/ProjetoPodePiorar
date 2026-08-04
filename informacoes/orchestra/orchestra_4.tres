@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Informacao" format=3 uid="uid://cs1mow546nqry"]
+
+[ext_resource type="Script" uid="uid://cmesj3xfmjv7o" path="res://scripts/resources/informacao.gd" id="1_caik6"]
+
+[resource]
+script = ExtResource("1_caik6")
+id = 18
+titulo = "Orchestra - Parte 4"
+descricao = "Algumas pessoas começaram a desaparecer, deixando para trás apenas bilhetes dizendo que iriam para outra cidade. Os motivos eram diversos: 
+
+\"Acho Belacidade chata\"
+\"Quero me aventurar\"
+\"Vou encontrar um crush\"
+As pessoas retornavam dias depois, sem qualquer lembrança dos dias em que estiveram fora. Todas elas tinham algo em comum, carregavam cicatrizes inexplicáveis, e alguns comportamentos estranhos. Outra coincidência chamava atenção: um cartão da recepção da Orchestra era encontrado entre seus pertences."
+tipo = 1
+numero = 4
+metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

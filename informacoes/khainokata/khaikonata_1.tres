@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Informacao" format=3 uid="uid://diusvbwajykfm"]
+
+[ext_resource type="Script" uid="uid://cmesj3xfmjv7o" path="res://scripts/resources/informacao.gd" id="1_ye0vw"]
+
+[resource]
+script = ExtResource("1_ye0vw")
+id = 10
+titulo = "Khainokata- Parte 1"
+descricao = "Berta, a velha solitária que vivia na remota área rural, sempre foi cercada por estranhos rumores. Enquanto muitos a chamavam de bruxa, outros juravam que ela apenas recebia visitas incomuns. Todas as sextas-feiras, as línguas mais afiadas afirmavam, com convicção, que figuras encapuzadas atravessavam a mata em direção ao seu casebre. Uma música estranha ecoava pela floresta, repetindo uma única palavra: \"Khainokata.\" Ninguém sabia o seu significado."
+metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

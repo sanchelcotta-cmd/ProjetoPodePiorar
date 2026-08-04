@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Informacao" format=3 uid="uid://bkch641q5y7cl"]
+
+[ext_resource type="Script" uid="uid://cmesj3xfmjv7o" path="res://scripts/resources/informacao.gd" id="1_rt06x"]
+
+[resource]
+script = ExtResource("1_rt06x")
+id = 0
+titulo = "Controle da Mente - Parte 1"
+descricao = "Belacidade foi tomada por uma febre digital. Um novo aplicativo de vídeos, voltado para adolescentes, tornou-se uma obsessão para geral. Quase ninguém leu seus extensos termos de uso — como de costume. O único a desconfiar foi Enrico, um jovem apaixonado por tecnologia. O garoto afirmou ter encontrado uma cláusula autorizando a transformação dos usuários em zumbis. Naturalmente, ninguém acreditou nele."
+tipo = 3
+metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

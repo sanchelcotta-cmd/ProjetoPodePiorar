@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Informacao" format=3 uid="uid://ciwdtrw25m71i"]
+
+[ext_resource type="Script" uid="uid://cmesj3xfmjv7o" path="res://scripts/resources/informacao.gd" id="1_ylmov"]
+
+[resource]
+script = ExtResource("1_ylmov")
+id = 14
+titulo = "Khainokata- Parte 5"
+descricao = "Com o crescimento do culto, a influência de Khainokata deixou de se limitar aos seus seguidores. Belacidade já não obedecia às leis da física. Rios corriam em direções opostas, sombras permaneciam onde não havia luz, e pombos começaram a demonstrar comportamentos um tanto quanto maliciosos. A ordem natural dava lugar ao caos, como se a própria realidade estivesse sendo lentamente reescrita por uma vontade caótica."
+numero = 5
+metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

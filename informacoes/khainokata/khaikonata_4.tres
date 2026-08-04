@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Informacao" format=3 uid="uid://dsyl3ptjld0s2"]
+
+[ext_resource type="Script" uid="uid://cmesj3xfmjv7o" path="res://scripts/resources/informacao.gd" id="1_b5wp1"]
+
+[resource]
+script = ExtResource("1_b5wp1")
+id = 13
+titulo = "Khainokata- Parte 4"
+descricao = "O altar dedicado a Khainokata transformou-se em um local de peregrinação. Objetos valiosos eram oferecidos como demonstração de devoção. Yngrid, uma jovem influencer, decidiu zombar da situação, oferecendo um rolo de papel higiênico durante uma noite. Três dias depois, seu carro capotou na rodovia — e a única coisa encontrada intacta após o acidente foi um pacote de papel higiênico."
+numero = 4
+metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

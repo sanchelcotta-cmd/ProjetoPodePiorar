@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Informacao" format=3 uid="uid://ba7e14odmk5dx"]
+
+[ext_resource type="Script" uid="uid://cmesj3xfmjv7o" path="res://scripts/resources/informacao.gd" id="1_cwie6"]
+
+[resource]
+script = ExtResource("1_cwie6")
+id = 3
+titulo = "Controle da Mente - Parte 4"
+descricao = "Enrico conseguiu acessar parte do código-fonte do aplicativo. Descobriu que ele não havia sido desenvolvido por uma empresa comum. Trechos inteiros do programa pareciam se reescrever, enquanto mensagens ocultas surgiam sempre que alguém tentava modificar seus arquivos. A linha que mais se repetia dizia:
+
+\"Os termos são irrevogáveis.\"
+Enrico percebeu que aquilo não era um simples programa, mas um instrumento criado para servir a uma inteligência desconhecida."
+numero = 4
+metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

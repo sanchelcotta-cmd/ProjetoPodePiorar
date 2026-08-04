@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3 uid="uid://c8xfj7mnvbnt3"]
+
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skill_effect_data.gd" id="1_0n5s8"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/passive_skill_data.gd" id="2_by51d"]
+
+[sub_resource type="Resource" id="Resource_bipol"]
+script = ExtResource("1_0n5s8")
+effect_type = 7
+target = 1
+amount = 3
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[resource]
+script = ExtResource("2_by51d")
+id = &"voar_afastar"
+display_name = "Voar"
+trigger = 5
+max_activations_per_turn = 1
+effects = Array[ExtResource("1_0n5s8")]([SubResource("Resource_bipol")])
+metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"

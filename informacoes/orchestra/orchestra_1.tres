@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Informacao" format=3 uid="uid://dnwnb20q5ayjg"]
+
+[ext_resource type="Script" uid="uid://cmesj3xfmjv7o" path="res://scripts/resources/informacao.gd" id="1_rg4fa"]
+
+[resource]
+script = ExtResource("1_rg4fa")
+id = 15
+titulo = "Orchestra - Parte 1"
+descricao = "A cidade era bastante tranquila. Um pequeno município do interior, cercado por minas abandonadas e matas densas. Um cientista de renome e personalidade enigmática, Dr. Enzo, chegou há pouco tempo com promessas de avanços tecnológicos. Assim surgiu a Orchestra, uma empresa dedicada às pesquisas científicas. A novidade logo despertou o fascínio dos habitantes de Belacidade, que passaram a observar, com certa desconfiança, clarões multicoloridos escapando das janelas da Orchestra durante as madrugadas."
+tipo = 1
+metadata/_custom_type_script = "uid://cmesj3xfmjv7o"
