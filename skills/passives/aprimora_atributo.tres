@@ -11,7 +11,7 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_mofsy")
-id = &"aprimora_atributo"
+id = &"ps_00002"
 display_name = "Aprimora atributo"
 description = "Aprimora atributo da própria entidade"
 trigger = 2

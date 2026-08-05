@@ -11,10 +11,9 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_o1215")
-id = &"protecao_50"
+id = &"ps_00017"
 display_name = "Proteção 50"
 description = "Reduz 50% do dano recebido."
 trigger = 8
-activation_chance = 0.5
 effects = Array[ExtResource("1_e7gbe")]([SubResource("Resource_i5m1h")])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"

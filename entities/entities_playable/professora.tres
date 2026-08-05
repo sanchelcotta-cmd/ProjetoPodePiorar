@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("1_dctp0")
-id = &"p0004"
+id = &"pj_00005"
 display_name = "Professora do Primário"
 description = "Uma professora criativa. "
 vida_base = 26

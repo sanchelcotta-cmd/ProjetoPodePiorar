@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_cwie6")
-id = 3
+id = &"in_00004"
 titulo = "Controle da Mente - Parte 4"
 descricao = "Enrico conseguiu acessar parte do código-fonte do aplicativo. Descobriu que ele não havia sido desenvolvido por uma empresa comum. Trechos inteiros do programa pareciam se reescrever, enquanto mensagens ocultas surgiam sempre que alguém tentava modificar seus arquivos. A linha que mais se repetia dizia:
 

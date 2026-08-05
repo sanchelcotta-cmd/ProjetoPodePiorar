@@ -10,7 +10,7 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_e8q0b")
-id = &"revelar_passivo"
+id = &"ps_00019"
 display_name = "Revelar Passivo"
 description = "Revela tipo de bloco de forma passiva"
 trigger = 2

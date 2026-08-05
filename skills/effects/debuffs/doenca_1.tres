@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="DebuffData" format=3 uid="uid://b5omu6pyjuty1"]
+
+[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/resources/debuffs_data.gd" id="1_ixho2"]
+
+[resource]
+script = ExtResource("1_ixho2")
+id = &"db_00001"
+display_name = "Doença Leve"
+description = "A doença progride para o próximo nível ao mudar de Dia: de leve, para doença, para grave.
+Esse efeito dura até encontrar e consumir um item de Cura."
+duration_type = 4
+health_modifier = 2
+metadata/_custom_type_script = "uid://drp24ngc2nn0y"

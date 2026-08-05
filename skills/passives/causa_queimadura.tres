@@ -11,9 +11,9 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_rpb5b")
-id = &"causa_queimadura"
-display_name = "Causa Doença"
+id = &"ps_00007"
+display_name = "Causa Queimadura"
 description = "Causa  queimadura ao atacar um alvo."
-trigger = 5
+trigger = 6
 effects = Array[ExtResource("1_sbthh")]([SubResource("Resource_t2ya0")])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"

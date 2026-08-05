@@ -12,8 +12,9 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_by51d")
-id = &"voar_afastar"
+id = &"ps_00022"
 display_name = "Voar"
+description = "Após atacar, recua metade da estamina. "
 trigger = 5
 max_activations_per_turn = 1
 effects = Array[ExtResource("1_0n5s8")]([SubResource("Resource_bipol")])

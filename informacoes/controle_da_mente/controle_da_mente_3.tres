@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_6lrtc")
-id = 2
+id = &"in_00003"
 titulo = "Controle da Mente - Parte 3"
 descricao = "As investigações sobre a epidemia revelaram que as mordidas dos zumbis não provocavam novas transformações. Apenas aqueles que haviam aceitado os termos de uso do aplicativo tornavam-se mortos-vivos. As vítimas dos ataques sofriam febre intensa e ferimentos graves, mas bastavam um antisséptico e um curativo — para aqueles que sobreviviam aos ataques."
 tipo = 3

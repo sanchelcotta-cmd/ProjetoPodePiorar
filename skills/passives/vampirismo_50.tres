@@ -11,7 +11,7 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_l5ve6")
-id = &"vampirismo_50"
+id = &"ps_00021"
 display_name = "Vampirismo 50"
 description = "Cura 50% do dano causado."
 trigger = 5

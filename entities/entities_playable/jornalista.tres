@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("1_uc7ll")
-id = &"p0001"
+id = &"pj_00002"
 display_name = "Jornalista"
 description = "Um repórter curioso."
 vida_base = 28

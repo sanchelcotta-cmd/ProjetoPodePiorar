@@ -11,7 +11,7 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_qf7nx")
-id = &"enraizar"
+id = &"ps_00012"
 display_name = "Enraizar"
 description = "Enraiza o alvo, impedindo movimento."
 max_activations_per_turn = 1

@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_4mp7s")
-id = 11
+id = &"in_00012"
 titulo = "Khainokata- Parte 2"
 descricao = "Ednaldo, um detetive particular contratado pelos vizinhos de Berta, encontrou um antigo altar escondido na mata. A estátua possuía proporções impossíveis, e suas inscrições pareciam diferentes a cada vez que eram observadas. Em seu diário, Ednaldo registrou que, desde o encontro com a estátua, sonhava todas as noites com uma voz que o chamava pelo nome. Poucos dias depois, desapareceu sem deixar vestígios, ganhando fama de caloteiro pela vizinhança."
 numero = 2

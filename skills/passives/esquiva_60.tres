@@ -10,7 +10,7 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_1v2nk")
-id = &"esquiva_60"
+id = &"ps_00014"
 display_name = "Esquiva 60%"
 description = "Têm 60% de chance de esquivar de um ataque."
 trigger = 8

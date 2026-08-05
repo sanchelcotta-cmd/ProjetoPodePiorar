@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("1_beckg")
-id = &"p0003"
+id = &"pj_00003"
 display_name = "Mãe"
 description = "Uma mãe cuidadosa."
 vida_base = 30

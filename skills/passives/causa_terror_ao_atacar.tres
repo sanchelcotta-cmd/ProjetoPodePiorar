@@ -19,8 +19,8 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_m0gki")
-id = &"causa_doenca_ao_atacar"
-display_name = "Causa Doença"
+id = &"ps_00009"
+display_name = "Causa Terror ao Atacar"
 description = "Chances de causar terror ao atacar um alvo."
 trigger = 5
 activation_chance = 0.6

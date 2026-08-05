@@ -10,7 +10,7 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_n64ly")
-id = &"nao_se_move"
+id = &"ps_00015"
 display_name = "Não pode se mover"
 description = "Este personagem não pode se mover."
 trigger = 0

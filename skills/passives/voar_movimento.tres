@@ -12,7 +12,7 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_gi0bf")
-id = &"voar_movimento"
+id = &"ps_00023"
 display_name = "Movimento de voar."
 description = "Ignora obstaculos para se mover"
 trigger = 2

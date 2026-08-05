@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_esutj")
-id = 1
+id = &"in_00002"
 titulo = "Controle da Mente - Parte 2"
 descricao = "Adolescentes que haviam instalado o aplicativo começaram a apresentar febre alta, tremores e lapsos de consciência. Os pais culparam o tempo na internet. E, dessa vez, não estavam tão errados assim. Durante uma tarde, todos receberam a mesma notificação em seus aparelhos:
 

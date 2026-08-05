@@ -6,7 +6,7 @@
 
 [resource]
 script = ExtResource("1_8h1q4")
-id = &"p0006"
+id = &"pj_00004"
 display_name = "Pedreiro"
 description = "Um paredão vivo."
 vida_base = 40

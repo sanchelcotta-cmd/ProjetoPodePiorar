@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_caik6")
-id = 18
+id = &"in_00019"
 titulo = "Orchestra - Parte 4"
 descricao = "Algumas pessoas começaram a desaparecer, deixando para trás apenas bilhetes dizendo que iriam para outra cidade. Os motivos eram diversos: 
 

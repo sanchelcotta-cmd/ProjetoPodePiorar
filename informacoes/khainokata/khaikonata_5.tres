@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_ylmov")
-id = 14
+id = &"in_00015"
 titulo = "Khainokata- Parte 5"
 descricao = "Com o crescimento do culto, a influência de Khainokata deixou de se limitar aos seus seguidores. Belacidade já não obedecia às leis da física. Rios corriam em direções opostas, sombras permaneciam onde não havia luz, e pombos começaram a demonstrar comportamentos um tanto quanto maliciosos. A ordem natural dava lugar ao caos, como se a própria realidade estivesse sendo lentamente reescrita por uma vontade caótica."
 numero = 5

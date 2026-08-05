@@ -11,7 +11,7 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_pkdf7")
-id = &"agarrar"
+id = &"ps_00001"
 display_name = "Agarrar"
 description = "Agarra o alvo, impedindo movimento e ações."
 max_activations_per_turn = 1

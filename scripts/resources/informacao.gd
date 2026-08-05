@@ -8,7 +8,7 @@ enum TipoInformacao {
 	CONTROLE_DA_MENTE
 }
 
-@export var id: int = -1
+@export var id: StringName
 @export var titulo: String = ""
 @export_multiline var descricao: String = ""
 @export var tipo: TipoInformacao

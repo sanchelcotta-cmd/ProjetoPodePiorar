@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("1_tj2et")
-id = &"p0004"
+id = &"pj_00006"
 display_name = "Universitário"
 description = "Um jovem sem foco, mas determinado."
 vida_base = 24

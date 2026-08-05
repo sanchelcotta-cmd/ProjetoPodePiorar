@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_smg6c")
-id = 6
+id = &"in_00007"
 titulo = "Homens de Preto - Parte 2"
 descricao = "Qualquer um que visitava a casa de Dionísio se via obrigado a desviar de caixas e caixas cheias de papéis, recortes, gravações, livros. O homem colecionava padrões que ninguém mais parecia perceber. Anotava desaparecimentos, ou sumiços repentinos nos quais as pessoas retornavam dias depois, agindo com uma desconfortável normalidade. Nas anotações de Dionísio, algumas perguntas se destacavam:
 \"Por que apagar memórias?\"

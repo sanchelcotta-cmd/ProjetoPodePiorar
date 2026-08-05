@@ -11,7 +11,7 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_81ui5")
-id = &"ataque_extra"
+id = &"ps_00003"
 display_name = "Ataque Extra"
 description = "Permite atacar duas vezes no turno."
 trigger = 2

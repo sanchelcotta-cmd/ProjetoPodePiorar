@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_ye0vw")
-id = 10
+id = &"in_00011"
 titulo = "Khainokata- Parte 1"
 descricao = "Berta, a velha solitária que vivia na remota área rural, sempre foi cercada por estranhos rumores. Enquanto muitos a chamavam de bruxa, outros juravam que ela apenas recebia visitas incomuns. Todas as sextas-feiras, as línguas mais afiadas afirmavam, com convicção, que figuras encapuzadas atravessavam a mata em direção ao seu casebre. Uma música estranha ecoava pela floresta, repetindo uma única palavra: \"Khainokata.\" Ninguém sabia o seu significado."
 metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

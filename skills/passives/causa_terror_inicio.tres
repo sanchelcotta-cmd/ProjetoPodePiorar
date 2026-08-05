@@ -18,8 +18,8 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_3in1x")
-id = &"causa_terror_inicio"
-display_name = "Causa Terror"
+id = &"ps_00010"
+display_name = "Causa Terror no Inicio"
 description = "Chances de causar terror ao iniciar um combate."
 trigger = 0
 activation_chance = 0.6

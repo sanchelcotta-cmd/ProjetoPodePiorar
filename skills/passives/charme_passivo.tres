@@ -12,7 +12,7 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_pkebp")
-id = &"charme_passivo"
+id = &"ps_00011"
 display_name = "Charme Passivo"
 description = "Chance de causar charme após sofrer dano."
 trigger = 8

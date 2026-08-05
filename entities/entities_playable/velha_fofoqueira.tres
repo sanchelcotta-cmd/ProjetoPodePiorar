@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("1_ykuqc")
-id = &"p0002"
+id = &"pj_00007"
 display_name = "Velha Fofoqueira"
 description = "Uma velha fofoqueira."
 vida_base = 28

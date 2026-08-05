@@ -11,7 +11,7 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
 script = ExtResource("2_1tnb0")
-id = &"causa_doenca"
+id = &"ps_00004"
 display_name = "Causa Doença"
 description = "Causa doença ao atacar um alvo"
 trigger = 5
