@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://c10yc2gks6wwn"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_u74mi"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_wyv2o"]
+[ext_resource type="Resource" uid="uid://c5unglf0psv07" path="res://resources/skills/passives/causa_terror_inicio.tres" id="3_qdlwj"]
+[ext_resource type="Resource" uid="uid://q7qmrdf1jiiv" path="res://resources/skills/passives/causa_terror_ao_atacar.tres" id="4_1cq5w"]
+[ext_resource type="Resource" uid="uid://6e0niea1dpux" path="res://resources/skills/passives/vampirismo_30.tres" id="5_30xye"]
+[ext_resource type="Resource" uid="uid://dokc0rnyidl15" path="res://resources/skills/passives/protecao_50.tres" id="6_y0ugj"]
+
+[resource]
+script = ExtResource("1_u74mi")
+display_name = "Bonequinha de Pano"
+description = "Só aparece de noite, pode causar terror, tem vampirismo e proteção."
+narrative_description = "Ela está caída no chão, coberta por remendos e sujeira, como um brinquedo esquecido há décadas. Os olhos de botão parecem acompanhar cada passo de vocês, embora isso seja impossível. Quando a pequena cabeça se inclina lentamente para o lado, você percebe que aquela boneca nunca deveria ter se movido."
+vida_base = 20
+ataque_base = 4
+stamina_base = 4
+maestrias = Array[int]([1])
+skill_passivas = Array[ExtResource("2_wyv2o")]([ExtResource("3_qdlwj"), ExtResource("4_1cq5w"), ExtResource("5_30xye"), ExtResource("6_y0ugj")])
+tags = Array[StringName]([&"Coisa do Capeta", &"Humanoide", &"Causa Terror", &"Vampirismo", &"Protecao", &"Suburbio"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"

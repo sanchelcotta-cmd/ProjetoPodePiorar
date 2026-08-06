@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://b6ohmttedy4ev"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_5f3q6"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_2y5qj"]
+[ext_resource type="Resource" uid="uid://c5unglf0psv07" path="res://resources/skills/passives/causa_terror_inicio.tres" id="3_d5bk6"]
+[ext_resource type="Resource" uid="uid://q7qmrdf1jiiv" path="res://resources/skills/passives/causa_terror_ao_atacar.tres" id="4_gq5oq"]
+[ext_resource type="Resource" uid="uid://8ta6ag3ik530" path="res://resources/skills/passives/causa_queimaduras_50.tres" id="5_2y5qj"]
+[ext_resource type="Resource" uid="uid://c8xfj7mnvbnt3" path="res://resources/skills/passives/voar_afastar.tres" id="6_d5bk6"]
+[ext_resource type="Resource" uid="uid://b0ijvyvuhberq" path="res://resources/skills/passives/voar_movimento.tres" id="7_gq5oq"]
+
+[resource]
+script = ExtResource("1_5f3q6")
+display_name = "Diabretes Flamejantes"
+description = "Só aparece de noite, pode causar terror, é voador e ataques podem causar queimadura."
+narrative_description = "“As pequenas criaturas saltam de um lado para o outro como crianças hiperativas, rindo alto enquanto espalham brasas por onde passam. O cheiro de enxofre invade o ambiente, e você percebe que, para elas, incendiar tudo ao redor parece ser apenas uma brincadeira."
+vida_base = 33
+ataque_base = 3
+stamina_base = 3
+maestrias = Array[int]([1])
+skill_passivas = Array[ExtResource("2_2y5qj")]([ExtResource("3_d5bk6"), ExtResource("4_gq5oq"), ExtResource("5_2y5qj"), ExtResource("6_d5bk6"), ExtResource("7_gq5oq")])
+tags = Array[StringName]([&"Coisa do Capeta", &"Criatura", &"Causa Terror", &"Queimadura", &"Voador", &"Baixo Centro"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"

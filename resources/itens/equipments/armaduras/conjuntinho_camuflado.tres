@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dmppbxgfc7mu0"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_hdh8o"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_jcomg"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_5cv2b"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_8ixso"]
+
+[resource]
+script = ExtResource("1_hdh8o")
+display_name = "Conjuntinho Camuflado"
+acquisition_sources = 27
+tags = Array[StringName]([&"Armadura", &"Comum"])
+bonus_life = 6
+consumed_on_use = false
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

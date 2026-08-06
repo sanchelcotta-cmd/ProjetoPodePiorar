@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://hgce36iodqxo"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_jwl35"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_plm58"]
+[ext_resource type="Resource" uid="uid://dlp5nfrpuby5u" path="res://resources/skills/passives/esquiva_30.tres" id="3_tew7l"]
+[ext_resource type="Resource" uid="uid://q7qmrdf1jiiv" path="res://resources/skills/passives/causa_terror_ao_atacar.tres" id="4_2wbmv"]
+
+[resource]
+script = ExtResource("1_jwl35")
+display_name = "Pìnscher Raivoso"
+description = "Pode destruir consumíveis ao atacar."
+narrative_description = "É pequeno, nervoso e faz muito mais barulho do que qualquer criatura daquele tamanho deveria conseguir. Os latidos parecem atravessar a alma, enquanto os olhos arregalados demonstram um ódio completamente desproporcional ao próprio corpo."
+vida_base = 40
+ataque_base = 7
+stamina_base = 7
+maestrias = Array[int]([1])
+skill_passivas = Array[ExtResource("2_plm58")]([ExtResource("3_tew7l"), ExtResource("4_2wbmv")])
+tags = Array[StringName]([&"Criatura", &"Causa Terror", &"Centro"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3 uid="uid://jl6r5f74ekng"]
+
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="1_q4bq7"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_qftj6"]
+
+[sub_resource type="Resource" id="Resource_iyqhm"]
+script = ExtResource("1_q4bq7")
+effect_type = 11
+target = 3
+percent = 1.0
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[resource]
+script = ExtResource("2_qftj6")
+id = &"ps_00026"
+display_name = "Contra-Ataque 50%"
+description = "50% de chance de atacar após sofrer dano"
+trigger = 8
+activation_chance = 0.5
+effects = Array[ExtResource("1_q4bq7")]([SubResource("Resource_iyqhm")])
+metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"

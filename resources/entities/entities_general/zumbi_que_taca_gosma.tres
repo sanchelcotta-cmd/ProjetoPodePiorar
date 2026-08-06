@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://xjvgsdswil66"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_7568b"]
+[ext_resource type="Resource" uid="uid://db8xx3150mvqj" path="res://resources/skills/actives/invocacao_3.tres" id="2_6vcgq"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_wx5nj"]
+[ext_resource type="Resource" uid="uid://6qqyc0ayls8h" path="res://resources/skills/passives/causa_doenca_50.tres" id="4_renvt"]
+
+[resource]
+script = ExtResource("1_7568b")
+display_name = "Zumbi Que taca gosma"
+description = "Criatura zumbificada que atira gosma que pode causar doença.
+Ao início do 3º turno do Encontro, caso pelo menos um Zumbi que Taca Gosma tenha permanecido vivo durante os dois primeiros turnos completos do combate, são invocados Zumbis Dançarinos. "
+narrative_description = "É difícil dizer onde termina o zumbi e onde começa a meleca. Em alguns momentos, parece que a gosma é quem está carregando o moribundo, e não o contrário."
+vida_base = 10
+ataque_base = 4
+stamina_base = 4
+maestrias = Array[int]([3])
+skill_passivas = Array[ExtResource("3_wx5nj")]([ExtResource("4_renvt")])
+skill_ativas = Array[Resource]([ExtResource("2_6vcgq")])
+tags = Array[StringName]([&"CORE_controle_da_mente", &"Humanoide", &"Causa Doenca", &"Baixo Centro", &"Centro"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"

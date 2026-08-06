@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://bfo4viornolat"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_0coj7"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_uxujr"]
+
+[resource]
+script = ExtResource("1_0coj7")
+display_name = "Cobaia Mutante"
+description = "Especial:
+1º turno: realiza um ataque à distância com Maestria Distância, tendo como alvo o personagem mais próximo. 
+2º turno: realiza um ataque corpo a corpo com Maestria Impacto, tendo como alvo o segundo personagem mais próximo que não tenha sido atacado no turno anterior. 
+3º turno: realiza um ataque corpo a corpo com Maestria Lâmina, tendo como alvo o terceiro personagem mais próximo que não tenha sido atacado no turno anterior. 
+Após o 3º turno, a sequência reinicia a partir do ataque à distância.
+
+A criatura nunca escolhe como alvo o mesmo personagem atacado no turno anterior. Caso o alvo correspondente já tenha sido atacado no turno anterior, ela seleciona o próximo personagem válido na ordem de proximidade."
+narrative_description = "A ficha dizia \"não alimentar após a mutação\". Claramente alguém não leu. O olhar vazio acompanha cada um dos seus movimentos, como se estivesse calculando a melhor forma de atacar."
+vida_base = 40
+ataque_base = 6
+stamina_base = 4
+maestrias = Array[int]([3, 2, 1])
+tags = Array[StringName]([&"CORE_orchestra", &"Humanoide", &"Passiva unica", &"Baixo Centro"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"

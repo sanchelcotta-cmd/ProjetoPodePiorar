@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Informacao" format=3 uid="uid://d32ca4l0bbw27"]
+
+[ext_resource type="Script" uid="uid://cmesj3xfmjv7o" path="res://scripts/sc_resources/informacao.gd" id="1_soir2"]
+
+[resource]
+script = ExtResource("1_soir2")
+id = &"in_00013"
+titulo = "Khainokata- Parte 3"
+descricao = "Moradores de Belacidade começaram a apresentar comportamentos idênticos, mesmo sem qualquer ligação aparente entre si. Comerciantes, agricultores, mineradores e professores passaram a repetir os mesmos gestos e a marcar as portas de suas casas com símbolos desconhecidos. Nenhum deles admitia participar de um culto, mas todos defendiam, com unhas e dentes, um tal de propósito maior."
+numero = 3
+metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://ckoxv4jke1tmx"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_7v67a"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_3ouyj"]
+[ext_resource type="Resource" uid="uid://ctit14nai16k3" path="res://resources/skills/passives/enraizar.tres" id="3_ixs7g"]
+[ext_resource type="Resource" uid="uid://bi7qkkp5atpu0" path="res://resources/skills/passives/ataque_extra.tres" id="4_a8h5u"]
+[ext_resource type="Resource" uid="uid://diqhj3kyn2evv" path="res://resources/skills/passives/nao_se_move.tres" id="5_e8miq"]
+
+[resource]
+script = ExtResource("1_7v67a")
+display_name = "Raízes Mutantes"
+description = "Uma raizque pode enraizar o alvo."
+narrative_description = "As vinhas se espalham silenciosamente pelo chão, contornando postes, carros abandonados e pedaços de concreto como se procurassem alguma coisa. À primeira vista parecem inofensivas, até que uma delas se move rápido demais para ser apenas uma planta."
+vida_base = 8
+ataque_base = 8
+maestrias = Array[int]([2])
+skill_passivas = Array[ExtResource("2_3ouyj")]([ExtResource("3_ixs7g"), ExtResource("4_a8h5u"), ExtResource("5_e8miq")])
+tags = Array[StringName]([&"Criatura", &"Elemental", &"Nao se move", &"Baixo Centro", &"Centro"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"

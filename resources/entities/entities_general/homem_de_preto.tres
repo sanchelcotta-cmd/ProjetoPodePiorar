@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://cps1gd8q2664f"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_lqeph"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_c1om5"]
+
+[resource]
+script = ExtResource("1_lqeph")
+display_name = "Homem de Preto"
+description = "Se o grupo não possuir nenhuma Informação, o Homem de Preto não realiza ataques, e o Encontro é encerrado imediatamente."
+narrative_description = "Vestindo um terno impecável, chapéu preto e uma expressão completamente vazia, ele permanece parado como se já esperasse pela chegada de vocês. A pele excessivamente pálida e a ausência de sobrancelhas tornam seu rosto difícil de esquecer. Enquanto vocês observam a figura, ela continua encarando o grupo, como se estivesse calculando alguma coisa."
+vida_base = 55
+maestrias = Array[int]([1, 3])
+tags = Array[StringName]([&"CORE_homens_de_preto", &"Humanoide", &"Atributo Variavel", &"Suburbio", &"Baixo Centro", &"Centro"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"

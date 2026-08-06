@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bp1gksstn7ack"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_0v5ho"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_f22gu"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_k4wpa"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="5_a53ko"]
+
+[resource]
+script = ExtResource("1_0v5ho")
+display_name = "Espada Irada Flamejante"
+description = "Bate forte."
+rarity = 4
+acquisition_sources = 12
+tags = Array[StringName]([&"Arma", &"Epica", &"Impacto"])
+equipment_slot = 1
+mastery_granted = 2
+mastery_bonus = 3
+bonus_atack = 12
+consumed_on_use = false
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

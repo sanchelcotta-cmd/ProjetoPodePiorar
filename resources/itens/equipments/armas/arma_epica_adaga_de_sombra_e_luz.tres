@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bpca4cthkefrp"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_jnt5c"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_d3hys"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_whmwm"]
+[ext_resource type="Resource" uid="uid://bi7qkkp5atpu0" path="res://resources/skills/passives/ataque_extra.tres" id="4_jnt5c"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="5_22k7p"]
+
+[sub_resource type="Resource" id="Resource_d3hys"]
+script = ExtResource("5_22k7p")
+effect_type = 15
+target = 1
+modify_mode = 1
+amount = 2
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[sub_resource type="Resource" id="Resource_whmwm"]
+script = ExtResource("3_whmwm")
+display_name = "Ataque de Luz"
+description = "Causa o dobro de dano."
+activation_chance = 0.5
+effects = Array[ExtResource("5_22k7p")]([SubResource("Resource_d3hys")])
+metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"
+
+[sub_resource type="Resource" id="Resource_uu8ag"]
+script = ExtResource("5_22k7p")
+effect_type = 3
+modify_mode = 2
+percent = 0.6
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[sub_resource type="Resource" id="Resource_22k7p"]
+script = ExtResource("3_whmwm")
+display_name = "Ataque de Sombra"
+description = "Vampirismo 60%"
+activation_chance = 0.5
+effects = Array[ExtResource("5_22k7p")]([SubResource("Resource_uu8ag")])
+metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"
+
+[resource]
+script = ExtResource("1_jnt5c")
+display_name = "Adaga de Sombra e Luz"
+description = "Ataques de luz e de sombra aplicam efeitos diferentes.
+De luz dobra o valor do ataque.
+De sombra aplica vampirismo 60%"
+rarity = 4
+acquisition_sources = 12
+tags = Array[StringName]([&"Arma", &"Epica", &"Lamina"])
+equipment_slot = 1
+mastery_granted = 1
+mastery_bonus = 3
+bonus_atack = 5
+granted_passives = Array[ExtResource("3_whmwm")]([ExtResource("4_jnt5c"), SubResource("Resource_whmwm"), SubResource("Resource_22k7p")])
+consumed_on_use = false
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

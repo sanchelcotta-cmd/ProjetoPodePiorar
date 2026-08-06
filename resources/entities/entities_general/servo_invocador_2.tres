@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://uee7rthfqc0t"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_hdqm7"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_e50il"]
+[ext_resource type="Resource" uid="uid://c8xfj7mnvbnt3" path="res://resources/skills/passives/voar_afastar.tres" id="3_hdqm7"]
+[ext_resource type="Resource" uid="uid://b0ijvyvuhberq" path="res://resources/skills/passives/voar_movimento.tres" id="4_e50il"]
+
+[resource]
+script = ExtResource("1_hdqm7")
+display_name = "Servo Invocador 2"
+description = "Sempre acompanha o Servor Invocador 1."
+narrative_description = "Ele abre um livro escrito numa língua impossível e começa a ler em voz alta. O pior não é ele conseguir pronunciar aquilo. O pior é quando uma sombra surge para corrigir a pronúncia."
+vida_base = 30
+ataque_base = 4
+stamina_base = 4
+maestrias = Array[int]([1])
+skill_passivas = Array[ExtResource("2_e50il")]([ExtResource("3_hdqm7"), ExtResource("4_e50il")])
+tags = Array[StringName]([&"CORE_khainokata", &"Humanoide", &"Voador", &"Baixo Centro"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"

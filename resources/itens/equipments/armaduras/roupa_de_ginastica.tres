@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://c38l3rgs2u6mk"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_ajyn0"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_yq4v7"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_612jq"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_p084y"]
+
+[resource]
+script = ExtResource("1_ajyn0")
+display_name = "Roupa Confortável de Ginástica"
+acquisition_sources = 27
+tags = Array[StringName]([&"Armadura", &"Comum"])
+bonus_life = 3
+consumed_on_use = false
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

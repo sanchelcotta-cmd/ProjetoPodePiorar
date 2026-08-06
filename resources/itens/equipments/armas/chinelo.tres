@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://btqlmywwjosxk"]
+
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="1_4vv0e"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_8lbrg"]
+[ext_resource type="Resource" uid="uid://dw547ru2nrgj1" path="res://resources/itens/equipments/armas/arma_epica_bumerangue_teleguiado.tres" id="2_12hnj"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="3_12hnj"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_cu6j4"]
+
+[resource]
+script = ExtResource("3_12hnj")
+display_name = "Chinelo"
+description = "Um Chinelo de dedo.
+Maestria: Distância"
+acquisition_sources = 19
+tags = Array[StringName]([&"Arma", &"Comum", &"Distancia"])
+equipment_slot = 1
+mastery_granted = 3
+mastery_bonus = 2
+bonus_atack = 4
+consumed_on_use = false
+craft_result = Array[ExtResource("3_12hnj")]([ExtResource("2_12hnj")])
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

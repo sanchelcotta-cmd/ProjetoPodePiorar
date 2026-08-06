@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://b5xo1t3l4lm4p"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_hp4v6"]
+[ext_resource type="Resource" uid="uid://db8xx3150mvqj" path="res://resources/skills/actives/invocacao_3.tres" id="2_4gjhx"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_stjmd"]
+
+[resource]
+script = ExtResource("1_hp4v6")
+display_name = "Guarda-Fantoche"
+description = "A cada início de seu 3º turno (3º, 6º, 9º...), possui 50% de chance de invocar um “Palhaço Assassino\"."
+narrative_description = "Vestidos como antigos guardas de parque de diversões, eles permanecem imóveis até perceberem a presença de vocês. Então, começam a caminhar em movimentos secos e desajeitados, carregando enormes martelos pintados com cores vibrantes. O único som é o estalar de suas articulações, como se alguém invisível estivesse manipulando enormes fantoches."
+vida_base = 30
+ataque_base = 6
+stamina_base = 6
+maestrias = Array[int]([2])
+skill_ativas = Array[Resource]([ExtResource("2_4gjhx")])
+tags = Array[StringName]([&"Humanoide", &"Invocador", &"Centro"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"

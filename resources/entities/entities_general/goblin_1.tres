@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://cq45veunscrtk"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_clixw"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_nkx4w"]
+
+[resource]
+script = ExtResource("1_clixw")
+display_name = "São tipo Goblins"
+description = "Andam em 3, cada um com uma maestria. 
+
+Este representa o goblin com lâmina."
+narrative_description = "Baixinhos. Feios. Barulhentos. Um carrega uma faca enferrujada, outro um pedaço de cano e o terceiro uma arma improvisada. Eles se entreolham, sorriem e, com gritos estridentes e gargalhadas nefastas, partem para cima."
+vida_base = 20
+ataque_base = 3
+stamina_base = 3
+maestrias = Array[int]([1])
+tags = Array[StringName]([&"Humanoide", &"Suburbio"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"

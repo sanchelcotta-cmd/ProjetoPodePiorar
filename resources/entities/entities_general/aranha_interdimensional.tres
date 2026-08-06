@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://corvqf1rd6i8x"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_f6ydv"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_xm38o"]
+[ext_resource type="Resource" uid="uid://dlp5nfrpuby5u" path="res://resources/skills/passives/esquiva_30.tres" id="3_8vdr4"]
+[ext_resource type="Resource" uid="uid://cabsc55m5jep4" path="res://resources/skills/passives/agarrar.tres" id="4_nf0r1"]
+[ext_resource type="Resource" uid="uid://bi7qkkp5atpu0" path="res://resources/skills/passives/ataque_extra.tres" id="5_ffe5n"]
+[ext_resource type="Resource" uid="uid://c8xfj7mnvbnt3" path="res://resources/skills/passives/voar_afastar.tres" id="6_aeeow"]
+[ext_resource type="Resource" uid="uid://b0ijvyvuhberq" path="res://resources/skills/passives/voar_movimento.tres" id="7_2qk11"]
+
+[resource]
+script = ExtResource("1_f6ydv")
+display_name = "Aranha Interdimensional"
+description = "Para cada ataque, escolhe aleatoriamente uma das seguintes ações: 
+• Jogar Teia: causa Agarrar 
+• Ataque corpo a corpo: prioriza personagens Agarrados. 
+"
+narrative_description = "O enorme corpo coberto por um exoesqueleto negro parece distorcer o ar ao redor, enquanto as longas patas se movem com uma rapidez inquietante. Seus muitos olhos observam cada integrante do grupo ao mesmo tempo."
+vida_base = 30
+ataque_base = 8
+stamina_base = 6
+maestrias = Array[int]([2, 3])
+skill_passivas = Array[ExtResource("2_xm38o")]([ExtResource("3_8vdr4"), ExtResource("4_nf0r1"), ExtResource("5_ffe5n"), ExtResource("6_aeeow"), ExtResource("7_2qk11")])
+tags = Array[StringName]([&"CORE_orchestra", &"Criatura", &"Voar", &"Agarrar Especial", &"Ataque Extra", &"Centro"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"

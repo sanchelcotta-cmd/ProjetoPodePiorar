@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://d1pfrgjra8qq1"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_jkwny"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_f4m7w"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_sa68h"]
+[ext_resource type="Resource" uid="uid://8ta6ag3ik530" path="res://resources/skills/passives/causa_queimaduras_50.tres" id="4_kbs5x"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="5_6ak1j"]
+
+[resource]
+script = ExtResource("1_jkwny")
+display_name = "Espada Irada Flamejante"
+description = "Pode causar Queimadura."
+rarity = 4
+acquisition_sources = 12
+tags = Array[StringName]([&"Arma", &"Epica", &"Lamina"])
+equipment_slot = 1
+mastery_granted = 1
+mastery_bonus = 3
+bonus_atack = 7
+granted_passives = Array[ExtResource("3_sa68h")]([ExtResource("4_kbs5x")])
+consumed_on_use = false
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://24o6pim87prl"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_srm6m"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_3a2px"]
+[ext_resource type="Resource" uid="uid://c8xfj7mnvbnt3" path="res://resources/skills/passives/voar_afastar.tres" id="3_fofov"]
+[ext_resource type="Resource" uid="uid://b0ijvyvuhberq" path="res://resources/skills/passives/voar_movimento.tres" id="4_m14re"]
+[ext_resource type="Resource" uid="uid://q7qmrdf1jiiv" path="res://resources/skills/passives/causa_terror_ao_atacar.tres" id="5_hpeas"]
+
+[resource]
+script = ExtResource("1_srm6m")
+id = &"en_00001"
+display_name = "Barata Gigante Voadora"
+description = "Inimigo corpo a corpo voador que pode causar Terror."
+narrative_description = "Primeiro você escuta o bater das asas, ritmado e pesado, como um tambor ecoando pela rua. Então a criatura finalmente aparece. É uma barata, do tamanho de uma cabra. Por um instante você pensa que isso já é ruim o bastante. Mas é pior – ela voa."
+vida_base = 25
+ataque_base = 2
+stamina_base = 2
+skill_passivas = Array[ExtResource("2_3a2px")]([ExtResource("3_fofov"), ExtResource("4_m14re"), ExtResource("5_hpeas")])
+tags = Array[StringName]([&"CORE_orchestra", &"Criatura", &"Voador", &"Causa Terror", &"Suburbio"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"

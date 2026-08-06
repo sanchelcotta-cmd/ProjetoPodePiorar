@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://7il55pwp2g5q"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_v6jem"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_yime3"]
+[ext_resource type="Resource" uid="uid://cxe02aiyoo01o" path="res://resources/skills/passives/charme_ativo.tres" id="3_pgk2d"]
+
+[resource]
+script = ExtResource("1_v6jem")
+display_name = "Dama Elemental"
+description = "Ser feérico, animações de ataque especial."
+narrative_description = "Ela caminha com elegância sobrenatural, como se estivesse desfilando em um jardim que só ela consegue enxergar. A cada gesto delicado, o ambiente responde de uma forma diferente: pequenas chamas dançam ao seu redor, pedras estremecem, e rajadas de vento levantam folhas secas."
+vida_base = 40
+ataque_base = 8
+stamina_base = 8
+maestrias = Array[int]([3])
+skill_passivas = Array[ExtResource("2_yime3")]([ExtResource("3_pgk2d")])
+tags = Array[StringName]([&"Humanoide", &"Elemental", &"Baixo Centro", &"Centro"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"

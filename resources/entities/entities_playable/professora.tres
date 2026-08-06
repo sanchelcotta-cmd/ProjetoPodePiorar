@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://ck0mihtrhjy1c"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_dctp0"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_ishlg"]
+
+[resource]
+script = ExtResource("1_dctp0")
+id = &"pj_00005"
+display_name = "Professora do Primário"
+description = "Uma professora criativa. "
+vida_base = 26
+ataque_base = 5
+stamina_base = 3
+maestrias = Array[int]([1])
+tags = Array[StringName]([&"Humano", &"Jogável"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"

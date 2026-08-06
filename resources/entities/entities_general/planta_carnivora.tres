@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://cs58l0rbrwh1m"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_xy3aq"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_42tev"]
+[ext_resource type="Resource" uid="uid://diqhj3kyn2evv" path="res://resources/skills/passives/nao_se_move.tres" id="3_po7uy"]
+
+[resource]
+script = ExtResource("1_xy3aq")
+display_name = "Planta Carnívora"
+narrative_description = "À primeira vista, parece apenas uma planta exótica crescendo entre as rachaduras da cidade. Então o enorme botão floral se abre lentamente, revelando fileiras de dentes afiados escondidos entre as pétalas.”"
+vida_base = 36
+ataque_base = 12
+maestrias = Array[int]([1])
+skill_passivas = Array[ExtResource("2_42tev")]([ExtResource("3_po7uy")])
+tags = Array[StringName]([&"Criatura", &"Elemental", &"Nao se move", &"Baixo Centro", &"Centro"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"

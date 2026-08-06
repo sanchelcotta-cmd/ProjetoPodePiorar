@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://bo8e3yee4huqr"]
+
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_8h1q4"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_oqmf0"]
+[ext_resource type="Resource" uid="uid://c4ueuiwdrdl42" path="res://resources/skills/passives/protecao_25.tres" id="3_rfk4y"]
+
+[resource]
+script = ExtResource("1_8h1q4")
+id = &"pj_00004"
+display_name = "Pedreiro"
+description = "Um paredão vivo."
+vida_base = 40
+ataque_base = 6
+stamina_base = 3
+maestrias = Array[int]([2])
+skill_passivas = Array[ExtResource("2_oqmf0")]([ExtResource("3_rfk4y")])
+tags = Array[StringName]([&"Humano", &"Jogável"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"
