@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://btuclq5fn0n78"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_2ocvw"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_kkjrk"]
+[ext_resource type="Resource" uid="uid://dsa3dwjhjlfye" path="res://resources/skills/actives/revela_blocos_1.tres" id="3_ob7vu"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="4_esjtr"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="5_khcht"]
+
+[sub_resource type="Resource" id="Resource_5uyal"]
+script = ExtResource("5_khcht")
+effect_type = 15
+percent = 1.0
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[sub_resource type="Resource" id="Resource_ovyrk"]
+script = ExtResource("4_esjtr")
+display_name = "Invisibilidade"
+description = "Enquanto invisível pode se mover, mas se atacar, perde invisibilidade até o próximo turno. Enquanto invisivel, não pode ser alvo de ataques ou acionar armadilhas."
+trigger = 0
+effects = Array[ExtResource("5_khcht")]([SubResource("Resource_5uyal")])
+metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"
+
+[resource]
+script = ExtResource("1_2ocvw")
+display_name = "Traje do Sniper"
+description = "No início do combate, fica invisível. Enquanto invisível pode se mover, mas se atacar, perde invisibilidade até o próximo turno. Enquanto invisivel, não pode ser alvo de ataques ou acionar armadilhas.
+
+Sinergia com Maestria a distância: +4"
+rarity = 4
+acquisition_sources = 4
+tags = Array[StringName]([&"armadura", &"epica", &"sinergia_distancia"])
+equipment_slot = 2
+mastery_granted = 3
+mastery_bonus = 4
+bonus_life = 12
+granted_passives = Array[ExtResource("4_esjtr")]([SubResource("Resource_ovyrk")])
+granted_active_skills = Array[ExtResource("2_kkjrk")]([ExtResource("3_ob7vu")])
+consumed_on_use = false
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

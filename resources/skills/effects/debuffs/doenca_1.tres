@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource("1_ixho2")
-id = &"db_00001"
+id = &"db_00003"
 display_name = "Doença Leve"
 description = "A doença progride para o próximo nível ao mudar de Dia: de leve, para doença, para grave.
 Esse efeito dura até encontrar e consumir um item de Cura."
-duration_type = 4
-health_modifier = 2
+duration_type = 3
+max_health_modifier = -2
 metadata/_custom_type_script = "uid://drp24ngc2nn0y"

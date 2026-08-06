@@ -44,12 +44,12 @@ description = "Ataques de luz e de sombra aplicam efeitos diferentes.
 De luz dobra o valor do ataque.
 De sombra aplica vampirismo 60%"
 rarity = 4
-acquisition_sources = 12
+acquisition_sources = 4
 tags = Array[StringName]([&"Arma", &"Epica", &"Lamina"])
 equipment_slot = 1
 mastery_granted = 1
 mastery_bonus = 3
-bonus_atack = 5
+bonus_attack = 5
 granted_passives = Array[ExtResource("3_whmwm")]([ExtResource("4_jnt5c"), SubResource("Resource_whmwm"), SubResource("Resource_22k7p")])
 consumed_on_use = false
 metadata/_custom_type_script = "uid://bql64fe8a0w24"

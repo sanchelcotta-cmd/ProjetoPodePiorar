@@ -14,5 +14,5 @@ vida_base = 20
 ataque_base = 3
 stamina_base = 3
 maestrias = Array[int]([1])
-tags = Array[StringName]([&"Humanoide", &"Suburbio"])
+tags = Array[StringName]([&"humanoide", &"suburbio"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

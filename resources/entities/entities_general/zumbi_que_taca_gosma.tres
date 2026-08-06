@@ -17,5 +17,5 @@ stamina_base = 4
 maestrias = Array[int]([3])
 skill_passivas = Array[ExtResource("3_wx5nj")]([ExtResource("4_renvt")])
 skill_ativas = Array[Resource]([ExtResource("2_6vcgq")])
-tags = Array[StringName]([&"CORE_controle_da_mente", &"Humanoide", &"Causa Doenca", &"Baixo Centro", &"Centro"])
+tags = Array[StringName]([&"core_controle_da_mente", &"humanoide", &"causa_doenca", &"baixo_centro", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

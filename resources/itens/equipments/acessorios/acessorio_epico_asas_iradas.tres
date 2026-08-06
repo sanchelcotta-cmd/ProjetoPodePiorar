@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://btcjiiyvg2gg3"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_rh1tx"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_dge7h"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_6nysy"]
+[ext_resource type="Resource" uid="uid://c8xfj7mnvbnt3" path="res://resources/skills/passives/voar_afastar.tres" id="4_bxtvt"]
+[ext_resource type="Resource" uid="uid://b0ijvyvuhberq" path="res://resources/skills/passives/voar_movimento.tres" id="5_n6h0s"]
+[ext_resource type="Resource" uid="uid://dlp5nfrpuby5u" path="res://resources/skills/passives/esquiva_30.tres" id="6_t81kv"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="7_6td7i"]
+
+[resource]
+script = ExtResource("1_rh1tx")
+display_name = "Prótese das Asas Iradas"
+description = "Ganha voar.
+Aumenta a estamina em +4
+Esquiva 30%"
+rarity = 4
+acquisition_sources = 4
+tags = Array[StringName]([&"acessorio", &"epica", &"voar"])
+equipment_slot = 3
+bonus_stamina = 4
+granted_passives = Array[ExtResource("3_6nysy")]([ExtResource("4_bxtvt"), ExtResource("5_n6h0s"), ExtResource("6_t81kv")])
+consumed_on_use = false
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

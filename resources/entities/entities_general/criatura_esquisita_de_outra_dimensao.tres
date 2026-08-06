@@ -12,5 +12,5 @@ vida_base = 20
 ataque_base = 2
 stamina_base = 2
 maestrias = Array[int]([1])
-tags = Array[StringName]([&"CORE_orchestra", &"Criatura", &"Suburbio"])
+tags = Array[StringName]([&"core_orchestra", &"criatura", &"suburbio"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

@@ -7,6 +7,7 @@
 script = ExtResource("1_optb8")
 target = 1
 percent = 1.0
+debuff_id = &"db_00003"
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
@@ -14,6 +15,6 @@ script = ExtResource("2_1tnb0")
 id = &"ps_00004"
 display_name = "Causa Doença"
 description = "Causa doença ao atacar um alvo"
-trigger = 5
+trigger = 6
 effects = Array[ExtResource("1_optb8")]([SubResource("Resource_t2ya0")])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"

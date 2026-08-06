@@ -18,5 +18,5 @@ ataque_base = 6
 stamina_base = 6
 maestrias = Array[int]([1])
 skill_passivas = Array[ExtResource("2_56s3v")]([ExtResource("3_7u1qt"), ExtResource("4_8pg85"), ExtResource("5_0w7kl"), ExtResource("6_h8gc2"), ExtResource("7_qfq1f")])
-tags = Array[StringName]([&"Coisa do Capeta", &"Criatura", &"Causa Terror", &"Vampirismo", &"Queimadura", &"Centro"])
+tags = Array[StringName]([&"coisa_do_capeta", &"criatura", &"causa_terror", &"vampirismo", &"queimadura", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

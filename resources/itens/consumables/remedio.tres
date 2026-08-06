@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://cmomwer8628v4"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_vvtwu"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_7xla2"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_42epl"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_xm0nr"]
+
+[sub_resource type="Resource" id="Resource_qr57e"]
+script = ExtResource("4_xm0nr")
+effect_type = 1
+modify_mode = 2
+percent = 1.0
+debuff_id = &"db_00003"
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[sub_resource type="Resource" id="Resource_vvtwu"]
+script = ExtResource("4_xm0nr")
+effect_type = 1
+percent = 1.0
+debuff_id = &"db_00004"
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[sub_resource type="Resource" id="Resource_7xla2"]
+script = ExtResource("4_xm0nr")
+effect_type = 1
+percent = 1.0
+debuff_id = &"db_00005"
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[resource]
+script = ExtResource("1_vvtwu")
+display_name = "Remédio"
+description = "Remove Debuff Doença"
+item_type = 1
+acquisition_sources = 3
+tags = Array[StringName]([&"medicamento", &"consumivel", &"comum"])
+use_effects = Array[ExtResource("4_xm0nr")]([SubResource("Resource_qr57e"), SubResource("Resource_vvtwu"), SubResource("Resource_7xla2")])
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

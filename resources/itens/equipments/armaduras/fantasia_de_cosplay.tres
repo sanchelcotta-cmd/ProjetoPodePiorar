@@ -2,7 +2,10 @@
 
 [ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_024mn"]
 [ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_e0wnb"]
+[ext_resource type="Resource" uid="uid://cf5lcnslr3kpk" path="res://resources/itens/equipments/armaduras/armadura_epica_uniforme_super_1.tres" id="2_s4uji"]
+[ext_resource type="Resource" uid="uid://day6sfw1j8ltx" path="res://resources/itens/equipments/armaduras/armadura_epica_uniforme_super_2.tres" id="3_34yug"]
 [ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_rojt6"]
+[ext_resource type="Resource" uid="uid://laale0uq78yu" path="res://resources/itens/equipments/armaduras/armadura_epica_uniforme_super_3.tres" id="4_arlr2"]
 [ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_s4uji"]
 
 [resource]
@@ -10,6 +13,8 @@ script = ExtResource("1_024mn")
 display_name = "Fantasia de Cosplay"
 acquisition_sources = 27
 tags = Array[StringName]([&"Armadura", &"Comum"])
+equipment_slot = 2
 bonus_life = 4
 consumed_on_use = false
+craft_result = Array[ExtResource("1_024mn")]([ExtResource("2_s4uji"), ExtResource("3_34yug"), ExtResource("4_arlr2")])
 metadata/_custom_type_script = "uid://bql64fe8a0w24"

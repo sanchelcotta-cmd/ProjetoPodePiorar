@@ -14,5 +14,5 @@ ataque_base = 6
 stamina_base = 3
 maestrias = Array[int]([2])
 skill_passivas = Array[ExtResource("2_oqmf0")]([ExtResource("3_rfk4y")])
-tags = Array[StringName]([&"Humano", &"Jogável"])
+tags = Array[StringName]([&"humano", &"jogavel"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

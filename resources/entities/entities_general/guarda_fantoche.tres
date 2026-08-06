@@ -14,5 +14,5 @@ ataque_base = 6
 stamina_base = 6
 maestrias = Array[int]([2])
 skill_ativas = Array[Resource]([ExtResource("2_4gjhx")])
-tags = Array[StringName]([&"Humanoide", &"Invocador", &"Centro"])
+tags = Array[StringName]([&"humanoide", &"invocador", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

@@ -7,14 +7,8 @@
 script = ExtResource("1_supn3")
 target = 1
 percent = 1.0
+debuff_id = &"db_00009"
 duration_turns = 1
-metadata/_custom_type_script = "uid://eticmfa8q3xa"
-
-[sub_resource type="Resource" id="Resource_supn3"]
-script = ExtResource("1_supn3")
-effect_type = 7
-target = 1
-percent = 1.0
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]
@@ -24,5 +18,5 @@ display_name = "Causa Terror ao Atacar"
 description = "Chances de causar terror ao atacar um alvo."
 trigger = 5
 activation_chance = 0.6
-effects = Array[ExtResource("1_supn3")]([SubResource("Resource_t2ya0"), SubResource("Resource_supn3")])
+effects = Array[ExtResource("1_supn3")]([SubResource("Resource_t2ya0")])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"

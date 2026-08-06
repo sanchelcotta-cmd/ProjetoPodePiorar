@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_2mofb"]
 [ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_uaxo4"]
+[ext_resource type="Resource" uid="uid://bxbk10kr5uavn" path="res://resources/itens/equipments/armaduras/armadura_epica_armadura_de_protecao.tres" id="2_w3bu4"]
 [ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_w3bu4"]
 [ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_qktok"]
 
@@ -10,6 +11,8 @@ script = ExtResource("1_2mofb")
 display_name = "Armadura Improvisada de Papelão"
 acquisition_sources = 27
 tags = Array[StringName]([&"Armadura", &"Comum"])
+equipment_slot = 2
 bonus_life = 6
 consumed_on_use = false
+craft_result = Array[ExtResource("1_2mofb")]([ExtResource("2_w3bu4")])
 metadata/_custom_type_script = "uid://bql64fe8a0w24"

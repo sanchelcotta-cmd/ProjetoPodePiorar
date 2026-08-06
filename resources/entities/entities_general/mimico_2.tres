@@ -13,5 +13,5 @@ vida_base = 40
 ataque_base = 5
 stamina_base = 5
 skill_passivas = Array[ExtResource("2_jbsjo")]([ExtResource("3_nxhj1")])
-tags = Array[StringName]([&"Causa Terror", &"Criatura", &"Baixo Centro", &"Centro"])
+tags = Array[StringName]([&"causa_terror", &"criatura", &"baixo_centro", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

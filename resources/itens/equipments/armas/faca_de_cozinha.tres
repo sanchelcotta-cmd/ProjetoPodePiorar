@@ -2,7 +2,8 @@
 
 [ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="1_nb0xs"]
 [ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_mvoev"]
-[ext_resource type="Resource" uid="uid://d1u6ar6qrg21v" path="res://resources/itens/equipments/armas/arma_epica_espada_irada_flamejante.tres" id="2_soku5"]
+[ext_resource type="Resource" uid="uid://d1pfrgjra8qq1" path="res://resources/itens/equipments/armas/arma_epica_espada_irada_flamejante.tres" id="2_soku5"]
+[ext_resource type="Resource" uid="uid://d1u6ar6qrg21v" path="res://resources/itens/equipments/armas/arma_epica_espada_irada_congelante.tres" id="3_fkq7r"]
 [ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="3_soku5"]
 [ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_fkq7r"]
 
@@ -11,12 +12,12 @@ script = ExtResource("3_soku5")
 display_name = "Faca de Cozinha"
 description = "Uma faca de cozinha.
 Maestria: Lâmina"
-acquisition_sources = 19
+acquisition_sources = 27
 tags = Array[StringName]([&"Arma", &"Comum", &"Lamina"])
 equipment_slot = 1
 mastery_granted = 1
 mastery_bonus = 2
-bonus_atack = 3
+bonus_attack = 3
 consumed_on_use = false
-craft_result = Array[ExtResource("3_soku5")]([ExtResource("2_soku5"), ExtResource("2_soku5")])
+craft_result = Array[ExtResource("3_soku5")]([ExtResource("2_soku5"), ExtResource("3_fkq7r")])
 metadata/_custom_type_script = "uid://bql64fe8a0w24"

@@ -11,5 +11,5 @@ description = "Um jovem sem foco, mas determinado."
 vida_base = 24
 ataque_base = 4
 stamina_base = 5
-tags = Array[StringName]([&"Humano", &"Jogável"])
+tags = Array[StringName]([&"humano", &"jogavel"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

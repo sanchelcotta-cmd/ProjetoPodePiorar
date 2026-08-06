@@ -12,5 +12,5 @@ vida_base = 32
 ataque_base = 4
 stamina_base = 3
 maestrias = Array[int]([1])
-tags = Array[StringName]([&"Humano", &"Jogável"])
+tags = Array[StringName]([&"humano", &"jogavel"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

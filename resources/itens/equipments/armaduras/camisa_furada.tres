@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_7wis4"]
 [ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_3ynlx"]
+[ext_resource type="Resource" uid="uid://br22yhdti7udd" path="res://resources/itens/equipments/armaduras/armadura_epica_uniforme_da_sorte.tres" id="2_biuw1"]
 [ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_biuw1"]
 [ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_5mew0"]
 
@@ -10,6 +11,8 @@ script = ExtResource("1_7wis4")
 display_name = "Camisa Furada de Time"
 acquisition_sources = 27
 tags = Array[StringName]([&"Armadura", &"Comum"])
+equipment_slot = 2
 bonus_life = 3
 consumed_on_use = false
+craft_result = Array[ExtResource("1_7wis4")]([ExtResource("2_biuw1")])
 metadata/_custom_type_script = "uid://bql64fe8a0w24"

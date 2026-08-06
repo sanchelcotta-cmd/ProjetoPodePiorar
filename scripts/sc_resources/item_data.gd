@@ -27,8 +27,7 @@ enum AcquisitionSource {
 	MAP_BLOCK = 1,
 	ENEMY_LOOT = 2,
 	CRAFT = 4,
-	EVENT_REWARD = 8,
-	STARTING_ITEM = 16
+	STARTING_ITEM = 8
 }
 
 @export_category("Identidade")
@@ -57,7 +56,7 @@ var acquisition_sources: int = AcquisitionSource.NONE
 @export var equipment_slot: EquipmentSlot = EquipmentSlot.NONE
 @export var mastery_granted: EntityData.Mastery = EntityData.Mastery.NONE
 @export_range(0, 99) var mastery_bonus: int = 0
-@export_range(0, 99) var bonus_atack: int = 0
+@export_range(0, 99) var bonus_attack: int = 0
 @export_range(0,99) var bonus_life: int = 0
 @export_range(0,99) var bonus_stamina: int = 0
 @export var granted_passives: Array[PassiveSkillData] = []

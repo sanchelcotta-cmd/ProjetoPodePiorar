@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://6g5lhbus10al"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_5ykud"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_sad86"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_45n8o"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_n48vh"]
+[ext_resource type="Resource" uid="uid://cxe02aiyoo01o" path="res://resources/skills/passives/charme_ativo.tres" id="4_sad86"]
+
+[resource]
+script = ExtResource("1_5ykud")
+display_name = "Traje Exuberante e Estonteante"
+description = "Sempre que atacar um alvo, tem 50% se chance de causar Charme.
++1 de Estamina"
+rarity = 4
+acquisition_sources = 4
+tags = Array[StringName]([&"armadura", &"epica"])
+equipment_slot = 2
+bonus_life = 9
+bonus_stamina = 1
+granted_passives = Array[ExtResource("3_45n8o")]([ExtResource("4_sad86")])
+use_effects = Array[ExtResource("4_n48vh")]([null])
+consumed_on_use = false
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

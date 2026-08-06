@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DebuffData" format=3 uid="uid://dkfp6bb2vbeo7"]
+
+[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/sc_resources/debuffs_data.gd" id="1_cf160"]
+
+[resource]
+script = ExtResource("1_cf160")
+id = &"db_00008"
+display_name = "Sangramento"
+description = "Dano continuo aplicado"
+tick_moment = 1
+damage_on_move = 2
+metadata/_custom_type_script = "uid://drp24ngc2nn0y"

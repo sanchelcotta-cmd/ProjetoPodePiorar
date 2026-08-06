@@ -14,6 +14,5 @@ script = ExtResource("2_l5ve6")
 id = &"ps_00021"
 display_name = "Vampirismo 50"
 description = "Cura 50% do dano causado."
-trigger = 5
 effects = Array[ExtResource("1_xv5gx")]([SubResource("Resource_surao")])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"

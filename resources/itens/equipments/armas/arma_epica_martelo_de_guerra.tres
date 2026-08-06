@@ -7,14 +7,14 @@
 
 [resource]
 script = ExtResource("1_0v5ho")
-display_name = "Espada Irada Flamejante"
+display_name = "Martelo de Guerra"
 description = "Bate forte."
 rarity = 4
-acquisition_sources = 12
+acquisition_sources = 4
 tags = Array[StringName]([&"Arma", &"Epica", &"Impacto"])
 equipment_slot = 1
 mastery_granted = 2
 mastery_bonus = 3
-bonus_atack = 12
+bonus_attack = 12
 consumed_on_use = false
 metadata/_custom_type_script = "uid://bql64fe8a0w24"

@@ -5,8 +5,8 @@
 
 [sub_resource type="Resource" id="Resource_wulwm"]
 script = ExtResource("1_vu4al")
-effect_type = 6
 target = 1
+debuff_id = &"db_00011"
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [resource]

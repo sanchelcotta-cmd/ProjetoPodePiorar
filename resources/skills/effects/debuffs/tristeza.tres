@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DebuffData" format=3 uid="uid://che8qy2xount2"]
+
+[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/sc_resources/debuffs_data.gd" id="1_78ntv"]
+
+[resource]
+script = ExtResource("1_78ntv")
+id = &"db_00010"
+display_name = "Tristeza"
+description = "Diminui o ataque, o movimento, e o valor de bônus dos consumíveis."
+duration_type = 1
+attack_modifier = -2
+stamina_modifier = -1
+consumable_modifier = -2
+metadata/_custom_type_script = "uid://drp24ngc2nn0y"

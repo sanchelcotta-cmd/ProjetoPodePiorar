@@ -15,6 +15,6 @@ script = ExtResource("2_gi0bf")
 id = &"ps_00023"
 display_name = "Movimento de voar."
 description = "Ignora obstaculos para se mover"
-trigger = 2
+trigger = 1
 effects = Array[ExtResource("1_ltviw")]([SubResource("Resource_ltviw")])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"

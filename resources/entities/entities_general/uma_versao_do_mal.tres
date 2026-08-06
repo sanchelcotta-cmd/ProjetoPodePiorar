@@ -10,5 +10,5 @@ display_name = "Uma versão igual a você só que do mal"
 description = "Ao iniciar o Encontro, copia a Maestria, o Ataque e a Vida base do personagem que ativou este bloco. Os valores copiados não são atualizados durante o Encontro. "
 narrative_description = "Um calafrio percorre seu corpo ao avistar, do outro lado da calçada, alguém. É como se olhar no espelho. Aquilo é idêntico a você rosto, os movimentos e até a postura são exatamente os mesmos, mas existe algo profundamente errado naquele olhar."
 skill_passivas = Array[ExtResource("2_3xm8l")]([ExtResource("3_3xm8l")])
-tags = Array[StringName]([&"Causa Terror", &"Humanoide", &"Baixo Centro", &"Centro"])
+tags = Array[StringName]([&"causa_terror", &"humanoide", &"baixo_centro", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

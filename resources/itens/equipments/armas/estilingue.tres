@@ -11,12 +11,12 @@ script = ExtResource("3_qeqmc")
 display_name = "Estilingue"
 description = "Um estilingue.
 Maestria: Distância"
-acquisition_sources = 19
+acquisition_sources = 27
 tags = Array[StringName]([&"Arma", &"Comum", &"Distancia"])
 equipment_slot = 1
 mastery_granted = 3
 mastery_bonus = 2
-bonus_atack = 4
+bonus_attack = 5
 consumed_on_use = false
 craft_result = Array[ExtResource("3_qeqmc")]([ExtResource("2_qeqmc")])
 metadata/_custom_type_script = "uid://bql64fe8a0w24"

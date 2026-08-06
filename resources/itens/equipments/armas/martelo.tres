@@ -11,12 +11,12 @@ script = ExtResource("3_4hxvl")
 display_name = "Martelo"
 description = "Um martelo.
 Maestria: Impacto."
-acquisition_sources = 19
+acquisition_sources = 27
 tags = Array[StringName]([&"Arma", &"Comum", &"Impacto"])
 equipment_slot = 1
 mastery_granted = 2
 mastery_bonus = 2
-bonus_atack = 3
+bonus_attack = 4
 consumed_on_use = false
 craft_result = Array[ExtResource("3_4hxvl")]([ExtResource("2_4hxvl")])
 metadata/_custom_type_script = "uid://bql64fe8a0w24"

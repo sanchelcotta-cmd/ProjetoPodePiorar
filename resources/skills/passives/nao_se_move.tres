@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_uhwsq"]
 script = ExtResource("1_ripyy")
+effect_type = 15
 percent = 1.0
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 

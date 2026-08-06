@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://day6sfw1j8ltx"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_sk262"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_bj2uh"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_pkner"]
+[ext_resource type="Resource" uid="uid://dlp5nfrpuby5u" path="res://resources/skills/passives/esquiva_30.tres" id="4_sk262"]
+[ext_resource type="Resource" uid="uid://bi7qkkp5atpu0" path="res://resources/skills/passives/ataque_extra.tres" id="5_bj2uh"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="6_j2h16"]
+
+[resource]
+script = ExtResource("1_sk262")
+display_name = "Uniforme do Super-Heró 2"
+description = "Super-agilidade: dois ataques por turno em combate + 30% de chance de esquiva"
+rarity = 4
+acquisition_sources = 4
+tags = Array[StringName]([&"armadura", &"epica"])
+equipment_slot = 2
+bonus_life = 9
+granted_passives = Array[ExtResource("3_pkner")]([ExtResource("4_sk262"), ExtResource("5_bj2uh")])
+use_effects = Array[ExtResource("6_j2h16")]([null])
+consumed_on_use = false
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

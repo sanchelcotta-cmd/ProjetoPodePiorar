@@ -10,5 +10,5 @@ description = "Se o grupo não possuir nenhuma Informação, o Homem de Preto n�
 narrative_description = "Vestindo um terno impecável, chapéu preto e uma expressão completamente vazia, ele permanece parado como se já esperasse pela chegada de vocês. A pele excessivamente pálida e a ausência de sobrancelhas tornam seu rosto difícil de esquecer. Enquanto vocês observam a figura, ela continua encarando o grupo, como se estivesse calculando alguma coisa."
 vida_base = 55
 maestrias = Array[int]([1, 3])
-tags = Array[StringName]([&"CORE_homens_de_preto", &"Humanoide", &"Atributo Variavel", &"Suburbio", &"Baixo Centro", &"Centro"])
+tags = Array[StringName]([&"core_homens_de_preto", &"humanoide", &"atributo_variavel", &"suburbio", &"baixo_centro", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

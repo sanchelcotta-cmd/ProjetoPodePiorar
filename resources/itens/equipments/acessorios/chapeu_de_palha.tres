@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://8mtp8df5qboq"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_qdwck"]
+[ext_resource type="Resource" uid="uid://cxib2qtiyensi" path="res://resources/itens/equipments/acessorios/acessorio_epico_cartola_do_magico.tres" id="2_54355"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_f2i4r"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_54355"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_miakv"]
+
+[resource]
+script = ExtResource("1_qdwck")
+display_name = "Chapeu de palha"
+description = "+1 de estamina"
+acquisition_sources = 3
+tags = Array[StringName]([&"acessorio", &"comum"])
+equipment_slot = 3
+bonus_stamina = 1
+consumed_on_use = false
+craft_result = Array[ExtResource("1_qdwck")]([ExtResource("2_54355")])
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

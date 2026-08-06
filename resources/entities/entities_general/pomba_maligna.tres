@@ -8,6 +8,7 @@
 
 [resource]
 script = ExtResource("1_0kmo1")
+display_name = "Pomba Maligna"
 description = "Criatura voadora que pode causar doença ao atacar."
 narrative_description = "Parece que ela sempre foi cruel e maligna, e só estava esperando o momento oportuno para mostrar as asinhas."
 vida_base = 10
@@ -15,5 +16,5 @@ ataque_base = 4
 stamina_base = 4
 maestrias = Array[int]([3])
 skill_passivas = Array[ExtResource("2_ef7ia")]([ExtResource("3_vama3"), ExtResource("4_0cicq"), ExtResource("5_sfwtb")])
-tags = Array[StringName]([&"Voador", &"Criatura", &"Causa Doenca", &"Suburbio"])
+tags = Array[StringName]([&"voador", &"criatura", &"causa_doenca", &"suburbio"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

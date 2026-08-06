@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="DebuffData" format=3 uid="uid://bhsh5t4rt0877"]
+
+[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/sc_resources/debuffs_data.gd" id="1_vi8gi"]
+
+[resource]
+script = ExtResource("1_vi8gi")
+id = &"db_00011"
+display_name = "Charme"
+description = "Move em direção ao causador do charme."
+duration_amount = 1
+control_effects = Array[int]([2, 3])
+percent = 1.0
+metadata/_custom_type_script = "uid://drp24ngc2nn0y"

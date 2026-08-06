@@ -12,6 +12,9 @@ display_name = "Esfera Flamejante"
 description = "Ao surgir, destrói e incendeia o bloco em que nasce, antes do início da ordem de iniciativa.
 Após terminar seu movimento, destrói e incendeia o bloco que ocupa. Blocos incendiados permanecem inutilizados até o fim da Rodada, impedindo sua ativação, mesmo após o término do combate."
 narrative_description = "Quando toca o chão, o impacto espalha labaredas em todas as direções, transformando ruas, carros e destroços em combustível. O calor é tão intenso que permanecer perto dela já parece uma péssima ideia."
+vida_base = 45
+ataque_base = 8
+stamina_base = 8
 skill_passivas = Array[ExtResource("2_pouex")]([ExtResource("3_ha3jh"), ExtResource("4_m5dd3"), ExtResource("5_e8jem")])
-tags = Array[StringName]([&"Criatura", &"Queimadura", &"Centro"])
+tags = Array[StringName]([&"criatura", &"queimadura", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

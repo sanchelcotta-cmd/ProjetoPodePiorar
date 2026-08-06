@@ -12,5 +12,5 @@ vida_base = 36
 ataque_base = 12
 maestrias = Array[int]([1])
 skill_passivas = Array[ExtResource("2_42tev")]([ExtResource("3_po7uy")])
-tags = Array[StringName]([&"Criatura", &"Elemental", &"Nao se move", &"Baixo Centro", &"Centro"])
+tags = Array[StringName]([&"criatura", &"elemental", &"nao_se_move", &"baixo_centro", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

@@ -14,5 +14,5 @@ ataque_base = 5
 stamina_base = 5
 maestrias = Array[int]([3])
 skill_passivas = Array[ExtResource("2_dpoj7")]([ExtResource("3_uqayj")])
-tags = Array[StringName]([&"CORE_khainokata", &"Humanoide", &"Protecao 25", &"Suburbio"])
+tags = Array[StringName]([&"core_khainokata", &"humanoide", &"protecao_25", &"suburbio"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

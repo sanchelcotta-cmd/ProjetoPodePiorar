@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dw41hoecb26pp"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_brs26"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_wg0se"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_tgm7o"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_lpo4b"]
+
+[sub_resource type="Resource" id="Resource_qr57e"]
+script = ExtResource("4_lpo4b")
+effect_type = 2
+amount = 5
+attribute_id = &"hp"
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[sub_resource type="Resource" id="Resource_brs26"]
+script = ExtResource("4_lpo4b")
+effect_type = 1
+modify_mode = 2
+percent = 0.3
+debuff_id = &"db_00010"
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[resource]
+script = ExtResource("1_brs26")
+display_name = "Bolinho de Chuva"
+description = "Recupera 5 de Vida.
+30% de chance de remover debuff Trizteza."
+item_type = 1
+acquisition_sources = 3
+tags = Array[StringName]([&"comida", &"consumivel", &"recupera_vida", &"comum"])
+use_effects = Array[ExtResource("4_lpo4b")]([SubResource("Resource_qr57e"), SubResource("Resource_brs26")])
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

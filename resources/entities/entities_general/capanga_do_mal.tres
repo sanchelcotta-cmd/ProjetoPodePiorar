@@ -15,5 +15,5 @@ ataque_base = 4
 stamina_base = 4
 maestrias = Array[int]([2])
 skill_passivas = Array[ExtResource("2_xd7q2")]([ExtResource("3_xd7q2")])
-tags = Array[StringName]([&"Humanoide", &"Do Mal", &"Baixo Centro", &"Centro"])
+tags = Array[StringName]([&"humanoide", &"do_mal", &"baixo_centro", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

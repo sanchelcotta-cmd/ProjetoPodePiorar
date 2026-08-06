@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://30c01tqp7ro6"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_irv0g"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_5gk7o"]
+[ext_resource type="Resource" uid="uid://beua1ocbh0mav" path="res://resources/itens/equipments/acessorios/acessorio_epico_passa_tempo.tres" id="2_bit1j"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_bit1j"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_lk0ml"]
+
+[sub_resource type="Resource" id="Resource_irv0g"]
+script = ExtResource("4_lk0ml")
+effect_type = 15
+modify_mode = 2
+amount = 1
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[sub_resource type="Resource" id="Resource_5gk7o"]
+script = ExtResource("3_bit1j")
+display_name = "Turno Extra"
+description = "20% de chance de ganhar um turno extra."
+trigger = 2
+activation_chance = 0.2
+max_activations_per_turn = 1
+effects = Array[ExtResource("4_lk0ml")]([SubResource("Resource_irv0g")])
+metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"
+
+[resource]
+script = ExtResource("1_irv0g")
+display_name = "Relógio de Bolso"
+description = "Chance de ganhar um turno extra."
+acquisition_sources = 3
+tags = Array[StringName]([&"acessorio", &"comum"])
+equipment_slot = 3
+granted_passives = Array[ExtResource("3_bit1j")]([SubResource("Resource_5gk7o")])
+consumed_on_use = false
+craft_result = Array[ExtResource("1_irv0g")]([ExtResource("2_bit1j")])
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

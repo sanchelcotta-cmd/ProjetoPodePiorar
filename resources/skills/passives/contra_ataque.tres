@@ -15,6 +15,6 @@ script = ExtResource("2_34sfk")
 id = &"ps_00025"
 display_name = "Contra-Ataque"
 description = "Ataca após sofrer dano"
-trigger = 8
+trigger = 9
 effects = Array[ExtResource("1_iyqhm")]([SubResource("Resource_iyqhm")])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"

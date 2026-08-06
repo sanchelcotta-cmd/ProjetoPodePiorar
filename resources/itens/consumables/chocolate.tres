@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://cioy75i0o6mus"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_eud43"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_1r78q"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_ewxlu"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_nwlni"]
+
+[sub_resource type="Resource" id="Resource_qr57e"]
+script = ExtResource("4_nwlni")
+effect_type = 2
+amount = 5
+attribute_id = &"hp"
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[sub_resource type="Resource" id="Resource_eud43"]
+script = ExtResource("4_nwlni")
+effect_type = 9
+amount = 1
+attribute_id = &"stamina"
+duration_turns = 1
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[resource]
+script = ExtResource("1_eud43")
+display_name = "Chocolate"
+description = "Recupera 5 de Vida.
++1 de estamina por 1 turno."
+item_type = 1
+acquisition_sources = 3
+tags = Array[StringName]([&"comida", &"consumivel", &"recupera_vida", &"comum"])
+use_effects = Array[ExtResource("4_nwlni")]([SubResource("Resource_qr57e"), SubResource("Resource_eud43")])
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

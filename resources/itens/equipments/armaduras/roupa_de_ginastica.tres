@@ -10,6 +10,7 @@ script = ExtResource("1_ajyn0")
 display_name = "Roupa Confortável de Ginástica"
 acquisition_sources = 27
 tags = Array[StringName]([&"Armadura", &"Comum"])
+equipment_slot = 2
 bonus_life = 3
 consumed_on_use = false
 metadata/_custom_type_script = "uid://bql64fe8a0w24"

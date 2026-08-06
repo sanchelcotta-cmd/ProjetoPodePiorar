@@ -18,5 +18,5 @@ vida_base = 40
 ataque_base = 6
 stamina_base = 4
 maestrias = Array[int]([3, 2, 1])
-tags = Array[StringName]([&"CORE_orchestra", &"Humanoide", &"Passiva unica", &"Baixo Centro"])
+tags = Array[StringName]([&"core_orchestra", &"humanoide", &"passiva_unica", &"baixo_centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

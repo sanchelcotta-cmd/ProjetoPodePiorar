@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://b78qhl5nj5r4l"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_w0j7s"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_0vqht"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="3_oq1pb"]
+[ext_resource type="Resource" uid="uid://cx6gnsrci27fe" path="res://resources/skills/passives/revelar_passivo.tres" id="4_0vqht"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="4_bv5kh"]
+
+[resource]
+script = ExtResource("1_w0j7s")
+display_name = "Óculos do Espião"
+description = "Ganha +10 de vida se usar este item e armadura épica do Espião.
+
+Informante: No início da rodada, revela todos os blocos de Encontros Indesejados no Mapa gerado."
+rarity = 4
+acquisition_sources = 4
+tags = Array[StringName]([&"acessorio", &"epica", &"sinergia_espiao"])
+equipment_slot = 3
+granted_passives = Array[ExtResource("4_bv5kh")]([ExtResource("4_0vqht")])
+consumed_on_use = false
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

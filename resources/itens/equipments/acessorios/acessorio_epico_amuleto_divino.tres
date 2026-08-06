@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://d1vyyl0rxpnfs"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_i4qyf"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_vre7k"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_6oeeo"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="7_nuq77"]
+
+[sub_resource type="Resource" id="Resource_mfpx3"]
+script = ExtResource("7_nuq77")
+effect_type = 15
+modify_mode = 2
+percent = 1.0
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[sub_resource type="Resource" id="Resource_5vmoc"]
+script = ExtResource("3_6oeeo")
+display_name = "Imunidade"
+description = "Não pode ser afetado por doenças, tristeza, terror ou maldições."
+trigger = 19
+effects = Array[ExtResource("7_nuq77")]([SubResource("Resource_mfpx3")])
+metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"
+
+[resource]
+script = ExtResource("1_i4qyf")
+display_name = "Prótese das Asas Iradas"
+description = "Imunidade: doença, terror, tristeza, maldições."
+rarity = 4
+acquisition_sources = 4
+tags = Array[StringName]([&"acessorio", &"epica", &"imunidade"])
+equipment_slot = 3
+bonus_stamina = 4
+granted_passives = Array[ExtResource("3_6oeeo")]([SubResource("Resource_5vmoc"), null])
+consumed_on_use = false
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

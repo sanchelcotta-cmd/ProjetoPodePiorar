@@ -16,5 +16,5 @@ stamina_base = 9
 maestrias = Array[int]([1])
 skill_passivas = Array[ExtResource("2_p4300")]([ExtResource("4_8s2cl")])
 skill_ativas = Array[Resource]([ExtResource("2_bbpd7")])
-tags = Array[StringName]([&"Humanoide", &"Causa Terror", &"Invocador", &"Centro"])
+tags = Array[StringName]([&"humanoide", &"causa_terror", &"invocador", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

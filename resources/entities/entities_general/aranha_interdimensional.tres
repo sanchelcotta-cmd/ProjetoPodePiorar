@@ -21,5 +21,5 @@ ataque_base = 8
 stamina_base = 6
 maestrias = Array[int]([2, 3])
 skill_passivas = Array[ExtResource("2_xm38o")]([ExtResource("3_8vdr4"), ExtResource("4_nf0r1"), ExtResource("5_ffe5n"), ExtResource("6_aeeow"), ExtResource("7_2qk11")])
-tags = Array[StringName]([&"CORE_orchestra", &"Criatura", &"Voar", &"Agarrar Especial", &"Ataque Extra", &"Centro"])
+tags = Array[StringName]([&"core_orchestra", &"criatura", &"voar", &"agarrar_especial", &"ataque_extra", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://b5g5xijeppq7d"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_t7skw"]
+[ext_resource type="Resource" uid="uid://b78qhl5nj5r4l" path="res://resources/itens/equipments/acessorios/acessorio_epico_oculos_do_espiao.tres" id="2_be3yt"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_p7d7t"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="3_be3yt"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="4_xjq1q"]
+
+[sub_resource type="Resource" id="Resource_t7skw"]
+script = ExtResource("3_be3yt")
+effect_type = 8
+modify_mode = 2
+amount = 2
+percent = 1.0
+duration_turns = 1
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[sub_resource type="Resource" id="Resource_p7d7t"]
+script = ExtResource("2_p7d7t")
+display_name = "Revela blocos"
+description = "Pode revelar até 2 blocos antes de se mover. 
+Uma vez por Rodada."
+use_context = 1
+target_mode = 1
+range_limit = 0
+max_uses_per_round = 1
+effects = Array[ExtResource("3_be3yt")]([SubResource("Resource_t7skw")])
+metadata/_custom_type_script = "uid://c3s14bqybert"
+
+[resource]
+script = ExtResource("1_t7skw")
+display_name = "Óculos de Leitura"
+description = "Pode revelar até 2 blocos antes de se mover. 
+Uma vez por Rodada."
+acquisition_sources = 3
+tags = Array[StringName]([&"acessorio", &"comum"])
+equipment_slot = 3
+granted_active_skills = Array[ExtResource("2_p7d7t")]([SubResource("Resource_p7d7t")])
+consumed_on_use = false
+craft_result = Array[ExtResource("1_t7skw")]([ExtResource("2_be3yt")])
+metadata/_custom_type_script = "uid://bql64fe8a0w24"

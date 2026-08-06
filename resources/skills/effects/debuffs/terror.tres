@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DebuffData" format=3 uid="uid://sh5cqbyrgsbp"]
+
+[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/sc_resources/debuffs_data.gd" id="1_2450w"]
+
+[resource]
+script = ExtResource("1_2450w")
+id = &"db_00009"
+display_name = "Terror"
+description = "Diminui o Dano e tem 50% de chance de fugir do causador da fonte de terror."
+duration_type = 4
+attack_modifier = -3
+control_effects = Array[int]([2])
+percent = 0.5
+metadata/_custom_type_script = "uid://drp24ngc2nn0y"

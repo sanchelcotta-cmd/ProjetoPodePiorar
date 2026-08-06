@@ -13,5 +13,5 @@ narrative_description = "A pele esverdeada, as olheiras profundas e os sorrisos 
 vida_base = 10
 stamina_base = 2
 skill_passivas = Array[ExtResource("2_tqc5q")]([ExtResource("3_vd6ji"), ExtResource("4_hkhyr")])
-tags = Array[StringName]([&"CORE_controle_da_mente", &"Humanoide", &"Causa Doenca", &"Suburbio", &"Baixo Centro", &"Centro"])
+tags = Array[StringName]([&"core_controle_da_mente", &"humanoide", &"causa_doenca", &"suburbio", &"baixo_centro", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

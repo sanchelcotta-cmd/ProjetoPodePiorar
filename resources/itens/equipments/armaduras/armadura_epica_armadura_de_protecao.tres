@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bxbk10kr5uavn"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_pv4rh"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_0c1is"]
+[ext_resource type="Resource" uid="uid://dsa3dwjhjlfye" path="res://resources/skills/actives/revela_blocos_1.tres" id="3_k0xui"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="4_0eqii"]
+[ext_resource type="Resource" uid="uid://dokc0rnyidl15" path="res://resources/skills/passives/protecao_50.tres" id="5_0eqii"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="5_uqtin"]
+[ext_resource type="Resource" uid="uid://b3irs3mvphhvq" path="res://resources/skills/passives/protecao_75.tres" id="6_uqtin"]
+[ext_resource type="Resource" uid="uid://bi7qkkp5atpu0" path="res://resources/skills/passives/ataque_extra.tres" id="7_pj6nr"]
+
+[resource]
+script = ExtResource("1_pv4rh")
+display_name = "Armadura de Proteção de Combate"
+description = "De proteção: 50% de proteção. 70% se tiver 3 ou mais inimigos em blocos adjacentes.
+De combate: Ganha um turno extra se tiver 3 ou mais inimigos em blocos adjacentes.
+
+Sinergia com Maestria a distância: +4"
+rarity = 4
+acquisition_sources = 4
+tags = Array[StringName]([&"armadura", &"epica"])
+equipment_slot = 2
+bonus_life = 12
+granted_passives = Array[ExtResource("4_0eqii")]([ExtResource("5_0eqii"), ExtResource("6_uqtin"), ExtResource("7_pj6nr")])
+granted_active_skills = Array[ExtResource("2_0c1is")]([ExtResource("3_k0xui")])
+consumed_on_use = false
+metadata/_custom_type_script = "uid://bql64fe8a0w24"
