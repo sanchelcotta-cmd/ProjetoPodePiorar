@@ -9,4 +9,5 @@ titulo = "Homens de Preto - Parte 5"
 descricao = "Uma coisa se repetia. Sempre que alguém se aproximava demais de algum segredo, acontecia exatamente a mesma coisa: a pessoa sumia por alguns dias e voltava como se nada tivesse acontecido. Teorias, fofocas, histórias e desconfianças desapareciam junto com ela. E rumores têm memória curta. Se não há ninguém para alimentá-los, simplesmente desaparecem."
 tipo = 2
 numero = 5
+tags = Array[StringName]([&"informacao", &"homens_de_preto"])
 metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

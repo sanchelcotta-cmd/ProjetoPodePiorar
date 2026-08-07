@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://beyug8trxkkx4"]
+
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_wa7oj"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="2_03veg"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_8jefg"]
+[ext_resource type="Resource" uid="uid://dciobhf4m2vxg" path="res://resources/skills/effects/debuffs/atordoado.tres" id="3_6vpxm"]
+
+[sub_resource type="Resource" id="Resource_ktxeq"]
+script = ExtResource("2_03veg")
+effect_type = 3
+debuff = ExtResource("3_6vpxm")
+has_duration = true
+duration_amount = 1
+duration_unit = 1
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_80rbd"]
+script = ExtResource("1_wa7oj")
+display_name = "Congelado"
+narrative_description = "Você não pode fazer nada kkkk"
+effects = Array[ExtResource("2_03veg")]([SubResource("Resource_ktxeq")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[resource]
+script = ExtResource("2_8jefg")
+display_name = "Você foi congelado"
+description = "O personagem fica incapaz de executar qualquer ação até o fim da Rodada atual."
+narrative_description = "Você quase que levanta o pé para mais um passo, mas seu corpo discordou. Em um piscar de olhos, você está completamente imobilizado, dentro de um grande cubo de gelo."
+valence = 2
+outcomes = Array[ExtResource("1_wa7oj")]([SubResource("Resource_80rbd")])
+metadata/_custom_type_script = "uid://cos7c56kjihyx"

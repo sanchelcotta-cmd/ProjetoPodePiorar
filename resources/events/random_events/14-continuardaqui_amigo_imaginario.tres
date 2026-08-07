@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://cgsl2l66yx38k"]
+
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_om6a7"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_jkbgw"]
+
+[resource]
+script = ExtResource("2_jkbgw")
+display_name = "Amigo Imaginário"
+description = "Um guia invisível revela todos os blocos de Encontro Indesejado ao alcance da Estamina do personagem que ativou o evento pelo resto da rodada."
+narrative_description = "É uma criatura engraçadinha. Anda saltitando, fazendo careta feia ao parar em um lugar, ou sorrindo ao parar em outro. O que essas caras e bocas querem dizer?"
+valence = 0
+metadata/_custom_type_script = "uid://cos7c56kjihyx"

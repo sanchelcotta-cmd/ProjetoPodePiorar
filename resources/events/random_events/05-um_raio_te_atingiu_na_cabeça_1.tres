@@ -1,0 +1,107 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://7d0noove6s2x"]
+
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_0pou7"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_7gwvl"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="2_njjuo"]
+[ext_resource type="Resource" uid="uid://t5c1hs7mlm6q" path="res://resources/skills/passives/esquiva_60.tres" id="3_3rcbj"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_mjj1g"]
+[ext_resource type="Resource" uid="uid://c8xfj7mnvbnt3" path="res://resources/skills/passives/voar_afastar.tres" id="5_lr2ph"]
+[ext_resource type="Resource" uid="uid://b0ijvyvuhberq" path="res://resources/skills/passives/voar_movimento.tres" id="6_rls06"]
+
+[sub_resource type="Resource" id="Resource_dqu3g"]
+script = ExtResource("2_njjuo")
+effect_type = 1
+statistic = 2
+amount = 2
+math_operation = 2
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_8r8f7"]
+script = ExtResource("2_njjuo")
+effect_type = 2
+statistic = 3
+amount = 2
+math_operation = 2
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_abe7a"]
+script = ExtResource("1_0pou7")
+display_name = "Força!"
+narrative_description = "Você ganhou super-força."
+weight = 30
+effects = Array[ExtResource("2_njjuo")]([SubResource("Resource_dqu3g"), SubResource("Resource_8r8f7")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[sub_resource type="Resource" id="Resource_7yvei"]
+script = ExtResource("2_njjuo")
+effect_type = 6
+passive = ExtResource("3_3rcbj")
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_ps1sv"]
+script = ExtResource("4_mjj1g")
+effect_type = 9
+amount = 2
+attribute_id = &"stamina"
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[sub_resource type="Resource" id="Resource_cr4im"]
+script = ExtResource("2_njjuo")
+effect_type = 2
+effect = SubResource("Resource_ps1sv")
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_pc2pi"]
+script = ExtResource("1_0pou7")
+display_name = "Super-Agilidade!"
+narrative_description = "Você é super-ágil agora."
+weight = 30
+effects = Array[ExtResource("2_njjuo")]([SubResource("Resource_7yvei"), SubResource("Resource_cr4im")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[sub_resource type="Resource" id="Resource_4hl55"]
+script = ExtResource("2_njjuo")
+effect_type = 6
+passive = ExtResource("5_lr2ph")
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_5i6wn"]
+script = ExtResource("2_njjuo")
+effect_type = 6
+passive = ExtResource("6_rls06")
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_a71yk"]
+script = ExtResource("1_0pou7")
+display_name = "Voar!"
+narrative_description = "Pode voar pelo mapa."
+weight = 30
+effects = Array[ExtResource("2_njjuo")]([SubResource("Resource_4hl55"), SubResource("Resource_5i6wn")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[sub_resource type="Resource" id="Resource_apdvx"]
+script = ExtResource("1_0pou7")
+display_name = "Todos os poderes!"
+narrative_description = "Força: dobra o Ataque e a Vida atual.
+Voar: ganha habilidade de voar.
+Super-agilidade: ganha +2 de estamina e, em combate, 60% de chance de desviar de ataques.
+"
+weight = 10
+effects = Array[ExtResource("2_njjuo")]([SubResource("Resource_dqu3g"), SubResource("Resource_8r8f7"), SubResource("Resource_4hl55"), SubResource("Resource_5i6wn"), SubResource("Resource_7yvei"), SubResource("Resource_cr4im")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[resource]
+script = ExtResource("2_7gwvl")
+display_name = "Um Raio Te Atingiu Bem na Cabeça!"
+description = "Um raio atinge o personagem, concedendo um superpoder aleatório:
+10% — Todos os poderes abaixo, simultaneamente.
+30% — Força: dobra o Ataque e a Vida atual.
+30% — Voar: ganha habilidade de voar.
+30% — Super-agilidade: ganha +2 de estamina e, em combate, 60% de chance de desviar de ataques.
+"
+narrative_description = "Do nada! [Personagem_ativo] estava andando, e um raio caiu bem na sua cabeça! Nem nuvem tinha... Agora  [Personagem_ativo] tem [Descrição do poder adquirido]"
+valence = 0
+resolution_mode = 1
+selection_weight = 4
+outcomes = Array[ExtResource("1_0pou7")]([SubResource("Resource_abe7a"), SubResource("Resource_pc2pi"), SubResource("Resource_a71yk"), SubResource("Resource_apdvx")])
+metadata/_custom_type_script = "uid://cos7c56kjihyx"

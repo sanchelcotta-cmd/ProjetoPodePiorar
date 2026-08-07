@@ -9,4 +9,5 @@ titulo = "Homens de Preto - Parte 4"
 descricao = "Sem qualquer explicação, Dionísio e Dona Cecília retornaram a Belacidade. Nenhum dos dois demonstrava qualquer sinal de trauma. O mais estranho era que Dionísio agia como um homem completamente comum. Não se lembrava de suas teorias conspiratórias, nem reconhecia as pistas que havia colecionado durante sua última obsessão. Cecília afirmava que os vizinhos eram fofoqueiros e bastante criativos, e dizia não fazer ideia do que significava \"homens de preto\"."
 tipo = 2
 numero = 4
+tags = Array[StringName]([&"informacao", &"homens_de_preto"])
 metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

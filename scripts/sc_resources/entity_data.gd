@@ -32,7 +32,7 @@ enum Mastery {
 @export var skill_passivas: Array[PassiveSkillData] = []
 
 @export_category("Skills ativas")
-@export var skill_ativas: Array[Resource] = []
+@export var skill_ativas: Array[ActiveSkillData] = []
 
 @export_category("Tags")
 @export var tags: Array[StringName] = []

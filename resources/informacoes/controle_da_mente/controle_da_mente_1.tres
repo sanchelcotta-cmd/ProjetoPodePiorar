@@ -8,4 +8,5 @@ id = &"in_00001"
 titulo = "Controle da Mente - Parte 1"
 descricao = "Belacidade foi tomada por uma febre digital. Um novo aplicativo de vídeos, voltado para adolescentes, tornou-se uma obsessão para geral. Quase ninguém leu seus extensos termos de uso — como de costume. O único a desconfiar foi Enrico, um jovem apaixonado por tecnologia. O garoto afirmou ter encontrado uma cláusula autorizando a transformação dos usuários em zumbis. Naturalmente, ninguém acreditou nele."
 tipo = 3
+tags = Array[StringName]([&"informacao", &"controle_da_mente"])
 metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

@@ -8,4 +8,5 @@ id = &"in_00016"
 titulo = "Orchestra - Parte 1"
 descricao = "A cidade era bastante tranquila. Um pequeno município do interior, cercado por minas abandonadas e matas densas. Um cientista de renome e personalidade enigmática, Dr. Enzo, chegou há pouco tempo com promessas de avanços tecnológicos. Assim surgiu a Orchestra, uma empresa dedicada às pesquisas científicas. A novidade logo despertou o fascínio dos habitantes de Belacidade, que passaram a observar, com certa desconfiança, clarões multicoloridos escapando das janelas da Orchestra durante as madrugadas."
 tipo = 1
+tags = Array[StringName]([&"informacao", &"orchestra"])
 metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

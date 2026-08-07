@@ -8,4 +8,5 @@ id = &"in_00006"
 titulo = "Homens de Preto - Parte 1"
 descricao = "Toda cidade pequena tem o seu louco. Dionísio era o de Belacidade. Era comum ver o homem de barba desgrenhada cochilando em uma cadeira de plástico na porta de algum bar. Havia algumas semanas, porém, passou a acordar desesperado, gritando e derrubando copos. No início, acreditava se tratar apenas de delírios, mas, conforme os dias passavam, convenceu-se de que estava sendo observado por homens misteriosos vestidos de preto. A ideia virou uma obsessão. Dionísio começou a reunir recortes de jornais, fotografias antigas e relatos de acontecimentos inexplicáveis. O cômodo da bagunça, nos fundos de sua casa, transformou-se em um caótico mural de conspirações."
 tipo = 2
+tags = Array[StringName]([&"informacao", &"homens_de_preto"])
 metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

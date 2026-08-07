@@ -12,4 +12,5 @@ descricao = "Qualquer um que visitava a casa de Dionísio se via obrigado a desv
 \"Por que o jornal local publica sobre uma capivara na primeira página?\""
 tipo = 2
 numero = 2
+tags = Array[StringName]([&"informacao", &"homens_de_preto"])
 metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

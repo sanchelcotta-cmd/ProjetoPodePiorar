@@ -14,4 +14,5 @@ descricao = "Algumas pessoas começaram a desaparecer, deixando para trás apena
 As pessoas retornavam dias depois, sem qualquer lembrança dos dias em que estiveram fora. Todas elas tinham algo em comum, carregavam cicatrizes inexplicáveis, e alguns comportamentos estranhos. Outra coincidência chamava atenção: um cartão da recepção da Orchestra era encontrado entre seus pertences."
 tipo = 1
 numero = 4
+tags = Array[StringName]([&"informacao", &"orchestra"])
 metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

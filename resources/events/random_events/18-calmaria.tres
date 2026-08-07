@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://pxy738gqxqtj"]
+
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_5sqxd"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_7xfcx"]
+
+[resource]
+script = ExtResource("2_7xfcx")
+display_name = "Calmaria"
+description = "Um alívio: o personagem recupera toda a Vida e remove todos os debuff ativos."
+narrative_description = "O vento para. O silêncio toma conta do lugar. Pela primeira vez em muito tempo, você sente que pode respirar sem esperar que alguma coisa dê errado.\""
+valence = 0
+metadata/_custom_type_script = "uid://cos7c56kjihyx"

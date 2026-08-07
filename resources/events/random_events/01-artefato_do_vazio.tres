@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://c323bhf6ml23o"]
+
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_kbo8m"]
+[ext_resource type="Script" uid="uid://dhvkyqk4odn4i" path="res://scripts/sc_resources/event_condition_data.gd" id="2_7j81m"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="2_8pfs7"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_gvv41"]
+
+[sub_resource type="Resource" id="Resource_epgdd"]
+script = ExtResource("2_7j81m")
+negate = true
+tag = &"khainokata"
+metadata/_custom_type_script = "uid://dhvkyqk4odn4i"
+
+[sub_resource type="Resource" id="Resource_7j81m"]
+script = ExtResource("2_8pfs7")
+effect_type = 1
+target = 3
+statistic = 2
+percent = 0.5
+math_operation = 1
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_wlutp"]
+script = ExtResource("1_kbo8m")
+display_name = "Consequência Ruim"
+narrative_description = "Todos perdem metade da vida."
+condition = SubResource("Resource_epgdd")
+effects = Array[ExtResource("2_8pfs7")]([SubResource("Resource_7j81m")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[sub_resource type="Resource" id="Resource_5uxdi"]
+script = ExtResource("2_7j81m")
+tag = &"khainokata"
+metadata/_custom_type_script = "uid://dhvkyqk4odn4i"
+
+[sub_resource type="Resource" id="Resource_hen2t"]
+script = ExtResource("1_kbo8m")
+display_name = "Consequência Boa"
+narrative_description = "Nada de ruim acontece. Ufa?"
+condition = SubResource("Resource_5uxdi")
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[resource]
+script = ExtResource("2_gvv41")
+display_name = "Artefato do Vazio"
+description = "Se o grupo não tiver nenhuma Informação do tipo \"Khainokata\", todos os personagens perdem metade da vida máxima."
+narrative_description = "A esfera parece pequena, mas quanto mais olha, menos consegue dizer o tamanho dela. O roxo pulsa sem emitir luz nenhuma, como se estivesse roubando a cor do mundo. Dá uma impressão estranha... como se ela estivesse lembrando de você... Ela gira lentamente, e parece encarar você – ou, talvez, sua alma."
+resolution_mode = 4
+outcomes = Array[ExtResource("1_kbo8m")]([SubResource("Resource_wlutp"), SubResource("Resource_hen2t")])
+metadata/_custom_type_script = "uid://cos7c56kjihyx"

@@ -12,4 +12,5 @@ descricao = "Pouco tempo depois, Dra. Maria fez uma viagem só de ida para a cap
 O laboratório permanecia praticamente intacto. A mala continuava no armário. O carro seguia na garagem. Sobre o chão, havia apenas pequenas manchas de uma substância reluzente que ninguém conseguiu identificar."
 tipo = 1
 numero = 3
+tags = Array[StringName]([&"informacao", &"orchestra"])
 metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

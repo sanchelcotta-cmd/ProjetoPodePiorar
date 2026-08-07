@@ -8,4 +8,5 @@ id = &"in_00005"
 titulo = "Controle da Mente - Parte 5"
 descricao = "Belacidade sucumbia à epidemia digital. As últimas gravações da biblioteca do Baixo-Centro mostravam Enrico encurralado, fazendo anotações em um bloco de notas. Aquele foi o último registro do garoto. O caderno, encontrado dias depois, afirmava que os adolescentes que aceitaram os termos de uso haviam deixado de pertencer a si mesmos. Seus cérebros agora pertenciam ao Grande Cérebro Nefasto, uma misteriosa entidade que assinava o domínio sobre o aplicativo."
 numero = 5
+tags = Array[StringName]([&"informacao", &"controle_da_mente"])
 metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

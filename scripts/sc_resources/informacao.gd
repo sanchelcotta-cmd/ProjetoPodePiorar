@@ -14,3 +14,4 @@ enum TipoInformacao {
 @export var tipo: TipoInformacao
 
 @export_range(1, 5) var numero: int = 1
+@export var tags: Array[StringName] = []

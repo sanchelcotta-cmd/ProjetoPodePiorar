@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://d082l53gy8d5b"]
+
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_4v3tx"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_bbxnr"]
+
+[resource]
+script = ExtResource("2_bbxnr")
+display_name = "Ventos Assombrosos"
+description = "Pelos próximos 2 turnos, todos os personagens perdem -2 de Estamina. Há 50% de chance de o evento também causar Terror em todos."
+narrative_description = "O vento começa fraco, mas logo parece atravessar seu corpo inteiro. Cada passo fica mais pesado. O vento agora assobia... Aquela música assustadora. Sim. Aquela mesma. (-- nossos advogados pediram para não especificar qual.)"
+valence = 2
+metadata/_custom_type_script = "uid://cos7c56kjihyx"

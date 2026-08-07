@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://ctbdiiasj2tpp"]
+
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_qp440"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="2_uq1f0"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="3_soki4"]
+
+[sub_resource type="Resource" id="Resource_hjaos"]
+script = ExtResource("2_uq1f0")
+effect_type = 28
+target = 4
+amount = 5
+has_duration = true
+duration_amount = 1
+duration_unit = 1
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_pa87y"]
+script = ExtResource("1_qp440")
+display_name = "Spawm Serelepe"
+effects = Array[ExtResource("2_uq1f0")]([SubResource("Resource_hjaos")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[resource]
+script = ExtResource("3_soki4")
+display_name = "Gnomos do Caos"
+description = "Gnomos se posicionam pelo mapa. Existem 5 Gnomos Misteriosos, visualmente indistinguíveis entre si. Chegar a um deles substitui o efeito do bloco, revelado apenas ao parar sobre ele. Após 3 gnomos serem ativados, todos os restantes desaparecem."
+narrative_description = "Cinco chapéus pontudos espalhados pelo mapa, todos iguais, todos imóveis... até você chegar perto. Um deles acena. Outro parece estar cochichando com uma pedra. Um terceiro enterra alguma coisa e começa a assobiar como se nada estivesse acontecendo."
+outcomes = Array[ExtResource("1_qp440")]([SubResource("Resource_pa87y")])
+custom_rule = &"spawm_gnomes"
+tags = Array[StringName]([&"gnomes_3"])
+metadata/_custom_type_script = "uid://cos7c56kjihyx"

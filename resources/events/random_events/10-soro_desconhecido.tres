@@ -1,0 +1,120 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://d00byp61bqmrf"]
+
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_h6u4r"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="2_f7005"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="3_mbgb4"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="4_04oqq"]
+[ext_resource type="Resource" uid="uid://cvi1f182rpjig" path="res://resources/skills/effects/debuffs/doenca_2.tres" id="5_d62mq"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="6_q2apb"]
+
+[sub_resource type="Resource" id="Resource_6w4fk"]
+script = ExtResource("2_f7005")
+effect_type = 1
+statistic = 2
+amount = 2
+math_operation = 2
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_4o1kl"]
+script = ExtResource("2_f7005")
+effect_type = 2
+statistic = 3
+amount = 2
+math_operation = 2
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_r2c0b"]
+script = ExtResource("1_h6u4r")
+display_name = "Superpoder"
+narrative_description = "Dobra o Ataque e a Vida atual."
+weight = 10
+effects = Array[ExtResource("2_f7005")]([SubResource("Resource_6w4fk"), SubResource("Resource_4o1kl")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[sub_resource type="Resource" id="Resource_djg1x"]
+script = ExtResource("2_f7005")
+effect_type = 1
+statistic = 2
+amount = 5
+math_operation = 0
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_vtpgt"]
+script = ExtResource("2_f7005")
+effect_type = 2
+statistic = 3
+amount = 2
+math_operation = 0
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_cy88p"]
+script = ExtResource("1_h6u4r")
+display_name = "Força"
+narrative_description = "+2 de Ataque e +5 de Vida máxima."
+weight = 20
+effects = Array[ExtResource("2_f7005")]([SubResource("Resource_djg1x"), SubResource("Resource_vtpgt")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[sub_resource type="Resource" id="Resource_kvrqi"]
+script = ExtResource("4_04oqq")
+metadata/_custom_type_script = "uid://c3s14bqybert"
+
+[sub_resource type="Resource" id="Resource_lo7of"]
+script = ExtResource("3_mbgb4")
+effect_type = 15
+modify_mode = 2
+percent = 1.0
+debuff_id = &"db_00005"
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[sub_resource type="Resource" id="Resource_eb81u"]
+script = ExtResource("2_f7005")
+effect_type = 5
+effect = SubResource("Resource_lo7of")
+active_skill = SubResource("Resource_kvrqi")
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_notf4"]
+script = ExtResource("1_h6u4r")
+display_name = "Imunidade"
+narrative_description = "Se torna imune à doenças"
+weight = 20
+effects = Array[ExtResource("2_f7005")]([SubResource("Resource_eb81u"), SubResource("Resource_eb81u"), SubResource("Resource_eb81u")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[sub_resource type="Resource" id="Resource_hp0xx"]
+script = ExtResource("2_f7005")
+effect_type = 3
+debuff = ExtResource("5_d62mq")
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_tj1s6"]
+script = ExtResource("1_h6u4r")
+display_name = "Doença"
+narrative_description = "Você fica Doente, doente."
+weight = 30
+effects = Array[ExtResource("2_f7005")]([SubResource("Resource_hp0xx")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[sub_resource type="Resource" id="Resource_wpr3f"]
+script = ExtResource("1_h6u4r")
+display_name = "Placebo"
+narrative_description = "Era placebo. Nada acontece."
+weight = 20
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[resource]
+script = ExtResource("6_q2apb")
+display_name = "Soro Desconhecido"
+description = "Um soro é encontrado. O jogador pode optar por usá-lo:
+10% — Superpoder: dobra o Ataque e a Vida atual.
+20% — Força: +2 de Ataque e +2 de Vida.
+20% — Ganha imunidade a doenças.
+30% — Fica doente (aplica o efeito de Doença).
+20% — Era placebo. Nada acontece.
+Se o jogador optar por não usar o soro, ele desaparece sem efeito."
+narrative_description = "Uma maleta preta aberta no meio da calçada. Dentro dela, uma ampola quebrada e outra ainda cheia de um líquido verde que parece emitir luz própria. Não existe etiqueta, nem indicação do fabricante. Só uma seringa já preparada. A pergunta não é se isso é uma péssima ideia. A pergunta é... você teria coragem?"
+resolution_mode = 3
+selection_weight = 5
+outcomes = Array[ExtResource("1_h6u4r")]([SubResource("Resource_r2c0b"), SubResource("Resource_cy88p"), SubResource("Resource_notf4"), SubResource("Resource_tj1s6"), SubResource("Resource_wpr3f")])
+metadata/_custom_type_script = "uid://cos7c56kjihyx"

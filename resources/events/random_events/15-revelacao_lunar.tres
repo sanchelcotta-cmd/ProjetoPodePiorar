@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://civlkryjauxnu"]
+
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_7bjjh"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_x3cl1"]
+
+[resource]
+script = ExtResource("2_x3cl1")
+display_name = "Revelação Lunar"
+description = "Se a Rodada atual for de Noite, revela todos os blocos de Encontro Indesejado do mapa. Se não for Noite, o evento não tem efeito."
+valence = 0
+metadata/_custom_type_script = "uid://cos7c56kjihyx"

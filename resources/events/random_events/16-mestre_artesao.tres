@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://buh0ueryuwch0"]
+
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_07v3h"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_72u7j"]
+
+[resource]
+script = ExtResource("2_72u7j")
+display_name = "Mestre Artesão"
+description = "O jogador escolhe um item equipado (arma ou armadura) e adiciona o resultado de um dado de 6 lados ao seu valor de Ataque (se arma) ou de Vida (se armadura)."
+narrative_description = "Um velho de barba comprida segura [sem item] como quem já viu milhares iguais. Sem dizer uma única palavra, ele bate nela algumas vezes com um martelo, devolve o equipamento e vai embora...
+(Se for roupa/vestimenta):
+“... Meio estranho martelar uma roupa. Mas ela parece... melhor.\"
+(Se for arma):
+Ela parece... melhor.\"
+"
+valence = 0
+metadata/_custom_type_script = "uid://cos7c56kjihyx"

@@ -12,4 +12,5 @@ descricao = "Adolescentes que haviam instalado o aplicativo começaram a apresen
 A transformação foi instantânea. Os infectados perderam a capacidade de raciocinar, mas continuavam repetindo as dancinhas que haviam aprendido no aplicativo."
 tipo = 3
 numero = 2
+tags = Array[StringName]([&"informacao", &"controle_da_mente"])
 metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

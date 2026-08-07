@@ -1,0 +1,86 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://ch5lo40r8pvt3"]
+
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_5p0qe"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="2_gfc4a"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="3_vmvyo"]
+
+[sub_resource type="Resource" id="Resource_rf38d"]
+script = ExtResource("2_gfc4a")
+effect_type = 11
+target = 3
+item_filter = Array[StringName]([&"arma", &"equipped"])
+amount = 1
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_poudy"]
+script = ExtResource("1_5p0qe")
+display_name = "Perdeu, Perdeu!"
+narrative_description = "Perde a arma."
+weight = 25
+roll_per_target = true
+effects = Array[ExtResource("2_gfc4a")]([SubResource("Resource_rf38d")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[sub_resource type="Resource" id="Resource_rqbml"]
+script = ExtResource("2_gfc4a")
+effect_type = 11
+target = 3
+item_filter = Array[StringName]([&"armadura", &"equipped"])
+amount = 1
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_ytt3h"]
+script = ExtResource("1_5p0qe")
+display_name = "Perdeu, Perdeu!"
+narrative_description = "Perde a armadura."
+weight = 25
+roll_per_target = true
+effects = Array[ExtResource("2_gfc4a")]([SubResource("Resource_rqbml")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[sub_resource type="Resource" id="Resource_w5gbr"]
+script = ExtResource("2_gfc4a")
+effect_type = 11
+item_filter = Array[StringName]([&"acessorio", &"equipped"])
+amount = 1
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_jp7xl"]
+script = ExtResource("1_5p0qe")
+display_name = "Perdeu, Perdeu!"
+narrative_description = "Perde o acessório."
+weight = 25
+roll_per_target = true
+effects = Array[ExtResource("2_gfc4a")]([SubResource("Resource_w5gbr")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[sub_resource type="Resource" id="Resource_r542w"]
+script = ExtResource("2_gfc4a")
+effect_type = 11
+target = 3
+item_filter = Array[StringName]([&"unequipped"])
+amount = 1
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_t8s38"]
+script = ExtResource("1_5p0qe")
+display_name = "Perdeu, Perdeu!"
+narrative_description = "Perde um item aleatório do inventário."
+effects = Array[ExtResource("2_gfc4a")]([SubResource("Resource_r542w")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[resource]
+script = ExtResource("3_vmvyo")
+display_name = "Ladrão das Sombras"
+description = "Cada personagem do grupo perde um item, sorteado individualmente com as mesmas probabilidades:
+25% — A arma equipada.
+25% — A armadura equipada.
+25% — O acessório equipado.
+25% — Um item do inventário.
+Este afeta todos os personagens do grupo."
+narrative_description = "Todo mundo sente um arrepio subindo da pontinha do dedinho do pé, até a nuca. Ao longe, uma gargalhada. Vinda daquele telhado? E então, vocês perderam... Cada um, algo que carregava."
+valence = 2
+resolution_mode = 1
+selection_weight = 4
+outcomes = Array[ExtResource("1_5p0qe")]([SubResource("Resource_poudy"), SubResource("Resource_ytt3h"), SubResource("Resource_jp7xl"), SubResource("Resource_t8s38")])
+metadata/_custom_type_script = "uid://cos7c56kjihyx"

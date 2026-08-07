@@ -1,0 +1,57 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://ck46hjboacb1e"]
+
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_bxfxi"]
+[ext_resource type="Script" uid="uid://dhvkyqk4odn4i" path="res://scripts/sc_resources/event_condition_data.gd" id="2_16hrv"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_uqagm"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="3_djwom"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="4_7m55p"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="5_c28uo"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="6_laqgt"]
+
+[sub_resource type="Resource" id="Resource_0nf3y"]
+script = ExtResource("2_16hrv")
+negate = true
+tag = &"homens_de_preto"
+metadata/_custom_type_script = "uid://dhvkyqk4odn4i"
+
+[sub_resource type="Resource" id="Resource_4jcx4"]
+script = ExtResource("4_7m55p")
+display_name = "Velho Louco"
+description = "Vida, Ataque e Estamina é calculado a partir da média das estatísticas de Vida, Ataque e Estamina do grupo."
+narrative_description = "Um velho louco."
+tags = Array[StringName]([&"homen_de_preto", &"humanoide"])
+metadata/_custom_type_script = "uid://8ma4cswg5n35"
+
+[sub_resource type="Resource" id="Resource_l4puh"]
+script = ExtResource("3_djwom")
+effect_type = 17
+target = 4
+entity = SubResource("Resource_4jcx4")
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_pvbcc"]
+script = ExtResource("1_bxfxi")
+display_name = "Consequência Ruim"
+narrative_description = "O velho louco ataca! Do nada!?"
+condition = SubResource("Resource_0nf3y")
+effects = Array[ExtResource("3_djwom")]([SubResource("Resource_l4puh")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[sub_resource type="Resource" id="Resource_r81tr"]
+script = ExtResource("1_bxfxi")
+display_name = "Consequência Boa"
+narrative_description = "O velho vai embora. Esquisito..."
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[resource]
+script = ExtResource("2_uqagm")
+display_name = "O Velho Louco"
+description = "Se o grupo não tiver nenhuma Informação do tipo \"Homens de Preto\", o velho se transforma em um inimigo e ataca o grupo.
+
+Atributos randomizados: +5 ou -5 pontos em relação à média de Vida e de Ataque dos personagens do grupo.
+"
+narrative_description = "Tem um velho esquisito, no canto da esquina. A aba do chapéu cobre metade da sua face, mas, mesmo meio de longe dá pra notar um olhão esbugalhado em sua direção. Ele parece querer analisar se vocês sabem o que ele sabe."
+resolution_mode = 4
+selection_weight = 2
+outcomes = Array[ExtResource("1_bxfxi")]([SubResource("Resource_pvbcc"), SubResource("Resource_r81tr")])
+metadata/_custom_type_script = "uid://cos7c56kjihyx"
