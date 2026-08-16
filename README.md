@@ -33,11 +33,14 @@ Informações influenciam eventos. Eventos afetam a exploração. Debuffs modifi
 Em vez de construir mecânicas independentes, o objetivo é criar um conjunto de sistemas capazes de produzir consequências emergentes, incentivando planejamento, adaptação e experimentação a cada nova campanha.
 Da mesma forma, a aleatoriedade nunca deve substituir estratégia. O inesperado faz parte da experiência, mas o resultado da partida deve refletir principalmente as decisões tomadas pelo jogador.
 
-## Tecnologias
-* Godot Engine
-* GDScript
-* Git
-* GitHub
+## Ferramentas
+
+- Godot Engine 4 — desenvolvimento do jogo
+- GDScript — programação
+- Git e GitHub — controle de versão
+
+- Pixel Studio — criação dos sprites
+- Pixelitita — aplicação de filtros e pós-processamento dos sprites
 
 ## Estado do Desenvolvimento
 Atualmente o projeto encontra-se na fase de implementação da infraestrutura principal.
