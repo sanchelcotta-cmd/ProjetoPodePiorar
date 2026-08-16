@@ -2,6 +2,23 @@
 
 [ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_07v3h"]
 [ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_72u7j"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="2_jts2s"]
+
+[sub_resource type="Resource" id="Resource_wlj0d"]
+script = ExtResource("2_jts2s")
+effect_type = 2
+selection_mode = 1
+tags_filter = Array[StringName]([&"armadura", &"arma"])
+dice_count = 1
+dice_sides = 6
+math_operation = 0
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_q72j0"]
+script = ExtResource("1_07v3h")
+display_name = "Item aprimorado."
+effects = Array[ExtResource("2_jts2s")]([SubResource("Resource_wlj0d")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [resource]
 script = ExtResource("2_72u7j")
@@ -14,4 +31,5 @@ narrative_description = "Um velho de barba comprida segura [sem item] como quem 
 Ela parece... melhor.\"
 "
 valence = 0
+outcomes = Array[ExtResource("1_07v3h")]([SubResource("Resource_q72j0")])
 metadata/_custom_type_script = "uid://cos7c56kjihyx"

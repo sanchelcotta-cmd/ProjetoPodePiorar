@@ -1,0 +1,85 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect_passive"]
+script = ExtResource("3_effect")
+effect_type = 6
+selection_mode = 1
+
+[sub_resource type="Resource" id="Effect_curse"]
+script = ExtResource("3_effect")
+effect_type = 25
+
+[sub_resource type="Resource" id="Effect_item"]
+script = ExtResource("3_effect")
+effect_type = 10
+selection_mode = 1
+
+[sub_resource type="Resource" id="Effect_information"]
+script = ExtResource("3_effect")
+effect_type = 14
+selection_mode = 2
+tags_filter = Array[StringName]([&"informacao"])
+
+[sub_resource type="Resource" id="Effect_immunity_a"]
+script = ExtResource("3_effect")
+effect_type = 28
+custom_rule = &"genio_immunity_status"
+
+[sub_resource type="Resource" id="Effect_immunity_b"]
+script = ExtResource("3_effect")
+effect_type = 28
+custom_rule = &"genio_immunity_combat"
+
+[sub_resource type="Resource" id="Effect_double_stat"]
+script = ExtResource("3_effect")
+effect_type = 28
+custom_rule = &"genio_double_attribute"
+
+[sub_resource type="Resource" id="Outcome_passive"]
+script = ExtResource("2_outcome")
+display_name = "Desejo: uma passiva nova."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_passive")])
+
+[sub_resource type="Resource" id="Outcome_immunity_status"]
+script = ExtResource("2_outcome")
+display_name = "Desejo: imunidade a Doença, Tristeza ou Terror."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_immunity_a")])
+
+[sub_resource type="Resource" id="Outcome_immunity_combat"]
+script = ExtResource("2_outcome")
+display_name = "Desejo: imunidade a crítico de Distância, Atordoamento ou Sangramento."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_immunity_b")])
+
+[sub_resource type="Resource" id="Outcome_curse"]
+script = ExtResource("2_outcome")
+display_name = "Desejo: quebrar uma maldição ativa."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_curse")])
+
+[sub_resource type="Resource" id="Outcome_item"]
+script = ExtResource("2_outcome")
+display_name = "Desejo: um item à escolha."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_item")])
+
+[sub_resource type="Resource" id="Outcome_information"]
+script = ExtResource("2_outcome")
+display_name = "Desejo: uma Informação aleatória."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_information")])
+
+[sub_resource type="Resource" id="Outcome_stat"]
+script = ExtResource("2_outcome")
+display_name = "Desejo: dobrar Ataque, Vida ou Estamina."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_double_stat")])
+
+[resource]
+script = ExtResource("1_event")
+display_name = "Gênio da Lâmpada"
+description = "O jogador escolhe um entre sete desejos: passiva, imunidade, quebra de maldição, item, Informação ou atributo dobrado."
+narrative_description = "Uma velha lamparina repousa sobre um balcão. Ao lado dela, um homem de gravata organiza uma pilha de papéis. Carimbo vermelho numa folha. Carimbo verde na outra. Ele alinha as pilhas com cuidado. Quando percebe sua presença, pega mais um formulário e pergunta: — Atendimento para desejo ou renovação de bênção? Reclamações é na Seção C. Sala 42."
+valence = 0
+resolution_mode = 2
+custom_rule = &"genio_da_lampada"
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome_passive"), SubResource("Outcome_immunity_status"), SubResource("Outcome_immunity_combat"), SubResource("Outcome_curse"), SubResource("Outcome_item"), SubResource("Outcome_information"), SubResource("Outcome_stat")])

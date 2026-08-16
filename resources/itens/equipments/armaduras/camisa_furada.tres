@@ -10,7 +10,7 @@
 script = ExtResource("1_7wis4")
 display_name = "Camisa Furada de Time"
 acquisition_sources = 27
-tags = Array[StringName]([&"Armadura", &"Comum"])
+tags = Array[StringName]([&"armadura", &"comum"])
 equipment_slot = 2
 bonus_life = 3
 consumed_on_use = false

@@ -2,6 +2,49 @@
 
 [ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_5sqxd"]
 [ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_7xfcx"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="2_lkn1g"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="3_xdaq2"]
+
+[sub_resource type="Resource" id="Resource_185yk"]
+script = ExtResource("3_xdaq2")
+effect_type = 2
+target = 6
+modify_mode = 2
+percent = 1.0
+attribute_id = &"hp"
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[sub_resource type="Resource" id="Resource_jyqi8"]
+script = ExtResource("2_lkn1g")
+effect_type = 1
+target = 3
+effect = SubResource("Resource_185yk")
+percent = 1.0
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_6rkd0"]
+script = ExtResource("3_xdaq2")
+effect_type = 1
+target = 6
+modify_mode = 2
+percent = 1.0
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[sub_resource type="Resource" id="Resource_ng1ii"]
+script = ExtResource("2_lkn1g")
+effect_type = 4
+target = 3
+effect = SubResource("Resource_6rkd0")
+statistic = 2
+percent = 1.0
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_ibiaw"]
+script = ExtResource("1_5sqxd")
+display_name = "Recupera vida"
+weight = 2
+effects = Array[ExtResource("2_lkn1g")]([SubResource("Resource_jyqi8"), SubResource("Resource_ng1ii")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [resource]
 script = ExtResource("2_7xfcx")
@@ -9,4 +52,5 @@ display_name = "Calmaria"
 description = "Um alívio: o personagem recupera toda a Vida e remove todos os debuff ativos."
 narrative_description = "O vento para. O silêncio toma conta do lugar. Pela primeira vez em muito tempo, você sente que pode respirar sem esperar que alguma coisa dê errado.\""
 valence = 0
+outcomes = Array[ExtResource("1_5sqxd")]([SubResource("Resource_ibiaw")])
 metadata/_custom_type_script = "uid://cos7c56kjihyx"

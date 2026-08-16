@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 28
+target = 3
+custom_rule = &"carreta_heal_and_terror_immunity_until_day_end"
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+display_name = "O grupo recupera a alegria."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+display_name = "Carreta da Alegria"
+description = "Todos recuperam completamente a Vida e ficam imunes a Terror até o fim do Dia."
+narrative_description = "Luzes coloridas iluminam a rua. Um grave ensurdecedor invade o bairro. Quatro figuras fantasiadas dançam como se o fim do mundo fosse só mais uma sexta-feira. Sem perceber, vocês já estão batendo palma, rindo e acompanhando a música. Por alguns minutos, parece impossível sentir medo."
+valence = 0
+custom_rule = &"carreta_heal_and_terror_immunity_until_day_end"
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

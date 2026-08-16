@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 28
+target = 3
+custom_rule = &"abducao_grupo"
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+display_name = "O grupo é abduzido."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+display_name = "Vocês Foram Abduzidos!"
+description = "O grupo retorna um dia depois, em novo mapa de distrito aleatório. O personagem ativo ativa imediatamente o bloco de chegada."
+narrative_description = "Uma luz cobre o grupo inteiro. Quando vocês conseguem abrir os olhos novamente, tudo mudou. O pior? Parece que passou um dia inteiro."
+custom_rule = &"abducao_grupo"
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

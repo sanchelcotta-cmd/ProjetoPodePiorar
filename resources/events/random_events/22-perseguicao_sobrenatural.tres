@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 28
+custom_rule = &"perseguicao_sobrenatural"
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+display_name = "O fantasma o amaldiçoa."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+display_name = "Perseguição Sobrenatural"
+description = "Um fantasma amaldiçoa o personagem ativo. Por um dia, ele sofre 2 de dano de Vida no início de cada turno."
+narrative_description = "Quando você olha para trás, não tem ninguém. Mas ao olhar pra frente, sente um puxão no pé. Se você olhar novamente, não verá ninguém. Mas da próxima, o puxão será mais forte... E ele virá."
+valence = 2
+custom_rule = &"perseguicao_sobrenatural"
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

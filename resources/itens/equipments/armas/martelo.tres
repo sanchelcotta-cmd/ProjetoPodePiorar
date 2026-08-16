@@ -12,7 +12,7 @@ display_name = "Martelo"
 description = "Um martelo.
 Maestria: Impacto."
 acquisition_sources = 27
-tags = Array[StringName]([&"Arma", &"Comum", &"Impacto"])
+tags = Array[StringName]([&"arma", &"comum", &"impacto"])
 equipment_slot = 1
 mastery_granted = 2
 mastery_bonus = 2

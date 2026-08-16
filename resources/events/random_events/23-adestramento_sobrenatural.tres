@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 28
+custom_rule = &"adestramento_sobrenatural"
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+display_name = "A criatura se torna aliada."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+display_name = "Adestramento Sobrenatural"
+description = "Um inimigo aleatório do distrito atual se transforma em um aliado extra."
+narrative_description = "Você percebe [criatura_sorteada]. Ela também te notou. Você se prepara para correr... Mas a criatura apenas inclina a cabeça, como se finalmente tivesse reconhecido seu dono. Alguns monstros só precisavam de um bom dono."
+valence = 0
+custom_rule = &"adestramento_sobrenatural"
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

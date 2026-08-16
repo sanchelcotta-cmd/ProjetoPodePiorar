@@ -12,7 +12,7 @@ display_name = "Chinelo"
 description = "Um Chinelo de dedo.
 Maestria: Distância"
 acquisition_sources = 27
-tags = Array[StringName]([&"Arma", &"Comum", &"Distancia"])
+tags = Array[StringName]([&"arma", &"comum", &"distancia"])
 equipment_slot = 1
 mastery_granted = 3
 mastery_bonus = 2

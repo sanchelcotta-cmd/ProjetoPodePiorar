@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 28
+custom_rule = &"lose_half_current_hp"
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+display_name = "Metade da sua força desaparece."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+display_name = "Danação"
+description = "O personagem ativo perde metade do valor de sua Vida atual."
+narrative_description = "Sem aviso. Seu coração falha uma batida. Você apenas sente que alguma coisa acabou de arrancar metade da sua força."
+valence = 2
+custom_rule = &"lose_half_current_hp"
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

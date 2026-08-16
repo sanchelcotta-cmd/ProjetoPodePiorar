@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect_max_hp"]
+script = ExtResource("3_effect")
+effect_type = 1
+amount = 2
+math_operation = 1
+
+[sub_resource type="Resource" id="Effect_epic_item"]
+script = ExtResource("3_effect")
+effect_type = 10
+selection_mode = 1
+tags_filter = Array[StringName]([&"epica"])
+
+[sub_resource type="Resource" id="Outcome_accept"]
+script = ExtResource("2_outcome")
+display_name = "Você aceita o pacto."
+narrative_description = "O gnomo sorri, pega a faquinha e entrega o item prometido."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_max_hp"), SubResource("Effect_epic_item")])
+
+[sub_resource type="Resource" id="Outcome_refuse"]
+script = ExtResource("2_outcome")
+display_name = "Você recusa o pacto."
+narrative_description = "O gnomo guarda a faquinha e o item, depois desaparece sem deixar rastros."
+
+[resource]
+script = ExtResource("1_event")
+display_name = "Pacto de Sangue"
+description = "O personagem ativo pode perder 2 de Vida máxima permanentemente para escolher um item Épico."
+narrative_description = "Um gnomo aparece sentado em uma pedra, balançando as pernas. Ele coloca um item incrível na sua frente e estende uma faquinha enferrujada. O sorriso dele deixa bem claro que a escolha é sua."
+resolution_mode = 2
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome_accept"), SubResource("Outcome_refuse")])

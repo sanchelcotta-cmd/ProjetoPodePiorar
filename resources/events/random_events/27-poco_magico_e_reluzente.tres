@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
+
+[sub_resource type="Resource" id="Outcome_hp_to_attack"]
+script = ExtResource("2_outcome")
+display_name = "Perde 5 de Vida e ganha 5 de Ataque"
+weight = 25
+
+[sub_resource type="Resource" id="Outcome_attack_to_hp"]
+script = ExtResource("2_outcome")
+display_name = "Perde 5 de Ataque e ganha 5 de Vida"
+weight = 25
+
+[sub_resource type="Resource" id="Outcome_hp"]
+script = ExtResource("2_outcome")
+display_name = "Ganha 5 de Vida"
+weight = 20
+
+[sub_resource type="Resource" id="Outcome_attack"]
+script = ExtResource("2_outcome")
+display_name = "Ganha 5 de Ataque"
+weight = 20
+
+[sub_resource type="Resource" id="Outcome_both"]
+script = ExtResource("2_outcome")
+display_name = "Ganha 5 de Vida e 5 de Ataque"
+weight = 10
+
+[resource]
+script = ExtResource("1_event")
+display_name = "Poço Mágico e Reluzente"
+description = "O personagem ativo pode beber do poço e sortear uma alteração de Vida e/ou Ataque."
+narrative_description = "No fundo do poço, a água brilha como se escondesse um pedaço do céu. A superfície reflete uma versão sua que sorri primeiro. Vai beber mesmo assim?"
+resolution_mode = 5
+custom_rule = &"poco_magico_e_reluzente"
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome_hp_to_attack"), SubResource("Outcome_attack_to_hp"), SubResource("Outcome_hp"), SubResource("Outcome_attack"), SubResource("Outcome_both")])

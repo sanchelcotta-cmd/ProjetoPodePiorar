@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 28
+custom_rule = &"solo_active_entity_for_three_turns"
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+display_name = "Você fica sozinho."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+display_name = "Ninguém Além de Você"
+description = "Por 3 turnos, só o personagem ativo permanece no mapa. Encontros Indesejados não ativam; depois, o grupo retorna às posições originais."
+narrative_description = "Você finalmente conseguiu alguns minutos de paz. Seus companheiros desapareceram, e curiosamente, não há mais nenhuma criatura perigosa à espreita. Curta enquanto dura. Coachs motivacionais chamariam isso de 'tempo de qualidade consigo mesmo', mas você chama de 'estranho pra caramba'."
+custom_rule = &"solo_active_entity_for_three_turns"
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

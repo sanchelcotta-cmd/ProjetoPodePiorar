@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 28
+custom_rule = &"vortice_mortal"
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+display_name = "Você é puxado para outra dimensão."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+display_name = "Vórtice Mortal"
+description = "O personagem ativo enfrenta sozinho um inimigo aleatório em uma dimensão paralela. Se vencer, retorna com um item Épico; se morrer, o grupo restante continua."
+narrative_description = "Tudo perde a cor. O vento desaparece e até o barulho dos seus passos some. Você não está mais com seus companheiros. Parece sequer fazer parte do mesmo plano que eles. Mas... Os olhos brilhando logo adiante. Você não está só!"
+custom_rule = &"vortice_mortal"
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

@@ -1,17 +1,18 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://d2imxktogoouj"]
 
 [ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_agpdo"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_p8vv7"]
 [ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_tqc5q"]
-[ext_resource type="Resource" uid="uid://cabsc55m5jep4" path="res://resources/skills/passives/agarrar.tres" id="3_vd6ji"]
-[ext_resource type="Resource" uid="uid://6jd5lqbb15c2" path="res://resources/skills/passives/causa_doenca.tres" id="4_hkhyr"]
+[ext_resource type="Resource" uid="uid://6qqyc0ayls8h" path="res://resources/skills/passives/causa_doenca_50.tres" id="4_kq8ao"]
 
 [resource]
 script = ExtResource("1_agpdo")
 display_name = "Zumbi Dançarino"
-description = "Criatura zumbificada que agarra antes de atacar."
+description = "Criatura zumbificada que pode causar doença ao atacar. Anda em grupo."
 narrative_description = "A pele esverdeada, as olheiras profundas e os sorrisos vazios já seriam estranhos o suficiente. Mas eles continuam dançando, repetindo uma coreografia silenciosa que ninguém consegue ouvir. Quando percebem a presença de vocês, os passos permanecem exatamente os mesmos. Só muda a direção da dança."
 vida_base = 10
+ataque_base = 2
 stamina_base = 2
-skill_passivas = Array[ExtResource("2_tqc5q")]([ExtResource("3_vd6ji"), ExtResource("4_hkhyr")])
+skill_passivas = Array[ExtResource("2_tqc5q")]([ExtResource("4_kq8ao")])
 tags = Array[StringName]([&"core_controle_da_mente", &"humanoide", &"causa_doenca", &"suburbio", &"baixo_centro", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

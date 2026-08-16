@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect_reveal"]
+script = ExtResource("3_effect")
+effect_type = 18
+target = 4
+amount = 2
+custom_rule = &"reveal_radius_from_active_entity"
+
+[sub_resource type="Resource" id="Effect_damage"]
+script = ExtResource("3_effect")
+effect_type = 0
+target = 3
+amount = 1
+math_operation = 1
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+display_name = "A terra revela seus segredos."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_reveal"), SubResource("Effect_damage")])
+
+[resource]
+script = ExtResource("1_event")
+display_name = "Pulsar da Terra"
+description = "Revela todos os blocos em um raio de 2 do personagem ativo. Em troca, todo o grupo perde 1 de Vida."
+narrative_description = "A terra pulsa uma única vez. As árvores estremecem. As paredes respiram. Por um breve instante, tudo o que estava escondido decide aparecer."
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

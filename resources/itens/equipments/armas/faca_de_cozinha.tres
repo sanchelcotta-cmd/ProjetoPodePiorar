@@ -13,7 +13,7 @@ display_name = "Faca de Cozinha"
 description = "Uma faca de cozinha.
 Maestria: Lâmina"
 acquisition_sources = 27
-tags = Array[StringName]([&"Arma", &"Comum", &"Lamina"])
+tags = Array[StringName]([&"arma", &"comum", &"lamina"])
 equipment_slot = 1
 mastery_granted = 1
 mastery_bonus = 2

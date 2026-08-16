@@ -32,6 +32,6 @@ narrative_description = "Au! Au!"
 vida_base = 20
 ataque_base = 4
 stamina_base = 4
-skill_ativas = Array[Resource]([SubResource("Resource_jhbqs")])
+skill_ativas = Array[ExtResource("3_pfjj7")]([SubResource("Resource_jhbqs")])
 tags = Array[StringName]([&"companheiro", &"criatura"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

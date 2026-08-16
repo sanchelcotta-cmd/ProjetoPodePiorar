@@ -12,7 +12,7 @@
 script = ExtResource("1_024mn")
 display_name = "Fantasia de Cosplay"
 acquisition_sources = 27
-tags = Array[StringName]([&"Armadura", &"Comum"])
+tags = Array[StringName]([&"armadura", &"comum"])
 equipment_slot = 2
 bonus_life = 4
 consumed_on_use = false

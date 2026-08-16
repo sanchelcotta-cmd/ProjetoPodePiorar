@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 28
+custom_rule = &"cartomante_reveal_and_warn"
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+display_name = "A cartomante mostra o futuro."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+display_name = "A Cartomante do Olho de Vidro"
+description = "Revela 3 blocos aleatórios e avisa se há Catástrofe, Armadilha ou Maldição na Rodada, sem identificar o bloco."
+narrative_description = "Sentada na varanda de uma casa velha, uma senhora embaralha um baralho gasto pelo tempo. Um dos olhos acompanha cada movimento seu. O outro, de vidro, mantém-se fixo ao baralho. Ela espalha três cartas sobre a mesa, suspira e aponta para três direções diferentes. Antes que você vá embora, ela sorri de canto."
+valence = 0
+custom_rule = &"cartomante_reveal_and_warn"
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

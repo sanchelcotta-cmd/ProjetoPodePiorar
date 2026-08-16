@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 28
+target = 3
+custom_rule = &"terremoto_reveal_and_individual_damage"
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+display_name = "O mapa inteiro é revelado."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+display_name = "Terremoto"
+description = "Revela todo o mapa. Cada personagem perde 1d6 de Vida; quem tirar 6 perde também o próximo turno."
+narrative_description = "Vocês estão andando, quando o chão inteiro começa a rugir. Tá tudo tremendo como se tivesse na velocidade vezes dois. Depois que tudo para, nada continua escondido, e nem todo mundo saiu inteiro."
+custom_rule = &"terremoto_reveal_and_individual_damage"
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

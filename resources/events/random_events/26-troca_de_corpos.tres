@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect_swap"]
+script = ExtResource("3_effect")
+effect_type = 27
+target = 3
+custom_rule = &"swap_bodies_reversible"
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+display_name = "Os corpos são trocados."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_swap")])
+
+[resource]
+script = ExtResource("1_event")
+display_name = "Troca de Corpos"
+description = "Todos os personagens trocam de corpo, passivas, itens e Maestrias. Se o evento se repetir, a troca é revertida."
+narrative_description = "Você pisca. Todo mundo parece... diferente. A voz não combina com o rosto. As mãos também não parecem suas. Pelo menos o desespero continua compartilhado."
+custom_rule = &"swap_bodies_reversible"
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

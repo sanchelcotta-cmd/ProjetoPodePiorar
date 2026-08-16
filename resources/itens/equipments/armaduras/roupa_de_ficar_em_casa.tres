@@ -10,7 +10,7 @@
 script = ExtResource("1_eu2nj")
 display_name = "Roupa de Ficar em Casa"
 acquisition_sources = 27
-tags = Array[StringName]([&"Armadura", &"Comum"])
+tags = Array[StringName]([&"armadura", &"comum"])
 equipment_slot = 2
 bonus_life = 4
 consumed_on_use = false
