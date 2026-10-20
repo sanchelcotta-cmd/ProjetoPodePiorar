@@ -1,0 +1,224 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/block_activation_popup.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://sprites/ui/uielementx_00005.png" id="2_frame"]
+[ext_resource type="Texture2D" path="res://sprites/ui/uielementx_00006.png" id="3_title"]
+[ext_resource type="Shader" path="res://shaders/ui_cyan_to_pink_80.gdshader" id="4_recolor"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_frame"]
+shader = ExtResource("4_recolor")
+
+[node name="BlockActivationPopup" type="CanvasLayer"]
+layer = 70
+script = ExtResource("1_script")
+
+[node name="Overlay" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+
+[node name="Dim" type="ColorRect" parent="Overlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0, 0, 0.47)
+
+[node name="Center" type="CenterContainer" parent="Overlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="FrameArea" type="Control" parent="Overlay/Center"]
+custom_minimum_size = Vector2(720, 585)
+layout_mode = 2
+mouse_filter = 0
+
+[node name="TitleBanner" type="TextureRect" parent="Overlay/Center/FrameArea"]
+material = SubResource("ShaderMaterial_frame")
+layout_mode = 1
+anchor_right = 1.0
+offset_left = 160.0
+offset_bottom = 86.0
+offset_right = -160.0
+grow_horizontal = 2
+mouse_filter = 2
+texture = ExtResource("3_title")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Title" type="Label" parent="Overlay/Center/FrameArea/TitleBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = 48.0
+offset_top = 9.0
+offset_right = -48.0
+offset_bottom = -9.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.996, 0.169, 0.592, 1)
+theme_override_font_sizes/font_size = 20
+text = "BLOCO ATIVADO"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Frame" type="TextureRect" parent="Overlay/Center/FrameArea"]
+material = SubResource("ShaderMaterial_frame")
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 100.0
+offset_bottom = -45.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_frame")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Content" type="MarginContainer" parent="Overlay/Center/FrameArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 64.0
+offset_top = 146.0
+offset_right = -64.0
+offset_bottom = -102.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="Body" type="VBoxContainer" parent="Overlay/Center/FrameArea/Content"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ConclusionTitle" type="Label" parent="Overlay/Center/FrameArea/Content/Body"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="EncounterName" type="Label" parent="Overlay/Center/FrameArea/Content/Body"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.23, 0.28, 1)
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ItemPreview" type="CenterContainer" parent="Overlay/Center/FrameArea/Content/Body"]
+visible = false
+custom_minimum_size = Vector2(0, 82)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="PreviewRow" type="HBoxContainer" parent="Overlay/Center/FrameArea/Content/Body/ItemPreview"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ItemIcon" type="TextureRect" parent="Overlay/Center/FrameArea/Content/Body/ItemPreview/PreviewRow"]
+custom_minimum_size = Vector2(78, 82)
+layout_mode = 2
+mouse_filter = 2
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MissingIcon" type="Label" parent="Overlay/Center/FrameArea/Content/Body/ItemPreview/PreviewRow"]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.75, 0.75, 0.78, 1)
+theme_override_font_sizes/font_size = 38
+text = "?"
+
+[node name="InfoButton" type="Button" parent="Overlay/Center/FrameArea/Content/Body/ItemPreview/PreviewRow"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+text = "ⓘ"
+tooltip_text = "Ver descrição e estatísticas do item"
+
+[node name="NarrativeScroll" type="ScrollContainer" parent="Overlay/Center/FrameArea/Content/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Narrative" type="Label" parent="Overlay/Center/FrameArea/Content/Body/NarrativeScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.95, 0.95, 0.97, 1)
+theme_override_font_sizes/font_size = 15
+text = "Descrição narrativa do bloco."
+autowrap_mode = 3
+
+[node name="Rewards" type="HFlowContainer" parent="Overlay/Center/FrameArea/Content/Body"]
+visible = false
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 6
+alignment = 1
+
+[node name="Feedback" type="Label" parent="Overlay/Center/FrameArea/Content/Body"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.78, 0.39, 1)
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+
+[node name="Buttons" type="HFlowContainer" parent="Overlay/Center/FrameArea/Content/Body"]
+layout_mode = 2
+theme_override_constants/separation = 7
+alignment = 1
+
+[node name="SkillInfo" type="PanelContainer" parent="Overlay"]
+visible = false
+z_index = 100
+custom_minimum_size = Vector2(275, 0)
+mouse_filter = 2
+
+[node name="Margin" type="MarginContainer" parent="Overlay/SkillInfo"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Content" type="HBoxContainer" parent="Overlay/SkillInfo/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="InfoIcon" type="Label" parent="Overlay/SkillInfo/Margin/Content"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.996, 0.17, 0.59, 1)
+theme_override_font_sizes/font_size = 14
+text = "ⓘ"
+
+[node name="Description" type="Label" parent="Overlay/SkillInfo/Margin/Content"]
+custom_minimum_size = Vector2(230, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 3

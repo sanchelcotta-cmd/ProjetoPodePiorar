@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://i3e074q5jx66"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_8ov3o"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_skill_effect"]
+[ext_resource type="Resource" uid="uid://rilplmmk2tw0" path="res://resources/skills/passives/permanent_effects/protese_do_terceiro_braco.tres" id="5_passive"]
+
+[sub_resource type="Resource" id="Effect_choose_mastery"]
+script = ExtResource("4_skill_effect")
+effect_type = 16
+amount = 1
+mastery_grant_mode = 1
+selection_mode = 2
+mastery_options = Array[int]([1, 2, 3])
+
+[sub_resource type="Resource" id="Effect_apply_mastery"]
+script = ExtResource("3_effect")
+effect_type = 5
+effect = SubResource("Effect_choose_mastery")
+
+[sub_resource type="Resource" id="Effect_grant_passive"]
+script = ExtResource("3_effect")
+effect_type = 6
+passive = ExtResource("5_passive")
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00056_out_01"
+id = &"ev_00056_out_01"
+display_name = "O terceiro braço se encaixa."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_apply_mastery"), SubResource("Effect_grant_passive")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00056"
+display_name = "Prótese do Terceiro Braço"
+description = "O jogador escolhe uma Maestria: recebe a nova Maestria ou +1 se já a possui. O personagem ganha um slot extra para arma e um ataque extra por turno de combate."
+narrative_description = "Você está andando numa boa, até que vê, se arrastando pelo chão, uma mão metálica. Ela não tem olhos, mas, se tivesse, estaria te encarando — e você sabe bem disso. A certeza vem quando a mão salta na sua direção e gruda no seu corpo. Ela simplesmente fica ali... Como se sempre tivesse pertencido a você."
+category = 1
+valence = 0
+can_repeat = false
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"permanent_effect", &"mastery", &"extra_attack"])

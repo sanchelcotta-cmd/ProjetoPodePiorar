@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_passive"]
+
+[sub_resource type="Resource" id="Effect_recruit"]
+script = ExtResource("1_effect")
+effect_type = 33
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[resource]
+script = ExtResource("2_passive")
+id = &"enemy_passive_001"
+display_name = "Memórias da Orchestra"
+description = "Com exatamente uma das Informações Orchestra 2/5 ou Orchestra 3/5, o grupo pode tentar recrutar A Experiência com 50% de chance."
+trigger = 21
+activation_context = 1
+activation_chance = 0.5
+required_information_ids = Array[StringName]([&"in_00017", &"in_00018"])
+minimum_matching_information = 1
+maximum_matching_information = 1
+requires_player_confirmation = true
+effects = Array[ExtResource("1_effect")]([SubResource("Effect_recruit")])
+tags = Array[StringName]([&"a_experiencia", &"recrutamento", &"informacao"])
+metadata/_custom_type_script = "res://scripts/resources/skills/passive_skill_data.gd"

@@ -1,13 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bkksiqf8tuh2"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_bvevc"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_4po0g"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_bvevc"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_4po0g"]
 [ext_resource type="Resource" uid="uid://dptxj0fh07geu" path="res://resources/itens/equipments/acessorios/acessorio_epico_escudo_flutuante_etereo.tres" id="2_be1d1"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_be1d1"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_3mw8b"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_be1d1"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_3mw8b"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/acessorios_simples_1.png" id="ppp_icon_sheet"]
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(294, 51, 68, 73)
 
 [resource]
 script = ExtResource("1_bvevc")
+icon = SubResource("ppp_item_icon")
+id = &"ac_00013"
 display_name = "Escudo Improvisado"
 description = "+2 de vida"
 acquisition_sources = 3

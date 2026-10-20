@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemStateData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/items/item_state_data.gd" id="1_state"]
+
+[resource]
+script = ExtResource("1_state")
+id = &"apodrecido"
+display_name = "Apodrecido"
+description = "Este item não pode recuperar Vida."
+blocks_hp_recovery = true

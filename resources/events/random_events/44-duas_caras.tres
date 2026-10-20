@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://dj64rnfrshdgd"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="2_mdxst"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
 
 [sub_resource type="Resource" id="Effect_win"]
 script = ExtResource("3_effect")
@@ -10,30 +11,38 @@ effect_type = 14
 selection_mode = 2
 tags_filter = Array[StringName]([&"informacao"])
 
+[sub_resource type="Resource" id="Outcome_win"]
+script = ExtResource("2_outcome")
+id = &"ev_00044_out_01"
+display_name = "Você acertou a moeda."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_win")])
+
 [sub_resource type="Resource" id="Effect_lose"]
 script = ExtResource("3_effect")
 effect_type = 15
 
-[sub_resource type="Resource" id="Outcome_win"]
-script = ExtResource("2_outcome")
-display_name = "Você acertou a moeda."
-effects = Array[ExtResource("3_effect")]([SubResource("Effect_win")])
-
 [sub_resource type="Resource" id="Outcome_lose"]
 script = ExtResource("2_outcome")
+id = &"ev_00044_out_02"
 display_name = "Você errou a moeda."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_lose")])
 
 [sub_resource type="Resource" id="Outcome_refuse"]
 script = ExtResource("2_outcome")
+id = &"ev_00044_out_03"
 display_name = "Você não joga."
 narrative_description = "Ele guarda a moeda e não diz mais nada."
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00044"
+tags = Array[StringName]([&"somente_campanha_completa"])
 display_name = "Duas-Caras"
 description = "O jogador pode escolher cara ou coroa, ou não jogar. Se acertar, recebe uma Informação aleatória; se errar, esquece a última Informação."
 narrative_description = "Cara. Coroa. Cara. Coroa. Ele nem parece piscar. Quando você se aproxima, ele finalmente segura a moeda, olha nos seus olhos e sorri: — Cara ou coroa?"
-resolution_mode = 5
-custom_rule = &"duas_caras_coin_flip"
+resolution_mode = 6
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome_win"), SubResource("Outcome_lose"), SubResource("Outcome_refuse")])
+guess_options = Array[StringName]([&"cara", &"coroa"])
+guess_match_outcome = SubResource("Outcome_win")
+guess_miss_outcome = SubResource("Outcome_lose")
+guess_refusal_outcome = SubResource("Outcome_refuse")

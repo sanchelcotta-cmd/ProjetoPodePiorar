@@ -1,12 +1,13 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://d2imxktogoouj"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_agpdo"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_p8vv7"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_tqc5q"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_agpdo"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_p8vv7"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_tqc5q"]
 [ext_resource type="Resource" uid="uid://6qqyc0ayls8h" path="res://resources/skills/passives/causa_doenca_50.tres" id="4_kq8ao"]
 
 [resource]
 script = ExtResource("1_agpdo")
+id = &"en_00033"
 display_name = "Zumbi Dançarino"
 description = "Criatura zumbificada que pode causar doença ao atacar. Anda em grupo."
 narrative_description = "A pele esverdeada, as olheiras profundas e os sorrisos vazios já seriam estranhos o suficiente. Mas eles continuam dançando, repetindo uma coreografia silenciosa que ninguém consegue ouvir. Quando percebem a presença de vocês, os passos permanecem exatamente os mesmos. Só muda a direção da dança."

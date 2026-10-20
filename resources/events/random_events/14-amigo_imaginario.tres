@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://cgsl2l66yx38k"]
+
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="1_xhfau"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="2_f7eep"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_f7eep"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="3_mp5ie"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="4_1gscp"]
+
+[sub_resource type="Resource" id="Resource_1vqgj"]
+script = ExtResource("3_mp5ie")
+effect_type = 8
+attribute_id = &"stamina"
+metadata/_custom_type_script = "uid://eticmfa8q3xa"
+
+[sub_resource type="Resource" id="Resource_5u88t"]
+script = ExtResource("2_f7eep")
+effect_type = 18
+target = 4
+effect = SubResource("Resource_1vqgj")
+percent = 1.0
+has_duration = true
+duration_amount = 1
+duration_unit = 1
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_f7bab"]
+script = ExtResource("1_xhfau")
+id = &"ev_00014_out_01"
+display_name = "Revelação misteriosa."
+effects = Array[ExtResource("2_f7eep")]([SubResource("Resource_5u88t")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[resource]
+script = ExtResource("4_1gscp")
+id = &"ev_00014"
+display_name = "Amigo Imaginário"
+description = "Um guia invisível revela todos os blocos de Encontro Indesejado ao alcance da Estamina do personagem que ativou o evento pelo resto da rodada."
+narrative_description = "É uma criatura engraçadinha. Anda saltitando, fazendo careta feia ao parar em um lugar, ou sorrindo ao parar em outro. O que essas caras e bocas querem dizer?"
+valence = 0
+outcomes = Array[ExtResource("1_xhfau")]([SubResource("Resource_f7bab")])
+metadata/_custom_type_script = "uid://cos7c56kjihyx"

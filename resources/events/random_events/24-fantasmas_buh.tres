@@ -1,35 +1,51 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://cqcj4iu0vxvj4"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_mtyc7"]
+[ext_resource type="Resource" uid="uid://sh5cqbyrgsbp" path="res://resources/skills/effects/debuffs/terror.tres" id="4_terror"]
 
 [sub_resource type="Resource" id="Effect_good"]
 script = ExtResource("3_effect")
 effect_type = 12
 selection_mode = 2
 
-[sub_resource type="Resource" id="Effect_bad"]
-script = ExtResource("3_effect")
-effect_type = 28
-custom_rule = &"fantasmas_do_mal"
-
 [sub_resource type="Resource" id="Outcome_good"]
 script = ExtResource("2_outcome")
+id = &"ev_00024_out_01"
 display_name = "Fantasmas do Bem"
 narrative_description = "Um fantasma atravessa você e deixa um embrulho cair no chão. Antes que dê tempo de agradecer, ele desaparece dando uma risadinha."
 weight = 30
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_good")])
 
+[sub_resource type="Resource" id="Effect_bad_damage"]
+script = ExtResource("3_effect")
+target = 3
+amount = 2
+math_operation = 1
+
+[sub_resource type="Resource" id="Effect_bad_terror"]
+script = ExtResource("3_effect")
+effect_type = 3
+target = 3
+debuff = ExtResource("4_terror")
+dice_count = 1
+dice_sides = 4
+has_duration = true
+duration_source = 1
+
 [sub_resource type="Resource" id="Outcome_bad"]
 script = ExtResource("2_outcome")
+id = &"ev_00024_out_02"
 display_name = "Fantasmas do Mal"
 narrative_description = "Eles aparecem sem fazer barulho. O grito vem depois. Quando tudo acaba, o frio continua aí."
 weight = 70
-effects = Array[ExtResource("3_effect")]([SubResource("Effect_bad")])
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_bad_damage"), SubResource("Effect_bad_terror")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00024"
 display_name = "Fantasmas BUH!"
 description = "Fantasmas do bem oferecem um item aleatório (30%). Fantasmas do mal causam 2 de dano em todos e aplicam Terror por 1d4 turnos (70%)."
 resolution_mode = 1

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" format=3 uid="uid://i6pf4y56cnkx"]
+
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_active"]
+
+[sub_resource type="Resource" id="Effect_summon"]
+script = ExtResource("1_effect")
+effect_type = 12
+amount = 1
+selection_mode = 1
+entity_ids = Array[StringName]([&"en_00012", &"en_00024"])
+summoned_can_summon = false
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[resource]
+script = ExtResource("2_active")
+id = &"enemy_active_008"
+display_name = "Invocação Elemental das Raízes"
+description = "No início do combate, possui 50% de chance de trazer aleatoriamente uma Dama Elemental ou Planta Carnívora."
+target_mode = 1
+automatic_triggers = Array[int]([0])
+activation_chance = 0.5
+activate_only_once = true
+effects = Array[ExtResource("1_effect")]([SubResource("Effect_summon")])
+tags = Array[StringName]([&"raizes_mutantes", &"invocacao_inicio"])

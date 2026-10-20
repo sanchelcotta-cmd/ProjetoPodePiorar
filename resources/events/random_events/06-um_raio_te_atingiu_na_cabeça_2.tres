@@ -1,16 +1,17 @@
 [gd_resource type="Resource" script_class="EventData" format=3 uid="uid://b4f3gw3xwl22j"]
 
-[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_68pr0"]
-[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_rthvk"]
-[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="2_whmba"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="1_68pr0"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="2_rthvk"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="2_whmba"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_0wkqw"]
 [ext_resource type="Resource" uid="uid://dciobhf4m2vxg" path="res://resources/skills/effects/debuffs/atordoado.tres" id="3_yjne5"]
 
 [sub_resource type="Resource" id="Resource_m7ah1"]
 script = ExtResource("2_whmba")
-statistic = 1
 dice_count = 1
 dice_sides = 6
-math_operation = 2
+dice_result_multiplier = 2.0
+math_operation = 1
 metadata/_custom_type_script = "uid://bknff8de8c2u0"
 
 [sub_resource type="Resource" id="Resource_wkoxg"]
@@ -18,11 +19,13 @@ script = ExtResource("2_whmba")
 effect_type = 3
 debuff = ExtResource("3_yjne5")
 has_duration = true
-duration_amount = 2
+duration_amount = 1
 metadata/_custom_type_script = "uid://bknff8de8c2u0"
 
 [sub_resource type="Resource" id="Resource_7ud4c"]
 script = ExtResource("1_68pr0")
+id = &"ev_00006_out_01"
+id = &"ev_00006_out_01"
 display_name = "Consequência Ruim!"
 narrative_description = "K-bum!"
 effects = Array[ExtResource("2_whmba")]([SubResource("Resource_m7ah1"), SubResource("Resource_wkoxg")])
@@ -30,10 +33,10 @@ metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [resource]
 script = ExtResource("2_rthvk")
+id = &"ev_00006"
 display_name = "Um Raio Te Atingiu Bem na Cabeça!"
 description = "Um raio atinge o personagem, causando dano igual ao dobro do resultado de um dado de 6 lados e perde o próximo turno."
 narrative_description = "“Do nada! [Personagem_ativo] estava andando, e um raio caiu bem na sua cabeça! Nem nuvem tinha... [Personagem_ativo] está totalmente chamuscado."
 valence = 2
-resolution_mode = 3
 outcomes = Array[ExtResource("1_68pr0")]([SubResource("Resource_7ud4c")])
 metadata/_custom_type_script = "uid://cos7c56kjihyx"

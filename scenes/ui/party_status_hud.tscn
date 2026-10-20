@@ -1,0 +1,354 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/party_status_hud.gd" id="1_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/party_character_card.tscn" id="2_card"]
+[ext_resource type="PackedScene" path="res://scenes/ui/character_inventory_panel.tscn" id="3_inventory"]
+[ext_resource type="Texture2D" path="res://sprites/ui/uielementx_00003.png" id="4_divider"]
+[ext_resource type="PackedScene" path="res://scenes/ui/item_details_panel.tscn" id="5_details"]
+[ext_resource type="PackedScene" path="res://scenes/ui/character_sheet_panel.tscn" id="6_sheet"]
+[ext_resource type="PackedScene" path="res://scenes/ui/stat_breakdown_tooltip.tscn" id="7_stats"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_drawer"]
+bg_color = Color(0.035, 0.05, 0.065, 0.8)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.996078, 0.168627, 0.592157, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bubble"]
+bg_color = Color(0.035, 0.09, 0.12, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0.972549, 0.909804, 1)
+corner_radius_top_left = 13
+corner_radius_top_right = 13
+corner_radius_bottom_right = 13
+corner_radius_bottom_left = 13
+
+[node name="PartyStatusHUD" type="CanvasLayer"]
+layer = 50
+script = ExtResource("1_hud")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 278.0
+offset_bottom = -6.0
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="Cards" type="VBoxContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+
+[node name="Playable1" parent="Root/Cards" instance=ExtResource("2_card")]
+layout_mode = 2
+slot_number = 1
+
+[node name="Playable2" parent="Root/Cards" instance=ExtResource("2_card")]
+layout_mode = 2
+slot_number = 2
+
+[node name="Playable3" parent="Root/Cards" instance=ExtResource("2_card")]
+layout_mode = 2
+slot_number = 3
+
+[node name="Divider12" type="TextureRect" parent="Root"]
+visible = false
+custom_minimum_size = Vector2(244, 4)
+layout_mode = 0
+offset_right = 244.0
+offset_bottom = 4.0
+mouse_filter = 2
+texture = ExtResource("4_divider")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Divider23" type="TextureRect" parent="Root"]
+visible = false
+custom_minimum_size = Vector2(244, 4)
+layout_mode = 0
+offset_right = 244.0
+offset_bottom = 4.0
+mouse_filter = 2
+texture = ExtResource("4_divider")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="MapHitTargets" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ActionLink" type="Line2D" parent="."]
+visible = false
+width = 3.0
+default_color = Color(0, 0.972549, 0.909804, 1)
+antialiased = true
+
+[node name="ActionDrawer" type="PanelContainer" parent="."]
+visible = false
+custom_minimum_size = Vector2(292, 0)
+offset_left = 308.0
+offset_top = 6.0
+offset_right = 600.0
+offset_bottom = 200.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_drawer")
+
+[node name="Margin" type="MarginContainer" parent="ActionDrawer"]
+layout_mode = 2
+theme_override_constants/margin_left = 11
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 11
+theme_override_constants/margin_bottom = 10
+
+[node name="Actions" type="VBoxContainer" parent="ActionDrawer/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Title" type="Label" parent="ActionDrawer/Margin/Actions"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.89, 0.89, 1)
+theme_override_font_sizes/font_size = 11
+text = "◎ ◎ ◎ ◎"
+text_overrun_behavior = 3
+
+[node name="ActionScroll" type="ScrollContainer" parent="ActionDrawer/Margin/Actions"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 0
+
+[node name="Rows" type="VBoxContainer" parent="ActionDrawer/Margin/Actions/ActionScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="WalkButton" type="Button" parent="ActionDrawer/Margin/Actions/ActionScroll/Rows"]
+layout_mode = 2
+text = "ANDAR ATÉ"
+
+[node name="SkillButtons" type="VBoxContainer" parent="ActionDrawer/Margin/Actions/ActionScroll/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="AllyButton" type="Button" parent="ActionDrawer/Margin/Actions/ActionScroll/Rows"]
+visible = false
+layout_mode = 2
+text = "ALIADO ▶"
+
+[node name="InventoryButton" type="Button" parent="ActionDrawer/Margin/Actions/ActionScroll/Rows"]
+layout_mode = 2
+text = "INVENTÁRIO"
+
+[node name="PassiveButtons" type="VBoxContainer" parent="ActionDrawer/Margin/Actions/ActionScroll/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ScrollArrows" type="HBoxContainer" parent="ActionDrawer/Margin/Actions"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Up" type="Button" parent="ActionDrawer/Margin/Actions/ScrollArrows"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "▲"
+
+[node name="Down" type="Button" parent="ActionDrawer/Margin/Actions/ScrollArrows"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "▼"
+
+[node name="Hint" type="Label" parent="ActionDrawer/Margin/Actions"]
+visible = false
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.67, 0.71, 1)
+theme_override_font_sizes/font_size = 10
+text = "Escolha um hex no mapa."
+autowrap_mode = 3
+
+[node name="AllyDrawer" type="PanelContainer" parent="."]
+visible = false
+custom_minimum_size = Vector2(292, 0)
+theme_override_styles/panel = SubResource("StyleBoxFlat_drawer")
+
+[node name="Margin" type="MarginContainer" parent="AllyDrawer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Content" type="VBoxContainer" parent="AllyDrawer/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="AllyDrawer/Margin/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.78, 0.35, 1)
+theme_override_font_sizes/font_size = 11
+text = "HABILIDADES DO ALIADO"
+
+[node name="AllyScroll" type="ScrollContainer" parent="AllyDrawer/Margin/Content"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 0
+
+[node name="Buttons" type="VBoxContainer" parent="AllyDrawer/Margin/Content/AllyScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="ScrollArrows" type="HBoxContainer" parent="AllyDrawer/Margin/Content"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Up" type="Button" parent="AllyDrawer/Margin/Content/ScrollArrows"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "▲"
+
+[node name="Down" type="Button" parent="AllyDrawer/Margin/Content/ScrollArrows"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "▼"
+
+[node name="HexChoice" type="PanelContainer" parent="."]
+visible = false
+custom_minimum_size = Vector2(292, 0)
+theme_override_styles/panel = SubResource("StyleBoxFlat_drawer")
+
+[node name="Margin" type="MarginContainer" parent="HexChoice"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Content" type="VBoxContainer" parent="HexChoice/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Header" type="HBoxContainer" parent="HexChoice/Margin/Content"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="HexChoice/Margin/Content/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.65, 0.88, 0.9, 1)
+theme_override_font_sizes/font_size = 11
+text = "◎ ◎ ◎ ◎"
+
+[node name="Close" type="Button" parent="HexChoice/Margin/Content/Header"]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+tooltip_text = "Fechar (Esc)"
+theme_override_colors/font_color = Color(0.9, 0.12, 0.16, 1)
+theme_override_colors/font_hover_color = Color(1, 0.3, 0.35, 1)
+theme_override_font_sizes/font_size = 16
+text = "×"
+flat = true
+
+[node name="Buttons" type="VBoxContainer" parent="HexChoice/Margin/Content"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="SkillInfo" type="PanelContainer" parent="."]
+visible = false
+z_index = 100
+custom_minimum_size = Vector2(254, 0)
+
+[node name="Margin" type="MarginContainer" parent="SkillInfo"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Content" type="HBoxContainer" parent="SkillInfo/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="InfoIcon" type="Label" parent="SkillInfo/Margin/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.996, 0.17, 0.59, 1)
+theme_override_font_sizes/font_size = 14
+text = "ⓘ"
+
+[node name="Description" type="Label" parent="SkillInfo/Margin/Content"]
+custom_minimum_size = Vector2(210, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 3
+
+[node name="InventoryLink" type="Line2D" parent="."]
+visible = false
+width = 3.0
+default_color = Color(0, 0.972549, 0.909804, 1)
+antialiased = true
+
+[node name="InventoryPanel" parent="." instance=ExtResource("3_inventory")]
+
+[node name="ItemDetailsLink" type="Line2D" parent="."]
+visible = false
+width = 3.0
+default_color = Color(0, 0.972549, 0.909804, 1)
+antialiased = true
+
+[node name="ItemDetailsPanel" parent="." instance=ExtResource("5_details")]
+
+[node name="InspectBubble" type="Button" parent="."]
+visible = false
+custom_minimum_size = Vector2(27, 27)
+offset_right = 27.0
+offset_bottom = 27.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleBoxFlat_bubble")
+theme_override_styles/hover = SubResource("StyleBoxFlat_bubble")
+text = "!"
+tooltip_text = "Abrir ficha"
+
+[node name="BubbleHint" type="PanelContainer" parent="."]
+visible = false
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bubble")
+
+[node name="Text" type="Label" parent="BubbleHint"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 10
+text = "  ABRIR FICHA  "
+
+[node name="CharacterSheetPanel" parent="." instance=ExtResource("6_sheet")]
+
+[node name="StatBreakdownTooltip" parent="." instance=ExtResource("7_stats")]

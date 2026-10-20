@@ -1,24 +1,30 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://bqxt8v2x4mqe3"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_oqpxa"]
 
 [sub_resource type="Resource" id="Effect"]
 script = ExtResource("3_effect")
-effect_type = 28
-target = 4
-custom_rule = &"saci_horizontal_whirlwind"
+effect_type = 40
+target = 8
+preserved_map_block_types = Array[int]([1])
+replacement_pool_excludes_current_map = true
+replacement_ignores_generation_balance = true
+replacement_draw_without_replacement = true
+reset_replaced_blocks_to_hidden = true
 
 [sub_resource type="Resource" id="Outcome"]
 script = ExtResource("2_outcome")
-display_name = "O redemoinho muda o caminho."
+id = &"ev_00041_out_01"
+display_name = "O redemoinho refaz a linha inteira."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00041"
 display_name = "Traquinagens do Saci"
-description = "Um redemoinho percorre horizontalmente a linha do bloco atual, alterando os efeitos atravessados. Blocos de Informação são revelados automaticamente."
+description = "O redemoinho refaz todos os hexágonos da linha horizontal do bloco que ativou o evento, inclusive esse bloco e os já ativados. Blocos de Informação permanecem exatamente onde estavam, sem mudar de estado. Os demais recebem Resources que não estavam no mapa atual, embaralhados e sorteados sem repetição, ignorando cotas, valências, pesos e percentuais da geração normal. Os blocos substituídos voltam a ficar ocultos e podem ser ativados novamente."
 narrative_description = "Um redemoinho atravessa a rua em disparada. Lá no meio, por um instante, você juraria ter visto um gorro vermelho. Ele deixou pelo caminho folhas, poeira e uma gargalhada estridente gravadas em sua memória."
-custom_rule = &"saci_horizontal_whirlwind"
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

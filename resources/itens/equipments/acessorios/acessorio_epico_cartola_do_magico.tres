@@ -1,13 +1,16 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://cxib2qtiyensi"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_uq3if"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_tyymc"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_5tm8v"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="7_25kq7"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_uq3if"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_tyymc"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_5tm8v"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="7_25kq7"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/acessorios_epicos_1.png" id="ppp_icon_sheet"]
 
 [sub_resource type="Resource" id="Resource_0nckx"]
 script = ExtResource("7_25kq7")
 effect_type = 13
+target = 8
 modify_mode = 2
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
@@ -16,14 +19,20 @@ script = ExtResource("2_tyymc")
 display_name = "Teleporte"
 description = "Escolha um bloco livre e vá até ele."
 use_context = 2
-target_mode = 1
-range_limit = 0
+target_mode = 5
+range_limit = -1
 max_uses_per_turn = 1
 effects = Array[ExtResource("7_25kq7")]([SubResource("Resource_0nckx")])
 metadata/_custom_type_script = "uid://c3s14bqybert"
 
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(121, 143, 77, 71)
+
 [resource]
 script = ExtResource("1_uq3if")
+icon = SubResource("ppp_item_icon")
+id = &"ac_00003"
 display_name = "Cartola do Mágico"
 description = "Pode se teleportar livremente pelo mapa."
 rarity = 4

@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_passive"]
+
+[sub_resource type="Resource" id="Resource_attack_buff"]
+script = ExtResource("1_effect")
+effect_type = 9
+amount = 4
+attribute_id = &"attack"
+stack_with_existing_effects = true
+has_duration = true
+duration_turns = 1
+duration_unit = 5
+
+[sub_resource type="Resource" id="Resource_counterattack"]
+script = ExtResource("1_effect")
+effect_type = 11
+target = 3
+requires_damage_source_in_equipped_weapon_range = true
+
+[resource]
+script = ExtResource("2_passive")
+id = &"playable_passive_003"
+display_name = "Não Mexe com os Meus Filhos!"
+description = "Quando um aliado, inclusive companheiro, a até 2 hexágonos sofrer dano, recebe +4 de Ataque acumulável a cada ativação até o fim do próximo turno dela. Se o atacante estiver no alcance da arma equipada, contra-ataca imediatamente."
+trigger = 11
+activation_context = 1
+max_distance_to_damaged_ally = 2
+include_companions_in_ally_damage_trigger = true
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_attack_buff"), SubResource("Resource_counterattack")])
+tags = Array[StringName]([&"mae"])

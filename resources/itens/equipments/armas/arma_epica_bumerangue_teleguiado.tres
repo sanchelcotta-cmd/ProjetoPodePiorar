@@ -1,13 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dw547ru2nrgj1"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_lnile"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_f1q4j"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_nv1mw"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_0k7tg"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_lnile"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_f1q4j"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_nv1mw"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_0k7tg"]
 [ext_resource type="Resource" uid="uid://t5c1hs7mlm6q" path="res://resources/skills/passives/esquiva_60.tres" id="4_f1q4j"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armas_epicas_1.png" id="ppp_icon_sheet"]
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(33, 138, 47, 83)
 
 [resource]
 script = ExtResource("1_lnile")
+icon = SubResource("ppp_item_icon")
+id = &"aa_00004"
 display_name = "Bumerangue Teleguiado"
 description = "Personagens que carregam este Item tem \"Esquiva\" 60% para ataques a distância."
 rarity = 4

@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3 uid="uid://cxbuegij7mj40"]
+
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="1_passive"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_ranged_ignores_range"]
+script = ExtResource("2_effect")
+effect_type = 51
+required_bound_source_mastery = 3
+mastery_options = Array[int]([3])
+
+[sub_resource type="Resource" id="Effect_blade_bleeding"]
+script = ExtResource("2_effect")
+target = 1
+debuff_id = &"db_00008"
+required_bound_source_mastery = 1
+
+[sub_resource type="Resource" id="Effect_impact_stun"]
+script = ExtResource("2_effect")
+target = 1
+debuff_id = &"db_00002"
+required_bound_source_mastery = 2
+
+[sub_resource type="Resource" id="Effect_absorbed_weapon_traits"]
+script = ExtResource("2_effect")
+effect_type = 53
+copy_bound_masteries = true
+copy_bound_passives = true
+copy_bound_bonus_attack = true
+copy_bound_bonus_max_hp = true
+copy_bound_bonus_stamina = true
+
+[resource]
+script = ExtResource("1_passive")
+id = &"permanent_passive_058"
+display_name = "Simbiose Elemental"
+description = "A arma absorvida ocupa permanentemente o slot de arma e não pode ser trocada. Preserva as Maestrias, passivas e bônus da arma Épica absorvida ou da evolução Épica de uma arma comum. Distância ignora o limite de alcance e a redução de dano pelos hexes até o alvo; Lâmina causa Sangramento em todo ataque que causar dano; Impacto causa Atordoamento em todo ataque que causar dano."
+trigger = 6
+activation_context = 1
+requires_attack_to_deal_damage = true
+effects = Array[ExtResource("2_effect")]([SubResource("Effect_blade_bleeding"), SubResource("Effect_impact_stun")])
+on_granted_effects = Array[ExtResource("2_effect")]([SubResource("Effect_absorbed_weapon_traits")])
+continuous_effects = Array[ExtResource("2_effect")]([SubResource("Effect_ranged_ignores_range")])
+tags = Array[StringName]([&"permanent_effect", &"elemental_symbiosis", &"bound_equipment"])

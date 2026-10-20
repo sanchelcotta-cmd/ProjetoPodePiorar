@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_passive"]
+
+[sub_resource type="Resource" id="Resource_custom"]
+script = ExtResource("1_effect")
+effect_type = 39
+effect_lifetime = 2
+restricted_equipment_rarity = 4
+auto_unequip_restricted_equipment = true
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[resource]
+script = ExtResource("2_passive")
+id = &"ps_00030"
+display_name = "Maldição: Agulha de Costura"
+description = "Enquanto o portador carregar esta maldição, seus equipamentos Épicos são desequipados automaticamente e ele não pode equipá-los novamente."
+continuous_effects = Array[ExtResource("1_effect")]([SubResource("Resource_custom")])
+metadata/_custom_type_script = "res://scripts/resources/skills/passive_skill_data.gd"

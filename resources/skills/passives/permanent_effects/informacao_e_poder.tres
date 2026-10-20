@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3 uid="uid://b82glj66hno4x"]
+
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="1_passive"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_information_scaling"]
+script = ExtResource("2_effect")
+effect_type = 40
+multiplier = 2.0
+recalculate_bonus_instead_of_stacking = true
+attribute_ids = Array[StringName]([&"max_hp", &"attack"])
+
+[resource]
+script = ExtResource("1_passive")
+id = &"permanent_passive_062"
+display_name = "Informação é Poder"
+description = "Aumenta a Vida máxima e o Ataque em 2 pontos por Informação possuída pelo grupo. Recalcula o bônus quando a quantidade muda, sem acumular a mesma Informação duas vezes."
+trigger = 16
+continuous_effects = Array[ExtResource("2_effect")]([SubResource("Effect_information_scaling")])
+tags = Array[StringName]([&"permanent_effect", &"information", &"scaling"])

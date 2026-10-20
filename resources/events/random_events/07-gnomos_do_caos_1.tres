@@ -1,8 +1,9 @@
 [gd_resource type="Resource" script_class="EventData" format=3 uid="uid://sja8f2etgxxv"]
 
-[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_7yb0k"]
-[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_3o5oy"]
-[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="2_hdh5b"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="1_7yb0k"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="2_3o5oy"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="2_hdh5b"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_hdh5b"]
 
 [sub_resource type="Resource" id="Resource_xpajy"]
 script = ExtResource("2_hdh5b")
@@ -13,6 +14,8 @@ metadata/_custom_type_script = "uid://bknff8de8c2u0"
 
 [sub_resource type="Resource" id="Resource_tem3e"]
 script = ExtResource("1_7yb0k")
+id = &"ev_00007_out_01"
+id = &"ev_00007_out_01"
 display_name = "Bagunça serelepe"
 narrative_description = "Todos os itens mudaram!"
 effects = Array[ExtResource("2_hdh5b")]([SubResource("Resource_xpajy")])
@@ -20,8 +23,9 @@ metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [resource]
 script = ExtResource("2_3o5oy")
+id = &"ev_00007"
 display_name = "Gnomos do Caos"
-description = "Os gnomos transformam todos os itens do inventário de todos os personagens em itens completamente aleatórios — inclusive trocando itens básicos por épicos, e vice-versa."
+description = "Os gnomos transformam aleatoriamente todos os itens carregados pelos jogáveis e todos os equipamentos vestidos pelo grupo, inclusive aliados. Equipados continuam no mesmo tipo de slot; os itens carregados podem ser remanejados entre jogáveis para caber. Se ainda faltar espaço, uma mochila indispensável permanece e muda para outro jogável, remanejando o acessório dele. Nenhum item se perde por falta de capacidade. Itens básicos podem virar Épicos e vice-versa, mas, se havia ao menos um Épico entre os itens afetados, ao menos um Épico retorna. Maldições existentes podem desaparecer na troca; nenhuma Maldição nova é sorteada."
 narrative_description = "Vocês percebem a coisinha minúscula, de corpo redondo, olhos grandes e chapéu pontudo. Ele tropeça na própria barba, chuta uma pedrinha, se levanta e te encara. Nessa hora, você sente que algo não tá normal... E aquele gnomo parece muito satisfeito com a qualidade da própria bagunça."
 outcomes = Array[ExtResource("1_7yb0k")]([SubResource("Resource_tem3e")])
 metadata/_custom_type_script = "uid://cos7c56kjihyx"

@@ -1,13 +1,15 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://dkydm5i15vrqs"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_k2n50"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_81bp0"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_k2n50"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_81bp0"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_goucq"]
 [ext_resource type="Resource" uid="uid://q7qmrdf1jiiv" path="res://resources/skills/passives/causa_terror_ao_atacar.tres" id="3_4tr25"]
 [ext_resource type="Resource" uid="uid://c8xfj7mnvbnt3" path="res://resources/skills/passives/voar_afastar.tres" id="4_cypsm"]
 [ext_resource type="Resource" uid="uid://b0ijvyvuhberq" path="res://resources/skills/passives/voar_movimento.tres" id="5_334de"]
 
 [resource]
 script = ExtResource("1_k2n50")
+id = &"en_00030"
 display_name = "Sombra Disforme"
 description = "Criatura que voa e pode causar terror."
 narrative_description = "Ela é uma sombra que abandonou o próprio dono. Desliza pelo chão sem emitir som, como se nunca tivesse pertencido a alguém. Seus olhos intensos permanecem cravados em você. Isso definitivamente não é um bom sinal."

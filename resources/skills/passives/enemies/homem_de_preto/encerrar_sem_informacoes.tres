@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_passive"]
+
+[sub_resource type="Resource" id="Effect_end"]
+script = ExtResource("1_effect")
+effect_type = 30
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[resource]
+script = ExtResource("2_passive")
+id = &"enemy_passive_007"
+display_name = "Nada Para Investigar"
+description = "Se o grupo não possuir Informações, o Homem de Preto não ataca. Depois da entrada em Combate, do posicionamento e da iniciativa, a narração aparece; confirmar encerra o Encontro."
+trigger = 21
+activation_context = 1
+maximum_group_information_count = 0
+effects = Array[ExtResource("1_effect")]([SubResource("Effect_end")])
+completion_narrative = "Vocês percebem o desdêm naqueles olhos. Eles vão embora..."
+tags = Array[StringName]([&"homem_de_preto", &"informacao", &"encerra_encontro"])
+metadata/_custom_type_script = "res://scripts/resources/skills/passive_skill_data.gd"

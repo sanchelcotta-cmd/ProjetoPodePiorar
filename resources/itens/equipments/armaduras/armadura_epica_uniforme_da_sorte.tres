@@ -1,29 +1,35 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://br22yhdti7udd"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_2pyjb"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_rdjaq"]
-[ext_resource type="Resource" uid="uid://dsa3dwjhjlfye" path="res://resources/skills/actives/revela_blocos_1.tres" id="3_la1fb"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="4_3llp4"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_2pyjb"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="4_3llp4"]
 [ext_resource type="Resource" uid="uid://dlp5nfrpuby5u" path="res://resources/skills/passives/esquiva_30.tres" id="5_w2bsg"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="8_q067b"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="8_q067b"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armaduras_epicas_1.png" id="ppp_icon_sheet"]
 
 [sub_resource type="Resource" id="Resource_y2e2r"]
 script = ExtResource("8_q067b")
-effect_type = 15
-modify_mode = 2
-duration_turns = 1
+effect_type = 44
+effect_lifetime = 1
+minimum_value = 5
+dice_sides = 6
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [sub_resource type="Resource" id="Resource_2pyjb"]
 script = ExtResource("4_3llp4")
 display_name = "Melhoria de Crítico"
 description = "Resultados de dados 5 e 6 são acertos críticos."
-trigger = 5
-effects = Array[ExtResource("8_q067b")]([SubResource("Resource_y2e2r")])
+continuous_effects = Array[ExtResource("8_q067b")]([SubResource("Resource_y2e2r")])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(259, 135, 84, 93)
 
 [resource]
 script = ExtResource("1_2pyjb")
+icon = SubResource("ppp_item_icon")
+id = &"ar_00006"
 display_name = "Uniforme da Sorte"
 description = "Em combate: Resultados 5 e 6 são acertos críticos.
 Pode anular um bloco de Armadilha ou Catástrofe por dia."
@@ -33,6 +39,5 @@ tags = Array[StringName]([&"armadura", &"epica"])
 equipment_slot = 2
 bonus_life = 9
 granted_passives = Array[ExtResource("4_3llp4")]([ExtResource("5_w2bsg"), SubResource("Resource_2pyjb")])
-granted_active_skills = Array[ExtResource("2_rdjaq")]([ExtResource("3_la1fb")])
 consumed_on_use = false
 metadata/_custom_type_script = "uid://bql64fe8a0w24"

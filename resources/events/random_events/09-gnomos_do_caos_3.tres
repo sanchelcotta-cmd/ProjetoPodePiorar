@@ -1,8 +1,14 @@
 [gd_resource type="Resource" script_class="EventData" format=3 uid="uid://ctbdiiasj2tpp"]
 
-[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_qp440"]
-[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="2_uq1f0"]
-[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="3_soki4"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="1_qp440"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="2_uq1f0"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="3_soki4"]
+[ext_resource type="Resource" uid="uid://b255640rxp8gi" path="res://resources/events/random_events/gnomes_3/01-raio_misterioso.tres" id="4_gnome_1"]
+[ext_resource type="Resource" uid="uid://bhhv0n1o3w1u3" path="res://resources/events/random_events/gnomes_3/02-festa_da_recuperacao.tres" id="5_gnome_2"]
+[ext_resource type="Resource" uid="uid://cdebwxfor44k0" path="res://resources/events/random_events/gnomes_3/03-encontro_de_outro_distrito.tres" id="6_gnome_3"]
+[ext_resource type="Resource" uid="uid://b0ex5nqpbcxrr" path="res://resources/events/random_events/gnomes_3/04-presente_epico.tres" id="7_gnome_4"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="8_87u2m"]
+[ext_resource type="Resource" uid="uid://oeehcx5q1cej" path="res://resources/events/random_events/gnomes_3/05-frutinha_magica.tres" id="8_gnome_5"]
 
 [sub_resource type="Resource" id="Resource_hjaos"]
 script = ExtResource("2_uq1f0")
@@ -12,20 +18,25 @@ amount = 5
 has_duration = true
 duration_amount = 1
 duration_unit = 1
+custom_rule = &"spawn_gnomes_3"
 metadata/_custom_type_script = "uid://bknff8de8c2u0"
 
 [sub_resource type="Resource" id="Resource_pa87y"]
 script = ExtResource("1_qp440")
+id = &"ev_00009_out_01"
+id = &"ev_00009_out_01"
 display_name = "Spawm Serelepe"
 effects = Array[ExtResource("2_uq1f0")]([SubResource("Resource_hjaos")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [resource]
 script = ExtResource("3_soki4")
+id = &"ev_00009"
 display_name = "Gnomos do Caos"
-description = "Gnomos se posicionam pelo mapa. Existem 5 Gnomos Misteriosos, visualmente indistinguíveis entre si. Chegar a um deles substitui o efeito do bloco, revelado apenas ao parar sobre ele. Após 3 gnomos serem ativados, todos os restantes desaparecem."
-narrative_description = "Cinco chapéus pontudos espalhados pelo mapa, todos iguais, todos imóveis... até você chegar perto. Um deles acena. Outro parece estar cochichando com uma pedra. Um terceiro enterra alguma coisa e começa a assobiar como se nada estivesse acontecendo."
+description = "Até 5 Gnomos Misteriosos ocupam hexágonos ocultos que não contêm Informação. Cada um tem uma cor, embaralhada entre os efeitos a cada surgimento; a cor não identifica o resultado. Ao parar sobre um deles, seu efeito substitui o conteúdo anterior do hex. Após 3 gnomos ativados, os restantes desaparecem."
+narrative_description = "Cinco chapéus pontudos e coloridos se espalham pelo mapa. Um dos gnomos acena. Outro parece cochichar com uma pedra. Um terceiro enterra alguma coisa e começa a assobiar como se nada estivesse acontecendo."
 outcomes = Array[ExtResource("1_qp440")]([SubResource("Resource_pa87y")])
-custom_rule = &"spawm_gnomes"
-tags = Array[StringName]([&"gnomes_3"])
+generated_events = Array[ExtResource("3_soki4")]([ExtResource("4_gnome_1"), ExtResource("5_gnome_2"), ExtResource("6_gnome_3"), ExtResource("7_gnome_4"), ExtResource("8_gnome_5")])
+custom_rule = &"spawn_gnomes_3"
+tags = Array[StringName]([&"gnomes_3", &"script_personalizado"])
 metadata/_custom_type_script = "uid://cos7c56kjihyx"

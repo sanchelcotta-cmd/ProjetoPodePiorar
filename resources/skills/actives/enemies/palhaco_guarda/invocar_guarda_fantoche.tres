@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/active_skill_data.gd" id="2_active"]
+
+[sub_resource type="Resource" id="Effect_summon"]
+script = ExtResource("1_effect")
+effect_type = 12
+entity_id = &"en_00018"
+amount = 1
+summoned_can_summon = false
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[resource]
+script = ExtResource("2_active")
+id = &"enemy_active_009"
+display_name = "Chamar Guarda-Fantoche"
+description = "No início dos turnos 3, 6, 9..., possui 50% de chance de invocar um Guarda-Fantoche sem habilidade de invocação."
+target_mode = 1
+automatic_triggers = Array[int]([1])
+activation_chance = 0.5
+first_activation_turn = 3
+repeat_every_turns = 3
+effects = Array[ExtResource("1_effect")]([SubResource("Effect_summon")])
+tags = Array[StringName]([&"palhaco_assassino", &"invocacao"])
+metadata/_custom_type_script = "res://scripts/resources/skills/active_skill_data.gd"

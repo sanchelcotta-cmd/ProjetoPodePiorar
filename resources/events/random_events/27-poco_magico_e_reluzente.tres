@@ -1,38 +1,76 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://cu38e5sfqpkuc"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="2_qlji4"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_h7ky0"]
+
+[sub_resource type="Resource" id="Effect_hp_minus_5"]
+script = ExtResource("2_qlji4")
+effect_type = 1
+amount = 5
+math_operation = 1
+
+[sub_resource type="Resource" id="Effect_attack_plus_5"]
+script = ExtResource("2_qlji4")
+effect_type = 2
+statistic = 3
+amount = 5
+math_operation = 0
 
 [sub_resource type="Resource" id="Outcome_hp_to_attack"]
 script = ExtResource("2_outcome")
-display_name = "Perde 5 de Vida e ganha 5 de Ataque"
+id = &"ev_00027_out_01"
+display_name = "Perde 5 de Vida máxima e ganha 5 de Ataque"
 weight = 25
+effects = Array[ExtResource("2_qlji4")]([SubResource("Effect_hp_minus_5"), SubResource("Effect_attack_plus_5")])
+
+[sub_resource type="Resource" id="Effect_attack_minus_5"]
+script = ExtResource("2_qlji4")
+effect_type = 2
+statistic = 3
+amount = 5
+math_operation = 1
+
+[sub_resource type="Resource" id="Effect_hp_plus_5"]
+script = ExtResource("2_qlji4")
+effect_type = 1
+amount = 5
+math_operation = 0
 
 [sub_resource type="Resource" id="Outcome_attack_to_hp"]
 script = ExtResource("2_outcome")
-display_name = "Perde 5 de Ataque e ganha 5 de Vida"
+id = &"ev_00027_out_02"
+display_name = "Perde 5 de Ataque e ganha 5 de Vida máxima"
 weight = 25
+effects = Array[ExtResource("2_qlji4")]([SubResource("Effect_attack_minus_5"), SubResource("Effect_hp_plus_5")])
 
 [sub_resource type="Resource" id="Outcome_hp"]
 script = ExtResource("2_outcome")
-display_name = "Ganha 5 de Vida"
+id = &"ev_00027_out_03"
+display_name = "Ganha 5 de Vida máxima"
 weight = 20
+effects = Array[ExtResource("2_qlji4")]([SubResource("Effect_hp_plus_5")])
 
 [sub_resource type="Resource" id="Outcome_attack"]
 script = ExtResource("2_outcome")
+id = &"ev_00027_out_04"
 display_name = "Ganha 5 de Ataque"
 weight = 20
+effects = Array[ExtResource("2_qlji4")]([SubResource("Effect_attack_plus_5")])
 
 [sub_resource type="Resource" id="Outcome_both"]
 script = ExtResource("2_outcome")
-display_name = "Ganha 5 de Vida e 5 de Ataque"
+id = &"ev_00027_out_05"
+display_name = "Ganha 5 de Vida máxima e 5 de Ataque"
 weight = 10
+effects = Array[ExtResource("2_qlji4")]([SubResource("Effect_hp_plus_5"), SubResource("Effect_attack_plus_5")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00027"
 display_name = "Poço Mágico e Reluzente"
-description = "O personagem ativo pode beber do poço e sortear uma alteração de Vida e/ou Ataque."
+description = "O personagem ativo pode beber do poço e sortear uma alteração de Vida máxima e/ou Ataque. A Vida atual não sobe ao ganhar Vida máxima e só cai se ultrapassar o novo limite."
 narrative_description = "No fundo do poço, a água brilha como se escondesse um pedaço do céu. A superfície reflete uma versão sua que sorri primeiro. Vai beber mesmo assim?"
-resolution_mode = 5
-custom_rule = &"poco_magico_e_reluzente"
+resolution_mode = 3
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome_hp_to_attack"), SubResource("Outcome_attack_to_hp"), SubResource("Outcome_hp"), SubResource("Outcome_attack"), SubResource("Outcome_both")])

@@ -1,15 +1,16 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://30c01tqp7ro6"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_irv0g"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_5gk7o"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_irv0g"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_5gk7o"]
 [ext_resource type="Resource" uid="uid://beua1ocbh0mav" path="res://resources/itens/equipments/acessorios/acessorio_epico_passa_tempo.tres" id="2_bit1j"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_bit1j"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_lk0ml"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_bit1j"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_lk0ml"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/acessorios_simples_1.png" id="ppp_icon_sheet"]
 
 [sub_resource type="Resource" id="Resource_irv0g"]
 script = ExtResource("4_lk0ml")
-effect_type = 15
-modify_mode = 2
+effect_type = 37
 amount = 1
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
@@ -23,8 +24,14 @@ max_activations_per_turn = 1
 effects = Array[ExtResource("4_lk0ml")]([SubResource("Resource_irv0g")])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"
 
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(214, 135, 68, 83)
+
 [resource]
 script = ExtResource("1_irv0g")
+icon = SubResource("ppp_item_icon")
+id = &"ac_00016"
 display_name = "Relógio de Bolso"
 description = "Chance de ganhar um turno extra."
 acquisition_sources = 3

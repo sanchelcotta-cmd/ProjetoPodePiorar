@@ -1,0 +1,231 @@
+[gd_scene format=3 uid="uid://cg4c2i7fjp1p4"]
+
+[ext_resource type="Script" uid="uid://dhghbdsu3t4av" path="res://scripts/maps/ppp_map_view.gd" id="1_map"]
+[ext_resource type="Script" uid="uid://d4ddsbbrk8j7o" path="res://scripts/campaign/gerencia_jogo.gd" id="2_campaign"]
+[ext_resource type="Script" uid="uid://dx8cjac4m8bq5" path="res://scripts/managers/block_manager.gd" id="3_block"]
+[ext_resource type="Script" uid="uid://3ovodc30qrp3" path="res://scripts/managers/skill_manager.gd" id="4_skill"]
+[ext_resource type="Script" uid="uid://b4lcpqfu6be25" path="res://scripts/managers/player_skill_manager.gd" id="5_player_skill"]
+[ext_resource type="Script" uid="uid://c5d3egs6iso8x" path="res://scripts/managers/exploration_manager.gd" id="6_exploration"]
+[ext_resource type="Script" uid="uid://dpdju65pshuad" path="res://scripts/managers/round_manager.gd" id="7_round"]
+[ext_resource type="Script" uid="uid://htjacfqp7rvd" path="res://scripts/maps/ppp_parallax_background.gd" id="9_parallax"]
+[ext_resource type="Script" uid="uid://inh3r4aqmlt1" path="res://scripts/visuals/playable_party_view.gd" id="10_party"]
+[ext_resource type="Script" uid="uid://d2xwdw2h18on8" path="res://scripts/visuals/ppp_depth_layer.gd" id="11_depth"]
+[ext_resource type="Script" uid="uid://c1ulxqaigg26v" path="res://scripts/visuals/companion_party_view.gd" id="12_companions"]
+[ext_resource type="Script" uid="uid://cjfin3an4uw4t" path="res://scripts/managers/gnomes_3_manager.gd" id="13_gnomes"]
+[ext_resource type="PackedScene" path="res://scenes/ui/party_status_hud.tscn" id="14_party_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/campaign_top_bar.tscn" id="15_top_bar"]
+[ext_resource type="PackedScene" path="res://scenes/ui/block_activation_popup.tscn" id="16_block_popup"]
+[ext_resource type="Script" uid="uid://cptv2kkgyqnk0" path="res://scripts/ui/neon_next_phase_button.gd" id="17_next_phase"]
+[ext_resource type="Script" uid="uid://co8w6fl6ngoul" path="res://scripts/managers/event_executor.gd" id="18_event_executor"]
+[ext_resource type="Script" uid="uid://tljpa3ydfy2h" path="res://scripts/managers/catastrophe_manager.gd" id="19_catastrophe"]
+[ext_resource type="Script" uid="uid://d2q2wjvh1u21g" path="res://scripts/visuals/catastrophe_visual_controller.gd" id="20_catastrophe_visual"]
+[ext_resource type="Script" uid="uid://bo4grsja2suiu" path="res://scripts/combat/combat_manager.gd" id="21_combat"]
+[ext_resource type="PackedScene" path="res://scenes/ui/initiative_turn_bar.tscn" id="22_initiative"]
+[ext_resource type="Script" uid="uid://pf8unnhi0226" path="res://scripts/visuals/glitch_visual_controller.gd" id="23_glitch"]
+[ext_resource type="Script" uid="uid://drni88nfma18a" path="res://scripts/visuals/carreta_visual_controller.gd" id="24_carreta"]
+[ext_resource type="Script" uid="uid://cs7qdwj48070j" path="res://scripts/visuals/solo_event_visual_controller.gd" id="25_solo"]
+[ext_resource type="Script" uid="uid://e6eudg3txh14" path="res://scripts/managers/gnomes_2_manager.gd" id="26_gnomes2"]
+[ext_resource type="Script" uid="uid://bo6ahkklld5gs" path="res://scripts/visuals/gnome_hover_hint.gd" id="27_gnome_hover"]
+
+[node name="Node2D" type="Node2D" unique_id=577434666]
+script = ExtResource("1_map")
+
+[node name="PontoZero" type="Node2D" parent="." unique_id=241538039]
+position = Vector2(395, 363)
+
+[node name="ParallaxBackground" type="CanvasLayer" parent="." unique_id=1901838203]
+layer = -100
+script = ExtResource("9_parallax")
+
+[node name="MapRoot" type="Node2D" parent="." unique_id=214109439]
+
+[node name="Background" type="Sprite2D" parent="MapRoot" unique_id=1010442680]
+z_index = -30
+
+[node name="Ground" type="Node2D" parent="MapRoot" unique_id=1965463702]
+z_index = -20
+
+[node name="StartZone" type="Node2D" parent="MapRoot" unique_id=1555494476]
+z_index = -10
+
+[node name="Hexes" type="Node2D" parent="MapRoot" unique_id=647848785]
+z_index = -9
+
+[node name="DepthSorted" type="Node2D" parent="MapRoot" unique_id=38173313]
+z_index = -8
+y_sort_enabled = true
+script = ExtResource("11_depth")
+
+[node name="PlayableActors" type="Node2D" parent="MapRoot/DepthSorted" unique_id=820761731 node_paths=PackedStringArray("gerencia", "exploration", "combat_manager")]
+y_sort_enabled = true
+script = ExtResource("10_party")
+gerencia = NodePath("../../../GerenciaJogo")
+exploration = NodePath("../../../ExplorationManager")
+combat_manager = NodePath("../../../CombatManager")
+
+[node name="CompanionActors" type="Node2D" parent="MapRoot/DepthSorted" unique_id=1866738934 node_paths=PackedStringArray("gerencia", "exploration", "skill_manager", "combat_manager")]
+y_sort_enabled = true
+script = ExtResource("12_companions")
+gerencia = NodePath("../../../GerenciaJogo")
+exploration = NodePath("../../../ExplorationManager")
+skill_manager = NodePath("../../../SkillManager")
+combat_manager = NodePath("../../../CombatManager")
+
+[node name="EnemyActors" type="Node2D" parent="MapRoot/DepthSorted" unique_id=1504471186]
+y_sort_enabled = true
+
+[node name="SpecialEventVisuals" type="Node2D" parent="MapRoot/DepthSorted" unique_id=1464068027]
+y_sort_enabled = true
+
+[node name="Gnomes2Visuals" type="Node2D" parent="MapRoot/DepthSorted" unique_id=331098974]
+y_sort_enabled = true
+
+[node name="CatastropheVisuals" type="Node2D" parent="MapRoot/DepthSorted" unique_id=1583504449]
+y_sort_enabled = true
+
+[node name="CatastropheVisualController" type="Node2D" parent="MapRoot" unique_id=1903706419 node_paths=PackedStringArray("catastrophe_manager", "visual_root")]
+script = ExtResource("20_catastrophe_visual")
+catastrophe_manager = NodePath("../../CatastropheManager")
+visual_root = NodePath("../DepthSorted/CatastropheVisuals")
+
+[node name="GerenciaJogo" type="Node" parent="." unique_id=1592334703 node_paths=PackedStringArray("map_view")]
+script = ExtResource("2_campaign")
+map_view = NodePath("..")
+
+[node name="BlockManager" type="Node" parent="." unique_id=318104959 node_paths=PackedStringArray("gerencia")]
+script = ExtResource("3_block")
+gerencia = NodePath("../GerenciaJogo")
+require_event_confirmation = true
+require_encounter_confirmation = true
+require_information_confirmation = true
+
+[node name="Gnomes3Manager" type="Node" parent="." unique_id=2055260048 node_paths=PackedStringArray("gerencia", "block_manager", "exploration", "combat_manager")]
+script = ExtResource("13_gnomes")
+gerencia = NodePath("../GerenciaJogo")
+block_manager = NodePath("../BlockManager")
+exploration = NodePath("../ExplorationManager")
+combat_manager = NodePath("../CombatManager")
+
+[node name="Gnomes2Manager" type="Node" parent="." unique_id=1156418177 node_paths=PackedStringArray("gerencia", "exploration", "combat_manager", "visual_root")]
+script = ExtResource("26_gnomes2")
+gerencia = NodePath("../GerenciaJogo")
+exploration = NodePath("../ExplorationManager")
+combat_manager = NodePath("../CombatManager")
+visual_root = NodePath("../MapRoot/DepthSorted/Gnomes2Visuals")
+
+[node name="GnomeHoverHint" type="Node" parent="." unique_id=888708654]
+script = ExtResource("27_gnome_hover")
+
+[node name="EventExecutor" type="Node" parent="." unique_id=425363172 node_paths=PackedStringArray("gerencia", "block_manager", "skill_manager", "catastrophe_manager", "exploration")]
+script = ExtResource("18_event_executor")
+gerencia = NodePath("../GerenciaJogo")
+block_manager = NodePath("../BlockManager")
+skill_manager = NodePath("../SkillManager")
+catastrophe_manager = NodePath("../CatastropheManager")
+exploration = NodePath("../ExplorationManager")
+
+[node name="CatastropheManager" type="Node" parent="." unique_id=1152766396 node_paths=PackedStringArray("gerencia", "skill_manager")]
+script = ExtResource("19_catastrophe")
+gerencia = NodePath("../GerenciaJogo")
+skill_manager = NodePath("../SkillManager")
+
+[node name="SkillManager" type="Node" parent="." unique_id=617302417 node_paths=PackedStringArray("catastrophe_manager")]
+script = ExtResource("4_skill")
+catastrophe_manager = NodePath("../CatastropheManager")
+
+[node name="CombatManager" type="Node" parent="." unique_id=353317532 node_paths=PackedStringArray("gerencia", "block_manager", "skill_manager", "map_view", "enemy_visual_root", "event_executor")]
+script = ExtResource("21_combat")
+gerencia = NodePath("../GerenciaJogo")
+block_manager = NodePath("../BlockManager")
+skill_manager = NodePath("../SkillManager")
+map_view = NodePath("..")
+enemy_visual_root = NodePath("../MapRoot/DepthSorted/EnemyActors")
+event_executor = NodePath("../EventExecutor")
+
+[node name="PlayerSkillManager" type="Node" parent="." unique_id=849105589 node_paths=PackedStringArray("block_manager", "skill_manager")]
+script = ExtResource("5_player_skill")
+block_manager = NodePath("../BlockManager")
+skill_manager = NodePath("../SkillManager")
+
+[node name="ExplorationManager" type="Node" parent="." unique_id=2118664766 node_paths=PackedStringArray("gerencia", "block_manager", "player_skill_manager", "catastrophe_manager")]
+script = ExtResource("6_exploration")
+gerencia = NodePath("../GerenciaJogo")
+block_manager = NodePath("../BlockManager")
+player_skill_manager = NodePath("../PlayerSkillManager")
+catastrophe_manager = NodePath("../CatastropheManager")
+
+[node name="GlitchVisualController" type="Node" parent="." unique_id=1322122752]
+script = ExtResource("23_glitch")
+
+[node name="SoloEventVisualController" type="Node" parent="." unique_id=432052931]
+script = ExtResource("25_solo")
+
+[node name="CarretaVisualController" type="CanvasLayer" parent="." unique_id=1231070717]
+layer = 20
+script = ExtResource("24_carreta")
+
+[node name="RoundUI" type="CanvasLayer" parent="." unique_id=1860242340]
+layer = 60
+
+[node name="NextPhaseButton" type="Button" parent="RoundUI" unique_id=1783180169]
+visible = false
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -249.0
+offset_top = -72.0
+offset_right = -18.0
+offset_bottom = -21.0
+grow_horizontal = 0
+grow_vertical = 0
+disabled = true
+text = "Próxima fase"
+script = ExtResource("17_next_phase")
+
+[node name="DestinationDialog" type="ConfirmationDialog" parent="RoundUI" unique_id=282901623]
+title = "Próxima fase"
+dialog_text = "Escolha para onde o grupo irá:"
+
+[node name="DistrictOptions" type="OptionButton" parent="RoundUI/DestinationDialog" unique_id=469584896]
+offset_left = 20.0
+offset_top = 70.0
+offset_right = 380.0
+offset_bottom = 102.0
+
+[node name="RoundManager" type="Node" parent="." unique_id=446084339 node_paths=PackedStringArray("gerencia", "exploration", "block_manager", "player_skill_manager", "skill_manager", "catastrophe_manager", "advance_button", "destination_dialog", "district_options")]
+script = ExtResource("7_round")
+gerencia = NodePath("../GerenciaJogo")
+exploration = NodePath("../ExplorationManager")
+block_manager = NodePath("../BlockManager")
+player_skill_manager = NodePath("../PlayerSkillManager")
+skill_manager = NodePath("../SkillManager")
+catastrophe_manager = NodePath("../CatastropheManager")
+advance_button = NodePath("../RoundUI/NextPhaseButton")
+destination_dialog = NodePath("../RoundUI/DestinationDialog")
+district_options = NodePath("../RoundUI/DestinationDialog/DistrictOptions")
+
+[node name="PartyStatusHUD" parent="." unique_id=1267966876 node_paths=PackedStringArray("gerencia", "exploration", "skill_manager", "combat_manager") instance=ExtResource("14_party_hud")]
+gerencia = NodePath("../GerenciaJogo")
+exploration = NodePath("../ExplorationManager")
+skill_manager = NodePath("../SkillManager")
+combat_manager = NodePath("../CombatManager")
+
+[node name="InitiativeTurnBar" parent="." unique_id=382602452 node_paths=PackedStringArray("combat_manager", "gerencia", "party_hud") instance=ExtResource("22_initiative")]
+combat_manager = NodePath("../CombatManager")
+gerencia = NodePath("../GerenciaJogo")
+party_hud = NodePath("../PartyStatusHUD")
+
+[node name="CampaignTopBar" parent="." unique_id=1705025206 node_paths=PackedStringArray("gerencia", "round_manager") instance=ExtResource("15_top_bar")]
+gerencia = NodePath("../GerenciaJogo")
+round_manager = NodePath("../RoundManager")
+
+[node name="BlockActivationPopup" parent="." unique_id=1380542902 node_paths=PackedStringArray("block_manager", "skill_manager", "player_skill_manager", "event_executor", "combat_manager") instance=ExtResource("16_block_popup")]
+block_manager = NodePath("../BlockManager")
+skill_manager = NodePath("../SkillManager")
+player_skill_manager = NodePath("../PlayerSkillManager")
+event_executor = NodePath("../EventExecutor")
+combat_manager = NodePath("../CombatManager")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2100316477]

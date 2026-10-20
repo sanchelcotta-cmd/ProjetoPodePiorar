@@ -1,23 +1,25 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://c45a0cq3k271h"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_edh08"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_2dr3v"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_edh08"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_2dr3v"]
 [ext_resource type="Resource" uid="uid://d1vyyl0rxpnfs" path="res://resources/itens/equipments/acessorios/acessorio_epico_amuleto_divino.tres" id="2_g8hbq"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_g8hbq"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_1u2ps"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_g8hbq"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_1u2ps"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/acessorios_simples_1.png" id="ppp_icon_sheet"]
 
 [sub_resource type="Resource" id="Resource_edh08"]
 script = ExtResource("4_1u2ps")
 effect_type = 1
-modify_mode = 2
-percent = 0.3
-debuff_id = &"db_00010"
+activation_chance = 0.3
+status_ids = Array[StringName]([&"db_00010", &"db_00009"])
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [sub_resource type="Resource" id="Resource_2dr3v"]
 script = ExtResource("2_2dr3v")
-display_name = "Remove Debuff tristeza"
-description = "Remove debuff de tristeza"
+id = &"item_active_anel_de_humor"
+display_name = "Ajustar Humor"
+description = "Uma tentativa por Rodada: 30% de chance de remover Tristeza e Terror ativos no portador."
 use_context = 2
 target_mode = 1
 range_limit = 0
@@ -25,32 +27,20 @@ max_uses_per_round = 1
 effects = Array[ExtResource("4_1u2ps")]([SubResource("Resource_edh08")])
 metadata/_custom_type_script = "uid://c3s14bqybert"
 
-[sub_resource type="Resource" id="Resource_g8hbq"]
-script = ExtResource("4_1u2ps")
-effect_type = 1
-modify_mode = 2
-percent = 0.3
-attribute_id = &"db_00009"
-metadata/_custom_type_script = "uid://eticmfa8q3xa"
-
-[sub_resource type="Resource" id="Resource_1u2ps"]
-script = ExtResource("2_2dr3v")
-display_name = "Remove Debuff terror"
-description = "Remove Debuff de terror"
-use_context = 2
-range_limit = 0
-max_uses_per_round = 1
-effects = Array[ExtResource("4_1u2ps")]([SubResource("Resource_g8hbq")])
-metadata/_custom_type_script = "uid://c3s14bqybert"
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(126, 64, 50, 54)
 
 [resource]
 script = ExtResource("1_edh08")
+icon = SubResource("ppp_item_icon")
+id = &"ac_00009"
 display_name = "Anel de Humor"
 description = "30% Chance de retirar debuffs: Tristeza ou Terror. Pode tentar uma vez por Rodada."
 acquisition_sources = 3
 tags = Array[StringName]([&"acessorio", &"comum"])
 equipment_slot = 3
-granted_active_skills = Array[ExtResource("2_2dr3v")]([SubResource("Resource_2dr3v"), SubResource("Resource_1u2ps")])
+granted_active_skills = Array[ExtResource("2_2dr3v")]([SubResource("Resource_2dr3v")])
 consumed_on_use = false
 craft_result = Array[ExtResource("1_edh08")]([ExtResource("2_g8hbq")])
 metadata/_custom_type_script = "uid://bql64fe8a0w24"

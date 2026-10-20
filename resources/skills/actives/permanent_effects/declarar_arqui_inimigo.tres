@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" format=3 uid="uid://bvep44t7w5s2u"]
+
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="1_active"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="2_effect"]
+[ext_resource type="Resource" uid="uid://bvei2ps8axu4p" path="res://resources/skills/passives/permanent_effects/arqui_inimigo_ataque.tres" id="3_attack"]
+[ext_resource type="Resource" uid="uid://e36nug1p4q6d" path="res://resources/skills/passives/permanent_effects/arqui_inimigo_defesa.tres" id="4_defense"]
+
+[sub_resource type="Resource" id="Effect_declare_rival"]
+script = ExtResource("2_effect")
+effect_type = 54
+target = 2
+passives_granted_on_success = Array[Resource]([ExtResource("3_attack"), ExtResource("4_defense")])
+
+[resource]
+script = ExtResource("1_active")
+id = &"permanent_active_070"
+display_name = "Declarar Arqui-Inimigo"
+description = "Durante um Encontro Indesejado, escolhe um inimigo e vincula o tipo dele (EntityData.id) como arqui-inimigo permanente. A habilidade desaparece depois da escolha."
+target_mode = 3
+consume_skill_on_success = true
+requires_undesired_encounter = true
+effects = Array[ExtResource("2_effect")]([SubResource("Effect_declare_rival")])
+tags = Array[StringName]([&"permanent_effect", &"archenemy", &"declaration"])

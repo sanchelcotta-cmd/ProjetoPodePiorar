@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="SpriteSheetAnimationData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/entities/sprite_sheet_animation_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://sprites/entities_allies/gatinho_idle_rajado_1x.png" id="2_sheet"]
+[ext_resource type="Texture2D" path="res://sprites/entities_allies/gatinho_idle_rajado_2_1x.png" id="3_sheet"]
+[ext_resource type="Texture2D" path="res://sprites/entities_allies/gatinho_walk_rajado_1x.png" id="4_sheet"]
+[ext_resource type="Texture2D" path="res://sprites/entities_allies/gatinho_jump_rajado_1x.png" id="5_sheet"]
+[ext_resource type="Texture2D" path="res://sprites/entities_allies/gatinho_carrying_rajado_1x.png" id="6_sheet"]
+[ext_resource type="Texture2D" path="res://sprites/entities_allies/gatinho_attacking_rajado_1x.png" id="7_sheet"]
+
+[resource]
+script = ExtResource("1_script")
+idle_sheet = ExtResource("2_sheet")
+idle_alternative_sheet = ExtResource("3_sheet")
+walk_sheet = ExtResource("4_sheet")
+jump_sheet = ExtResource("5_sheet")
+carrying_sheet = ExtResource("6_sheet")
+attack_sheet = ExtResource("7_sheet")
+palette = 4
+idle_fps = 6.0
+walk_fps = 6.0
+action_fps = 6.0
+irregular_idle = true

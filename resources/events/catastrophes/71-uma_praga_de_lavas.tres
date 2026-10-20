@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Resource" path="res://resources/itens/states/apodrecido.tres" id="4_rotten"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 33
+target = 3
+effect_scope = 1
+item_category_filter = 2
+item_state = ExtResource("4_rotten")
+apply_item_state_to_existing = true
+apply_item_state_to_future_acquisitions = true
+discard_affected_items_on_expiration = true
+has_duration = true
+expiration_mode = 1
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00071_out_01"
+id = &"ev_00071_out_01"
+display_name = "A comida apodreceu."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00071"
+display_name = "Uma Praga de Lavas"
+description = "Todos os Consumíveis nos inventários ficam apodrecidos e não podem recuperar Vida. Pelo restante do Dia, todo Consumível encontrado também nasce apodrecido. Na virada do Dia, os itens apodrecidos são descartados; no novo mapa, os Consumíveis encontrados voltam ao normal."
+narrative_description = "Você vê uma maçã escurecer diante dos seus olhos. Depois outra, e depois todas. Alguma coisa decidiu que hoje ninguém vai almoçar."
+category = 2
+valence = 2
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"catastrophe", &"inventory", &"consumables", &"day_duration"])

@@ -1,23 +1,30 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://dh78ukxhfelfs"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_wjnqd"]
 
 [sub_resource type="Resource" id="Effect"]
 script = ExtResource("3_effect")
-effect_type = 28
-custom_rule = &"chicken_visual_until_round_end"
+effect_type = 37
+visual_effect_id = &"chicken_form"
+has_duration = true
+duration_amount = 1
+duration_unit = 1
+expiration_mode = 2
 
 [sub_resource type="Resource" id="Outcome"]
 script = ExtResource("2_outcome")
+id = &"ev_00051_out_01"
 display_name = "Você vira uma galinha."
+narrative_description = "Por enquanto, o mundo verá uma galinha azulada onde você estava. Até o fim desta Rodada, sua aparência muda, mas Vida, Ataque, Estamina, itens, Maestrias e habilidades permanecem intactos."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00051"
 display_name = "Transmutação Galiforme"
 description = "Até o fim da Rodada, o personagem ativo tem aparência de galinha; atributos, itens, Maestrias e passivas não mudam."
 narrative_description = "[personagem_ativo] sente um arrepio subir da ponta dos pés até o topo da cabeça. As mãos desaparecem. Um bico surge onde deveria haver um nariz. Algumas penas depois, e uma vontade irresistível de ciscar. Então, resta apenas um sonoro: 'Pó... pó... pó...?'."
-custom_rule = &"chicken_visual_until_round_end"
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

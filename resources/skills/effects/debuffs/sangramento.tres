@@ -1,12 +1,20 @@
 [gd_resource type="Resource" script_class="DebuffData" format=3 uid="uid://dkfp6bb2vbeo7"]
 
-[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/sc_resources/debuffs_data.gd" id="1_cf160"]
+[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/resources/status/debuffs_data.gd" id="1_cf160"]
+[ext_resource type="Texture2D" path="res://sprites/debuffs/debuffs_1x.png" id="2_sheet"]
+
+[sub_resource type="AtlasTexture" id="Icon"]
+atlas = ExtResource("2_sheet")
+region = Rect2(157, 57, 36, 32)
 
 [resource]
 script = ExtResource("1_cf160")
 id = &"db_00008"
+icon = SubResource("Icon")
 display_name = "Sangramento"
-description = "Dano continuo aplicado"
+description = "Causa 1 de dano no início de cada turno por uma quantidade de turnos igual ao resultado do dado que causou o Sangramento, não ao dano final do ataque. Cada ação de movimento causa mais 2 de dano. Termina na próxima virada de Rodada, se não acabar antes."
 tick_moment = 1
 damage_on_move = 2
+fixed_damage_per_tick = 1
+duration_from_die_result = true
 metadata/_custom_type_script = "uid://drp24ngc2nn0y"

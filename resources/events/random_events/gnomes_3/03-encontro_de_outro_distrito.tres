@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://cdebwxfor44k0"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_p8mb7"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 28
+target = 4
+custom_rule = &"gnome_3_start_other_district_encounter"
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"gn_00003_out_01"
+display_name = "Um encontro inesperado começou."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"gn_00003"
+display_name = "Gnomo Misterioso"
+description = "Aciona um Encontro Indesejado de outro Distrito. À Noite, o encontro obrigatoriamente contém um inimigo com a tag coisa_do_capeta de outro Distrito."
+narrative_description = "O gnomo assovia para uma rua que não parece fazer parte deste bairro. Alguma coisa responde ao longe."
+valence = 2
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+custom_rule = &"gnome_3_start_other_district_encounter"
+tags = Array[StringName]([&"gnomes_3", &"script_personalizado", &"encounter", &"other_district"])

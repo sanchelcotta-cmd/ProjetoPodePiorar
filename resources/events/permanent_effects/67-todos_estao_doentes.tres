@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://cvqjd61c5qq48"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_w1fcy"]
+[ext_resource type="Resource" uid="uid://b5omu6pyjuty1" path="res://resources/skills/effects/debuffs/doenca_1.tres" id="4_disease"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 3
+target = 3
+debuff = ExtResource("4_disease")
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00067_out_01"
+id = &"ev_00067_out_01"
+display_name = "O grupo inteiro contraiu Doença."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00067"
+display_name = "Todos Estão Doentes!"
+description = "Todos os personagens contraem Doença e seguem sua progressão padrão individualmente até consumir um item de Cura."
+narrative_description = "Primeiro um espirro. Depois outro. Em poucos minutos ninguém consegue dizer uma frase inteira sem tossir ou fungar. Seja lá o que vocês pegaram... ninguém escapou."
+category = 1
+valence = 2
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"permanent_effect", &"disease", &"group"])

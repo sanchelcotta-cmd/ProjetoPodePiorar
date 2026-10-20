@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/active_skill_data.gd" id="2_active"]
+
+[sub_resource type="Resource" id="Resource_reveal"]
+script = ExtResource("1_effect")
+effect_type = 8
+
+[resource]
+script = ExtResource("2_active")
+id = &"item_active_001"
+display_name = "Super-Sentidos"
+description = "Revela blocos em um alcance igual à metade da Estamina atual do portador."
+use_context = 1
+target_mode = 6
+range_mode = 3
+max_uses_per_turn = 1
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_reveal")])
+tags = Array[StringName]([&"uniforme_super_heroi", &"super_sentidos"])

@@ -1,9 +1,11 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://cioy75i0o6mus"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_eud43"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_1r78q"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_ewxlu"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_nwlni"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_eud43"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_1r78q"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_ewxlu"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_nwlni"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/consumiveis_2.png" id="ppp_icon_sheet"]
 
 [sub_resource type="Resource" id="Resource_qr57e"]
 script = ExtResource("4_nwlni")
@@ -20,8 +22,14 @@ attribute_id = &"stamina"
 duration_turns = 1
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(231, 133, 76, 65)
+
 [resource]
 script = ExtResource("1_eud43")
+icon = SubResource("ppp_item_icon")
+id = &"cs_00009"
 display_name = "Chocolate"
 description = "Recupera 5 de Vida.
 +1 de estamina por 1 turno."

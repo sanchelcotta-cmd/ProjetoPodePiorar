@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="Informacao" format=3 uid="uid://ba7e14odmk5dx"]
 
-[ext_resource type="Script" uid="uid://cmesj3xfmjv7o" path="res://scripts/sc_resources/informacao.gd" id="1_cwie6"]
+[ext_resource type="Script" uid="uid://cmesj3xfmjv7o" path="res://scripts/resources/information/informacao.gd" id="1_cwie6"]
 
 [resource]
 script = ExtResource("1_cwie6")
@@ -10,6 +10,7 @@ descricao = "Enrico conseguiu acessar parte do código-fonte do aplicativo. Desc
 
 \"Os termos são irrevogáveis.\"
 Enrico percebeu que aquilo não era um simples programa, mas um instrumento criado para servir a uma inteligência desconhecida."
+tipo = 3
 numero = 4
 tags = Array[StringName]([&"informacao", &"controle_da_mente"])
 metadata/_custom_type_script = "uid://cmesj3xfmjv7o"

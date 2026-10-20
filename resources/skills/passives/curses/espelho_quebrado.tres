@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_passive"]
+
+[sub_resource type="Resource" id="Resource_custom"]
+script = ExtResource("1_effect")
+effect_type = 25
+target = 0
+value_source = 2
+percent = 0.5
+generated_damage_can_trigger_passives = false
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[resource]
+script = ExtResource("2_passive")
+id = &"ps_00028"
+display_name = "Maldição: Espelho Quebrado"
+description = "Sempre que o portador causar dano, ele sofre metade desse dano, arredondada para baixo."
+trigger = 7
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_custom")])
+metadata/_custom_type_script = "res://scripts/resources/skills/passive_skill_data.gd"

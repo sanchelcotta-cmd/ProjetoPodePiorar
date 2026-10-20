@@ -1,10 +1,12 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://17s211mdi2s7"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_k3vv0"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_bfrgq"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_k3vv0"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_30tnu"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_bfrgq"]
 
 [resource]
 script = ExtResource("1_k3vv0")
+id = &"en_00016"
 display_name = "São tipo Goblins"
 description = "Andam em 3, cada um com uma maestria. 
 

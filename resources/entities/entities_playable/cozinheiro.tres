@@ -1,16 +1,22 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://bl1nlh7ebdn3k"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_atd1a"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_5ph5l"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_atd1a"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_5ph5l"]
+[ext_resource type="Resource" path="res://resources/skills/passives/playables/cozinheiro/tempero_do_chef.tres" id="3_passive"]
+[ext_resource type="Resource" path="res://resources/skills/actives/playables/cozinheiro/marmita_do_dia.tres" id="4_active"]
+[ext_resource type="Resource" path="res://resources/entities/animations/cozinheiro_animation.tres" id="9_animation"]
 
 [resource]
 script = ExtResource("1_atd1a")
 id = &"pj_00001"
 display_name = "Cozinheiro"
 description = "Um cozinheiro bom de faca."
+playable_animation = ExtResource("9_animation")
 vida_base = 32
 ataque_base = 4
 stamina_base = 3
 maestrias = Array[int]([1])
+skill_passivas = Array[ExtResource("2_5ph5l")]([ExtResource("3_passive")])
+skill_ativas = Array[ExtResource("4_active")]([ExtResource("4_active")])
 tags = Array[StringName]([&"humano", &"jogavel"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

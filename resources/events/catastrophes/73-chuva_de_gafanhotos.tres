@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect_damage_before_action"]
+script = ExtResource("3_effect")
+execution_mode = 2
+trigger_moment = 1
+effect_scope = 1
+amount = 1
+use_night_amount_override = true
+night_amount_override = 2
+math_operation = 1
+has_duration = true
+expiration_mode = 2
+
+[sub_resource type="Resource" id="Effect_suppress_exploration_skills"]
+script = ExtResource("3_effect")
+effect_type = 35
+target = 4
+effect_scope = 1
+skill_context_filter = 2
+suppress_passives = true
+suppress_actives = true
+has_duration = true
+expiration_mode = 2
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00073_out_01"
+id = &"ev_00073_out_01"
+display_name = "Os gafanhotos cobrem o céu."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_damage_before_action"), SubResource("Effect_suppress_exploration_skills")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00073"
+display_name = "Chuva de Gafanhotos"
+description = "Durante a Rodada, todos sofrem 1 de dano antes de cada ação; à Noite, sofrem 2. Todas as passivas e habilidades ativas de Exploração ficam indisponíveis."
+narrative_description = "Um zumbido distante toma conta do céu. Quando vocês olham para cima, já é tarde. Milhares de gafanhotos escurecem o sol. Alguns batem no rosto. Outros grudam na roupa. Não existe um segundo de paz."
+category = 2
+valence = 2
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"catastrophe", &"damage_modifier", &"exploration", &"round_duration"])

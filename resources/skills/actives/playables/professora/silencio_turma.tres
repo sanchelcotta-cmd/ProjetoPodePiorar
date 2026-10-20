@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/active_skill_data.gd" id="2_active"]
+
+[sub_resource type="Resource" id="Resource_reduce_attack"]
+script = ExtResource("1_effect")
+effect_type = 9
+target = 2
+modify_mode = 3
+value_source = 1
+value_source_attribute_id = &"attack"
+minimum_value = 1
+attribute_id = &"attack"
+has_duration = true
+duration_turns = 2
+
+[resource]
+script = ExtResource("2_active")
+id = &"playable_active_004"
+display_name = "Silêncio, Turma!"
+description = "Uma vez por combate, seleciona um inimigo. Por 2 turnos, reduz o Ataque dele em valor igual ao Ataque Base da Professora, sem deixá-lo abaixo de 1."
+target_mode = 3
+max_uses_per_combat = 1
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_reduce_attack")])
+tags = Array[StringName]([&"professora"])

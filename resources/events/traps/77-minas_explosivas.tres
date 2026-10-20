@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://bu3uo5liihkd7"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_ivmij"]
+[ext_resource type="Resource" uid="uid://dx3oneirwx7vm" path="res://resources/skills/effects/debuffs/queimadura.tres" id="4_debuff"]
+
+[sub_resource type="Resource" id="Effect_explosion_damage"]
+script = ExtResource("3_effect")
+target = 7
+area_radius = 1
+dice_count = 1
+dice_sides = 6
+shared_roll_id = &"mine_damage"
+math_operation = 1
+
+[sub_resource type="Resource" id="Effect_burn"]
+script = ExtResource("3_effect")
+effect_type = 3
+target = 7
+debuff = ExtResource("4_debuff")
+value_source = 3
+area_radius = 1
+shared_roll_id = &"mine_damage"
+status_initial_tick_damage_from_value = true
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00077_out_01"
+display_name = "A mina explode."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_explosion_damage"), SubResource("Effect_burn")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00077"
+display_name = "Minas Explosivas"
+description = "Causa 1d6 de dano e Queimadura no hex ativado e em seus seis hexágonos vizinhos. A Queimadura começa com o mesmo valor do dado e diminui 1 de dano por turno até zerar."
+narrative_description = "Um clique metálico quase tímido soa sob seu pé. Então o chão decide responder em voz alta."
+category = 3
+valence = 2
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"trap", &"damage", &"burn", &"area_hex", &"dice"])

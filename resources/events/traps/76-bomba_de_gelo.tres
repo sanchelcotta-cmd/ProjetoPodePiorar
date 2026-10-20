@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://dvvkt5uwffmg7"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_priwa"]
+[ext_resource type="Resource" uid="uid://dciobhf4m2vxg" path="res://resources/skills/effects/debuffs/atordoado.tres" id="4_debuff"]
+
+[sub_resource type="Resource" id="Effect_stun"]
+script = ExtResource("3_effect")
+effect_type = 3
+debuff = ExtResource("4_debuff")
+dice_count = 1
+dice_sides = 6
+has_duration = true
+duration_source = 1
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00076_out_01"
+display_name = "O gelo fecha sobre você."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_stun")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00076"
+display_name = "Bomba de Gelo"
+description = "Atordoa o personagem ativo por 1d6 turnos."
+narrative_description = "Você pisa em algo gelado demais para estar ali. O estalo vem antes da névoa branca, e a névoa vem antes de seus músculos pararem de responder."
+category = 3
+valence = 2
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"trap", &"stun", &"dice"])

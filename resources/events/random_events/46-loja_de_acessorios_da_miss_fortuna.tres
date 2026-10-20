@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://bp7sbssuumg0o"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_5klyg"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
 
 [sub_resource type="Resource" id="Effect_item"]
 script = ExtResource("3_effect")
@@ -12,13 +13,15 @@ tags_filter = Array[StringName]([&"acessorio"])
 
 [sub_resource type="Resource" id="Outcome"]
 script = ExtResource("2_outcome")
+id = &"ev_00046_out_01"
 display_name = "Escolha um acessório."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_item")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00046"
 display_name = "Loja de Acessórios da Miss Fortuna"
 description = "O jogador escolhe e obtém qualquer acessório disponível no jogo."
-narrative_description = "Uma pequena lojinha aparece onde, até alguns segundos atrás, não existia absolutamente nada. Na porta, uma plaquinha escrita à mão: 'Miss Fortuna'. Lá dentro, uma mulher elegante organiza dezenas de acessórios sobre uma bancada de madeira. [fala_miss_fortuna]"
+narrative_description = "Uma pequena lojinha aparece onde, até alguns segundos atrás, não existia absolutamente nada. Na porta, uma plaquinha escrita à mão: 'Miss Fortuna'. Lá dentro, uma mulher elegante organiza dezenas de acessórios sobre uma bancada de madeira. Sem sequer levantar a cabeça, ela diz:\n[fala_miss_fortuna]"
 valence = 0
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

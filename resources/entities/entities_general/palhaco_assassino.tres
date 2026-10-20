@@ -1,12 +1,14 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://b8o4t3srex7bw"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_5g3di"]
-[ext_resource type="Resource" uid="uid://db8xx3150mvqj" path="res://resources/skills/actives/invocacao_3.tres" id="2_bbpd7"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_p4300"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_5g3di"]
+[ext_resource type="Resource" path="res://resources/skills/actives/enemies/palhaco_guarda/invocar_guarda_fantoche.tres" id="2_bbpd7"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_p4300"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_tyt5s"]
 [ext_resource type="Resource" uid="uid://q7qmrdf1jiiv" path="res://resources/skills/passives/causa_terror_ao_atacar.tres" id="4_8s2cl"]
 
 [resource]
 script = ExtResource("1_5g3di")
+id = &"en_00022"
 display_name = "Palhaço Assassino"
 description = "A cada início de seu 3º turno (3º, 6º, 9º...), possui 50% de chance de invocar um “Guarda-Fantoche\"."
 narrative_description = "A maquiagem exagerada escorre pelo rosto, misturando tinta com sangue seco. O enorme sorriso pintado nunca desaparece, mesmo quando ele afia lentamente a lâmina contra a própria roupa. Entre uma gargalhada e outra, ele parece genuinamente feliz por finalmente ter encontrado um novo público."
@@ -15,6 +17,6 @@ ataque_base = 9
 stamina_base = 9
 maestrias = Array[int]([1])
 skill_passivas = Array[ExtResource("2_p4300")]([ExtResource("4_8s2cl")])
-skill_ativas = Array[Resource]([ExtResource("2_bbpd7")])
+skill_ativas = Array[ExtResource("2_tyt5s")]([ExtResource("2_bbpd7")])
 tags = Array[StringName]([&"humanoide", &"causa_terror", &"invocador", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

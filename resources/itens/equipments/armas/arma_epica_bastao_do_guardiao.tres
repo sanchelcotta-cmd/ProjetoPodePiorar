@@ -1,14 +1,22 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://cfikf1f35otm5"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_ecptv"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_apv43"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_0nbx0"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_ecptv"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_apv43"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_0nbx0"]
 [ext_resource type="Resource" uid="uid://dokc0rnyidl15" path="res://resources/skills/passives/protecao_50.tres" id="4_h4nle"]
 [ext_resource type="Resource" uid="uid://jl6r5f74ekng" path="res://resources/skills/passives/contra_ataque_50.tres" id="5_x0ph0"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="6_6t7f6"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="6_6t7f6"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armas_epicas_1.png" id="ppp_icon_sheet"]
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(210, 136, 37, 89)
 
 [resource]
 script = ExtResource("1_ecptv")
+icon = SubResource("ppp_item_icon")
+id = &"aa_00003"
 display_name = "Bastão do Guardião"
 description = "Chance de bloquear ataques e de contra-atacar quando o inimigo está adjacente."
 rarity = 4

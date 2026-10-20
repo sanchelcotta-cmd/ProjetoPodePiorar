@@ -1,23 +1,26 @@
 [gd_resource type="Resource" script_class="EventData" format=3 uid="uid://ckcwnr7h4i2u5"]
 
-[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_refv0"]
-[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="2_y3fhi"]
-[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="3_b0wku"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="1_refv0"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="2_y3fhi"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="3_b0wku"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_y3fhi"]
 
 [sub_resource type="Resource" id="Resource_xpajy"]
 script = ExtResource("2_y3fhi")
-effect_type = 28
+effect_type = 38
 target = 4
 tags_filter = Array[StringName]([&"informacao", &"encontro_indesejado"])
-amount = 6
-percent = 1.0
+visual_mask_id = &"gnome_2"
 has_duration = true
 duration_amount = 1
 duration_unit = 1
+expiration_mode = 2
 metadata/_custom_type_script = "uid://bknff8de8c2u0"
 
 [sub_resource type="Resource" id="Resource_tem3e"]
 script = ExtResource("1_refv0")
+id = &"ev_00008_out_01"
+id = &"ev_00008_out_01"
 display_name = "Revelação serelepe"
 narrative_description = "Eles estão em algum lugar... Por que?"
 effects = Array[ExtResource("2_y3fhi")]([SubResource("Resource_xpajy")])
@@ -25,8 +28,10 @@ metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [resource]
 script = ExtResource("3_b0wku")
+id = &"ev_00008"
 display_name = "Gnomos do Caos"
 description = "Até o fim da Rodada, gnomos aparecem sobre os blocos de Informação e de Encontro Indesejado, tornando impossível saber qual é qual."
 narrative_description = "Quando você pisca, eles estão ali. Piscou de novo, desestão."
 outcomes = Array[ExtResource("1_refv0")]([SubResource("Resource_tem3e")])
+tags = Array[StringName]([&"gnomes_2", &"information", &"undesired_encounter", &"round_duration"])
 metadata/_custom_type_script = "uid://cos7c56kjihyx"

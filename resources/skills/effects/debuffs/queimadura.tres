@@ -1,12 +1,20 @@
 [gd_resource type="Resource" script_class="DebuffData" format=3 uid="uid://dx3oneirwx7vm"]
 
-[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/sc_resources/debuffs_data.gd" id="1_vxppn"]
+[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/resources/status/debuffs_data.gd" id="1_vxppn"]
+[ext_resource type="Texture2D" uid="uid://chb81bkerek7r" path="res://sprites/debuffs/debuffs_1x.png" id="2_sheet"]
+
+[sub_resource type="AtlasTexture" id="Icon"]
+atlas = ExtResource("2_sheet")
+region = Rect2(80, 49, 38, 41)
 
 [resource]
 script = ExtResource("1_vxppn")
 id = &"db_00007"
 display_name = "Queimadura"
-description = "Causa dano continuo durante turnos."
+description = "Causa dano contínuo durante os turnos e termina ao chegar a zero ou na próxima virada de Rodada."
+icon = SubResource("Icon")
 tick_moment = 1
 damage_change_per_tick = -1
+change_tick_damage_before_applying = true
+ends_when_tick_damage_reaches_zero = true
 metadata/_custom_type_script = "uid://drp24ngc2nn0y"

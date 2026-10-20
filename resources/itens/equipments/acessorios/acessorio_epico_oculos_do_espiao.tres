@@ -1,13 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://b78qhl5nj5r4l"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_w0j7s"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_0vqht"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="3_oq1pb"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_w0j7s"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_0vqht"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="3_oq1pb"]
 [ext_resource type="Resource" uid="uid://cx6gnsrci27fe" path="res://resources/skills/passives/revelar_passivo.tres" id="4_0vqht"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="4_bv5kh"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="4_bv5kh"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/acessorios_epicos_1.png" id="ppp_icon_sheet"]
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(193, 63, 92, 48)
 
 [resource]
 script = ExtResource("1_w0j7s")
+icon = SubResource("ppp_item_icon")
+id = &"ac_00007"
 display_name = "Óculos do Espião"
 description = "Ganha +10 de vida se usar este item e armadura épica do Espião.
 

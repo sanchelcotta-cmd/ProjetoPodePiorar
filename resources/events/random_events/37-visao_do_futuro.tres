@@ -1,24 +1,29 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://cc8tvmw82736f"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_rg1qq"]
 
 [sub_resource type="Resource" id="Effect"]
 script = ExtResource("3_effect")
-effect_type = 28
-custom_rule = &"choose_three_blocks_and_reveal"
+effect_type = 18
+target = 4
+selection_mode = 1
+amount = 3
+reveal_detail = 1
 
 [sub_resource type="Resource" id="Outcome"]
 script = ExtResource("2_outcome")
+id = &"ev_00037_out_01"
 display_name = "Você vê três caminhos."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00037"
 display_name = "Visão do Futuro"
 description = "O personagem ativo seleciona 3 blocos do mapa e revela seus tipos e efeitos."
 narrative_description = "Por um instante, você tem certeza de já ter vivido aquilo e, por alguns segundos, você enxerga coisas que ainda nem aconteceram. Três caminhos passam diante dos seus olhos. Se é bom ou ruim, só vivendo de novo."
 valence = 0
-custom_rule = &"choose_three_blocks_and_reveal"
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

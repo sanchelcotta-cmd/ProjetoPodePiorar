@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://ok3mx2w8yst8"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_d3wvh"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Resource" uid="uid://cxbuegij7mj40" path="res://resources/skills/passives/permanent_effects/simbiose_elemental.tres" id="4_passive"]
+
+[sub_resource type="Resource" id="Effect_absorb_weapon_and_grant_passive"]
+script = ExtResource("3_effect")
+effect_type = 6
+selection_mode = 1
+passive = ExtResource("4_passive")
+grant_binding_source = 3
+required_bound_item_slot = 1
+required_bound_item_rarity = 4
+remove_bound_item_on_grant = true
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00058_out_01"
+id = &"ev_00058_out_01"
+display_name = "A arma foi absorvida."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_absorb_weapon_and_grant_passive")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00058"
+display_name = "Simbiose Elemental"
+description = "Absorve primeiro uma arma Épica equipada ou, se não houver, uma Épica sorteada da mochila. Sem Épica, absorve a arma comum equipada ou sorteia uma comum da mochila e a evolui para uma versão Épica. Sem nenhuma arma, o efeito é inválido. A arma absorvida ocupa o slot permanentemente e não pode ser trocada. Preserva passivas, Maestria e bônus da versão Épica. Distância ignora o limite de alcance e a redução de dano pelos hexes até o alvo; Lâmina causa Sangramento e Impacto causa Atordoamento em todo ataque que causar dano."
+narrative_description = "Você apoia a mão sobre sua arma por um instante. Quando tenta pegá-la de volta... ela já não está mais ali. Desesperado, você procura no chão, na mochila, ao redor. Só então percebe o peso diferente no próprio braço. Sem nenhuma explicação, a arma agora faz parte de você... para sempre?"
+category = 1
+valence = 0
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"permanent_effect", &"epic_equipment", &"mastery"])

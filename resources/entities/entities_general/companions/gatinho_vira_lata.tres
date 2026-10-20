@@ -1,43 +1,22 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://dk3k3likl7o4g"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_upxac"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="2_myyhc"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="3_w1keq"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="4_jh5jo"]
-
-[sub_resource type="Resource" id="Resource_ebpn1"]
-script = ExtResource("2_myyhc")
-effect_type = 8
-target = 6
-modify_mode = 2
-duration_turns = 1
-metadata/_custom_type_script = "uid://eticmfa8q3xa"
-
-[sub_resource type="Resource" id="Resource_jhbqs"]
-script = ExtResource("3_w1keq")
-display_name = "Sexto-Sentido"
-description = "Uma vez por Rodada, durante a fase de Exploração, revela todos os blocos de Encontros Indesejados dentro do alcance da estamina.
-
-Os blocos ficam destacados, mas não revelam quais inimigos estão em cada um.
-
-Dura um turno."
-use_context = 1
-target_mode = 6
-range_limit = 0
-cooldown_turns = 1
-max_uses_per_round = 1
-effects = Array[ExtResource("2_myyhc")]([SubResource("Resource_ebpn1")])
-metadata/_custom_type_script = "uid://c3s14bqybert"
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_entity"]
+[ext_resource type="Resource" path="res://resources/skills/actives/companions/gatinho_vira_lata/sexto_sentido.tres" id="2_active"]
+[ext_resource type="Resource" path="res://resources/entities/animations/gatinho_rajado_animation.tres" id="3_rajado"]
+[ext_resource type="Resource" path="res://resources/entities/animations/gatinho_preto_animation.tres" id="4_preto"]
+[ext_resource type="Resource" path="res://resources/entities/animations/gatinho_orange_animation.tres" id="5_orange"]
+[ext_resource type="Resource" path="res://resources/entities/animations/gatinho_branco_animation.tres" id="6_branco"]
 
 [resource]
-script = ExtResource("1_upxac")
-display_name = "Doguinho Caramelo"
-description = "Companheiro que pode revelar blocos de Encontros Indesejados ao redor."
+script = ExtResource("1_entity")
+id = &"en_00002"
+display_name = "Gatinho Vira-Lata"
+description = "Companheiro que detecta Encontros Indesejados próximos à sua posição."
 narrative_description = "Miau."
+animation_variants = Array[ExtResource("3_rajado")]([ExtResource("3_rajado"), ExtResource("4_preto"), ExtResource("5_orange"), ExtResource("6_branco")])
 vida_base = 20
 ataque_base = 4
 stamina_base = 4
-maestrias = Array[int]([1])
-skill_ativas = Array[ExtResource("3_w1keq")]([SubResource("Resource_jhbqs")])
-tags = Array[StringName]([&"companheiro", &"criatura"])
+skill_ativas = Array[ExtResource("2_active")]([ExtResource("2_active")])
+tags = Array[StringName]([&"companheiro", &"criatura", &"gatinho_vira_lata"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

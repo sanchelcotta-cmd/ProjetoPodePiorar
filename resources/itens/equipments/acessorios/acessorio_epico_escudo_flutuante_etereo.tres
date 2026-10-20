@@ -1,21 +1,41 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dptxj0fh07geu"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_55pqq"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_6o6m7"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_xhe4c"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_hvyb1"]
-[ext_resource type="Resource" uid="uid://c4ueuiwdrdl42" path="res://resources/skills/passives/protecao_25.tres" id="4_w21it"]
-[ext_resource type="Resource" uid="uid://b3irs3mvphhvq" path="res://resources/skills/passives/protecao_75.tres" id="5_qc7yq"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_55pqq"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_6o6m7"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_xhe4c"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_hvyb1"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/acessorios_epicos_1.png" id="ppp_icon_sheet"]
+
+[sub_resource type="Resource" id="Resource_profile"]
+script = ExtResource("4_hvyb1")
+effect_type = 22
+percent = 0.8
+secondary_percent = 0.4
+
+[sub_resource type="Resource" id="Resource_protection"]
+script = ExtResource("3_xhe4c")
+id = &"item_passive_005"
+display_name = "Escudo de Maestria"
+description = "Ao equipar, escolha uma Maestria. Recebe 80% de Proteção contra ela e 40% contra as demais."
+trigger = 21
+effects = Array[ExtResource("4_hvyb1")]([SubResource("Resource_profile")])
+tags = Array[StringName]([&"escudo_flutuante"])
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(289, 39, 84, 84)
 
 [resource]
 script = ExtResource("1_55pqq")
+icon = SubResource("ppp_item_icon")
+id = &"ac_00005"
 display_name = "Escudo Flutuante Etéreo"
-description = "Ganha 75% de proteção contra um tipo de Maestria à sua escolha (fixo.
-Ganha 25% de proteção contra os demais ataques."
+description = "Escolha uma Maestria. Recebe 80% de Proteção contra ataques dessa Maestria e 40% contra as demais."
 rarity = 4
 acquisition_sources = 4
 tags = Array[StringName]([&"acessorio", &"epica"])
 equipment_slot = 3
-granted_passives = Array[ExtResource("3_xhe4c")]([ExtResource("4_w21it"), ExtResource("5_qc7yq")])
+granted_passives = Array[ExtResource("3_xhe4c")]([SubResource("Resource_protection")])
 consumed_on_use = false
 metadata/_custom_type_script = "uid://bql64fe8a0w24"

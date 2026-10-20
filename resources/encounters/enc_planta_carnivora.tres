@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EncounterData" format=3 uid="uid://5trrtoskmsul"]
+
+[ext_resource type="Script" uid="uid://dhce6dhgmgajf" path="res://scripts/resources/encounters/encounter_data.gd" id="1_encounter"]
+[ext_resource type="Script" uid="uid://byg0mnegm8bqm" path="res://scripts/resources/encounters/encounter_member_data.gd" id="2_member"]
+[ext_resource type="Resource" uid="uid://cs58l0rbrwh1m" path="res://resources/entities/entities_general/planta_carnivora.tres" id="3_entity"]
+
+[sub_resource type="Resource" id="Resource_member_1"]
+script = ExtResource("2_member")
+entity = ExtResource("3_entity")
+minimum = 4
+maximum = 4
+
+[resource]
+script = ExtResource("1_encounter")
+id = &"enc_00028"
+display_name = "Planta Carnívora"
+description = "Encontro Indesejado: Planta Carnívora."
+districts = Array[StringName]([&"baixo_centro", &"centro"])
+members = Array[ExtResource("2_member")]([SubResource("Resource_member_1")])
+tags = Array[StringName]([&"baixo_centro", &"centro"])

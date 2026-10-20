@@ -1,10 +1,15 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://bfo4viornolat"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_0coj7"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_uxujr"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_0coj7"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_1wri3"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_uxujr"]
+[ext_resource type="Resource" path="res://resources/skills/actives/enemies/cobaia_mutante/ataque_distancia.tres" id="3_ranged"]
+[ext_resource type="Resource" path="res://resources/skills/actives/enemies/cobaia_mutante/ataque_impacto.tres" id="4_impact"]
+[ext_resource type="Resource" path="res://resources/skills/actives/enemies/cobaia_mutante/ataque_lamina.tres" id="5_blade"]
 
 [resource]
 script = ExtResource("1_0coj7")
+id = &"en_00009"
 display_name = "Cobaia Mutante"
 description = "Especial:
 1º turno: realiza um ataque à distância com Maestria Distância, tendo como alvo o personagem mais próximo. 
@@ -18,5 +23,6 @@ vida_base = 40
 ataque_base = 6
 stamina_base = 4
 maestrias = Array[int]([3, 2, 1])
-tags = Array[StringName]([&"core_orchestra", &"humanoide", &"passiva_unica", &"baixo_centro"])
+skill_ativas = Array[ExtResource("2_1wri3")]([ExtResource("3_ranged"), ExtResource("4_impact"), ExtResource("5_blade")])
+tags = Array[StringName]([&"core_orchestra", &"humanoide", &"sequencia_de_ataques", &"baixo_centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

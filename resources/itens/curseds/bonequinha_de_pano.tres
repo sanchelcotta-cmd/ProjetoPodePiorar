@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/items/item_data.gd" id="1_item"]
+[ext_resource type="Resource" path="res://resources/skills/passives/curses/bonequinha_de_pano.tres" id="2_passive"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/amaldicoados_1.png" id="ppp_icon_sheet"]
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(19, 60, 94, 113)
+
+[resource]
+script = ExtResource("1_item")
+icon = SubResource("ppp_item_icon")
+id = &"cu_00001"
+display_name = "Bonequinha de Pano"
+description = "Na virada de cada Dia, causa 2d6 de dano a cada personagem do grupo do portador. Concede Prioridade Forçada ao portador: inimigos hostis o escolhem como alvo antes dos demais, salvo empate com outra prioridade equivalente. Só pode ser removida por purificação."
+item_type = 2
+acquisition_sources = 1
+tags = Array[StringName]([&"cursed", &"bonequinha_de_pano"])
+can_be_discarded = false
+passives_active_while_carried = true
+granted_passives = Array[ExtResource("2_passive")]([ExtResource("2_passive")])
+consumed_on_use = false
+metadata/_custom_type_script = "res://scripts/resources/items/item_data.gd"

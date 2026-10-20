@@ -1,11 +1,46 @@
 [gd_resource type="Resource" script_class="EventData" format=3 uid="uid://civlkryjauxnu"]
 
-[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_7bjjh"]
-[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_x3cl1"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="1_7bjjh"]
+[ext_resource type="Script" uid="uid://dhvkyqk4odn4i" path="res://scripts/resources/events/event_condition_data.gd" id="2_d7r4m"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="2_x3cl1"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_d6ytb"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="4_d6ytb"]
+
+[sub_resource type="Resource" id="Resource_tegkf"]
+script = ExtResource("2_d7r4m")
+condition_type = 1
+metadata/_custom_type_script = "uid://dhvkyqk4odn4i"
+
+[sub_resource type="Resource" id="Resource_v2ljw"]
+script = ExtResource("3_d6ytb")
+effect_type = 18
+target = 4
+tags_filter = Array[StringName]([&"encounter"])
+reveal_all_blocks = true
+metadata/_custom_type_script = "uid://bknff8de8c2u0"
+
+[sub_resource type="Resource" id="Resource_v4jq6"]
+script = ExtResource("1_7bjjh")
+id = &"ev_00015_out_01"
+display_name = "É noite"
+narrative_description = "A lua parece um sorriso rasgando o céu. E, por um breve instante, seu brilho revela onde os perigos se escondem."
+condition = SubResource("Resource_tegkf")
+effects = Array[ExtResource("3_d6ytb")]([SubResource("Resource_v2ljw")])
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
+
+[sub_resource type="Resource" id="Resource_6k44x"]
+script = ExtResource("1_7bjjh")
+id = &"ev_00015_out_02"
+display_name = "É dia."
+narrative_description = "Nada acontece."
+metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [resource]
 script = ExtResource("2_x3cl1")
+id = &"ev_00015"
 display_name = "Revelação Lunar"
 description = "Se a Rodada atual for de Noite, revela todos os blocos de Encontro Indesejado do mapa. Se não for Noite, o evento não tem efeito."
 valence = 0
+resolution_mode = 4
+outcomes = Array[ExtResource("1_7bjjh")]([SubResource("Resource_v4jq6"), SubResource("Resource_6k44x")])
 metadata/_custom_type_script = "uid://cos7c56kjihyx"

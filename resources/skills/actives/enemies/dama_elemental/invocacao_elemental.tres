@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" format=3 uid="uid://cuyqkgkjtjftx"]
+
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_active"]
+
+[sub_resource type="Resource" id="Effect_summon"]
+script = ExtResource("1_effect")
+effect_type = 12
+amount = 1
+selection_mode = 1
+entity_ids = Array[StringName]([&"en_00024", &"en_00026"])
+summoned_can_summon = false
+
+[resource]
+script = ExtResource("2_active")
+id = &"enemy_active_006"
+display_name = "Invocação Elemental da Dama"
+description = "No início do combate, traz aleatoriamente uma Planta Carnívora ou Raízes Mutantes. A criatura trazida não pode ativar sua própria invocação inicial."
+target_mode = 1
+automatic_triggers = Array[int]([0])
+activate_only_once = true
+effects = Array[ExtResource("1_effect")]([SubResource("Effect_summon")])
+tags = Array[StringName]([&"dama_elemental", &"invocacao_inicio"])

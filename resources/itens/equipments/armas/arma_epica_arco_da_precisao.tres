@@ -1,27 +1,37 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://cpvafbi4bcprm"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_1w6rl"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_8srvt"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_jsv8e"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="6_rwwld"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_1w6rl"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_8srvt"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_jsv8e"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="6_rwwld"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armas_epicas_1.png" id="ppp_icon_sheet"]
 
 [sub_resource type="Resource" id="Resource_8aikx"]
 script = ExtResource("6_rwwld")
-effect_type = 15
+effect_type = 41
 target = 1
 amount = 2
+reset_consecutive_bonus_on_miss = false
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [sub_resource type="Resource" id="Resource_ddr6f"]
 script = ExtResource("3_jsv8e")
 display_name = "Dano Continuo"
-description = "Cada vez que dispara em sequência contra o mesmo alvo, adiciona +2 no resultado do ataque (acumulativo). "
-max_activations_per_turn = 1
+description = "Após o primeiro disparo, cada novo disparo contra o mesmo alvo acumula +2 no resultado do ataque; errar não zera a sequência. Trocar de alvo a reinicia."
+trigger = 5
+required_attack_item_id = &"aa_00002"
 effects = Array[ExtResource("6_rwwld")]([SubResource("Resource_8aikx")])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"
 
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(306, 31, 48, 94)
+
 [resource]
 script = ExtResource("1_1w6rl")
+icon = SubResource("ppp_item_icon")
+id = &"aa_00002"
 display_name = "Arco da Precisão"
 description = "Dano Contínuo: Cada vez que dispara em sequência contra o mesmo alvo, adiciona +2 no resultado do ataque (acumulativo). "
 rarity = 4

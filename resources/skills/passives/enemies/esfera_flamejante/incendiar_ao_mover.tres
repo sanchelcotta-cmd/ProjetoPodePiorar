@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_passive"]
+
+[sub_resource type="Resource" id="Effect_destroy"]
+script = ExtResource("1_effect")
+effect_type = 31
+target = 11
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[sub_resource type="Resource" id="Effect_burn"]
+script = ExtResource("1_effect")
+effect_type = 32
+target = 11
+tile_state_id = &"incendiado"
+has_duration = true
+duration_turns = 1
+duration_unit = 1
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[resource]
+script = ExtResource("2_passive")
+id = &"enemy_passive_004"
+display_name = "Rastro Incendiário"
+description = "Após terminar um movimento, destrói e incendeia o hexágono ocupado até o fim da Rodada."
+trigger = 4
+activation_context = 1
+effects = Array[ExtResource("1_effect")]([SubResource("Effect_destroy"), SubResource("Effect_burn")])
+tags = Array[StringName]([&"esfera_flamejante", &"destruir_hex", &"incendiar_hex"])
+metadata/_custom_type_script = "res://scripts/resources/skills/passive_skill_data.gd"

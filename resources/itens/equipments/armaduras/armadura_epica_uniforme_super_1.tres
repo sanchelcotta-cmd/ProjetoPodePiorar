@@ -1,14 +1,22 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://cf5lcnslr3kpk"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_b7url"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_i5vdh"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_2gi5d"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_b7url"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_i5vdh"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_2gi5d"]
 [ext_resource type="Resource" uid="uid://dx222o7g10xbv" path="res://resources/skills/passives/bonus_de_ataque_base.tres" id="4_i5vdh"]
 [ext_resource type="Resource" uid="uid://c4ueuiwdrdl42" path="res://resources/skills/passives/protecao_25.tres" id="5_2gi5d"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="5_vl00r"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="5_vl00r"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armaduras_epicas_1.png" id="ppp_icon_sheet"]
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(147, 29, 87, 96)
 
 [resource]
 script = ExtResource("1_b7url")
+icon = SubResource("ppp_item_icon")
+id = &" ar_00007"
 display_name = "Uniforme do Super-Heró 1"
 description = "Super-Força: +8 de ataque e 25% de proteção."
 rarity = 4

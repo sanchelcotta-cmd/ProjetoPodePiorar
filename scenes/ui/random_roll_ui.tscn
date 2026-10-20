@@ -1,0 +1,66 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/random_roll_ui.gd" id="1_roll_ui"]
+
+[node name="RandomRollUI" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_roll_ui")
+
+[node name="RollContainer" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -210.0
+offset_top = 72.0
+offset_right = -20.0
+offset_bottom = 182.0
+grow_horizontal = 0
+mouse_filter = 2
+
+[node name="CoinButton" type="Button" parent="RollContainer"]
+layout_mode = 0
+offset_right = 190.0
+offset_bottom = 54.0
+text = "CARA OU COROA\nClique para escolher"
+
+[node name="ChoicePanel" type="Panel" parent="RollContainer"]
+visible = false
+layout_mode = 0
+offset_top = 62.0
+offset_right = 190.0
+offset_bottom = 172.0
+
+[node name="ChoiceLabel" type="Label" parent="RollContainer/ChoicePanel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 7.0
+offset_right = 180.0
+offset_bottom = 29.0
+horizontal_alignment = 1
+text = "Escolha um lado"
+
+[node name="ChoiceA" type="Button" parent="RollContainer/ChoicePanel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 35.0
+offset_right = 88.0
+offset_bottom = 67.0
+text = "A"
+
+[node name="ChoiceB" type="Button" parent="RollContainer/ChoicePanel"]
+layout_mode = 0
+offset_left = 102.0
+offset_top = 35.0
+offset_right = 180.0
+offset_bottom = 67.0
+text = "B"
+
+[node name="ConfirmButton" type="Button" parent="RollContainer/ChoicePanel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 75.0
+offset_right = 180.0
+offset_bottom = 103.0
+disabled = true
+text = "Confirmar e lançar"

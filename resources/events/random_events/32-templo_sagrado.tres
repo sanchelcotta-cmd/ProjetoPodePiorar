@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://bhdhcsk0vj5t"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_mwlel"]
 
 [sub_resource type="Resource" id="Effect_remove_curses"]
 script = ExtResource("3_effect")
@@ -11,17 +12,21 @@ target = 3
 
 [sub_resource type="Resource" id="Effect_remove_cursed_items"]
 script = ExtResource("3_effect")
-effect_type = 28
+effect_type = 11
 target = 3
-custom_rule = &"remove_cursed_items_from_group"
+item_filter = Array[StringName]([&"cursed"])
+remove_all_matching_items = true
+ignore_discard_restriction = true
 
 [sub_resource type="Resource" id="Outcome"]
 script = ExtResource("2_outcome")
+id = &"ev_00032_out_01"
 display_name = "As maldições são quebradas."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_remove_curses"), SubResource("Effect_remove_cursed_items")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00032"
 display_name = "Templo Sagrado"
 description = "Todas as maldições ativas são quebradas e os itens amaldiçoados são retirados do inventário de todos os personagens."
 narrative_description = "Uma capelinha simples. Daquelas que parecem esquecidas pelo tempo. A imagem da santa sorri enquanto uma luz morna percorre o corpo de todos vocês. Basta um Ave Maria e dois Pai Nossos, e tudo o que é de ruim há de ir."

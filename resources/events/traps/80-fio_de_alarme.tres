@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://tbypxi3ok2kk"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_76hr3"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect_alarm"]
+script = ExtResource("3_effect")
+effect_type = 17
+encounter_selection = 1
+randomize_equal_distance = true
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00080_out_01"
+display_name = "O alarme chama atenção."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_alarm")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00080"
+display_name = "Fio de Alarme"
+description = "Inicia o Encontro Indesejado mais próximo. Se houver mais de um à mesma distância, escolhe aleatoriamente apenas um deles."
+narrative_description = "O fio quase invisível vibra quando você o toca. Em algum ponto do mapa, alguma coisa ouviu."
+category = 3
+valence = 2
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"trap", &"encounter", &"nearest", &"random_tie"])

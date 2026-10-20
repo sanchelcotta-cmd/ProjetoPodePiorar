@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DebuffData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/status/debuffs_data.gd" id="1_debuff"]
+[ext_resource type="Texture2D" path="res://sprites/debuffs/debuffs_1x.png" id="2_sheet"]
+
+[sub_resource type="AtlasTexture" id="Icon"]
+atlas = ExtResource("2_sheet")
+region = Rect2(42, 56, 35, 33)
+
+[resource]
+script = ExtResource("1_debuff")
+id = &"db_00012"
+icon = SubResource("Icon")
+display_name = "Impedido de Consumir"
+description = "Não pode usar itens Consumíveis enquanto durar o efeito."
+duration_amount = 1
+control_effects = Array[int]([5])

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3 uid="uid://cvyh5ydxf37ix"]
+
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="1_passive"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_copy_chosen_enemy"]
+script = ExtResource("2_effect")
+effect_type = 53
+copy_bound_masteries = true
+copy_bound_passives = true
+copy_bound_attack_base_as_bonus = true
+copy_bound_max_hp_base_as_bonus = true
+
+[resource]
+script = ExtResource("1_passive")
+id = &"permanent_passive_061"
+display_name = "Mutação Genética"
+description = "Copia as Maestrias e Passivas de um inimigo escolhido do último Encontro e soma seus valores base de Ataque e Vida máxima como bônus permanentes."
+on_granted_effects = Array[ExtResource("2_effect")]([SubResource("Effect_copy_chosen_enemy")])
+tags = Array[StringName]([&"permanent_effect", &"genetic_mutation", &"bound_enemy"])

@@ -1,7 +1,8 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://d3pxn4flky4li"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_ivror"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_56s3v"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_ivror"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_7u1qt"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_56s3v"]
 [ext_resource type="Resource" uid="uid://c5unglf0psv07" path="res://resources/skills/passives/causa_terror_inicio.tres" id="3_7u1qt"]
 [ext_resource type="Resource" uid="uid://q7qmrdf1jiiv" path="res://resources/skills/passives/causa_terror_ao_atacar.tres" id="4_8pg85"]
 [ext_resource type="Resource" uid="uid://dmjrtpkpl0wm2" path="res://resources/skills/passives/vampirismo_50.tres" id="5_0w7kl"]
@@ -10,8 +11,9 @@
 
 [resource]
 script = ExtResource("1_ivror")
-display_name = "Cão Infernal."
-description = "Só aparece de noite, pode causar terror, tem vampirismo e proteção."
+id = &"en_00007"
+display_name = "Cão Infernal"
+description = "Pode causar Terror e Queimadura, tem Vampirismo e Esquiva."
 narrative_description = "O primeiro rosnado ecoa entre os prédios, seguido por vários outros. As criaturas saem das sombras com os pelos chamuscados, as presas brilhando entre pequenas chamas que escapam da boca a cada respiração."
 vida_base = 66
 ataque_base = 6

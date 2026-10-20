@@ -1,12 +1,20 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://c38l3rgs2u6mk"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_ajyn0"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_yq4v7"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_612jq"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_p084y"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_ajyn0"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_yq4v7"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_612jq"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_p084y"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armaduras_simples_1.png" id="ppp_icon_sheet"]
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(150, 130, 80, 105)
 
 [resource]
 script = ExtResource("1_ajyn0")
+icon = SubResource("ppp_item_icon")
+id = &"ar_00014"
 display_name = "Roupa Confortável de Ginástica"
 acquisition_sources = 27
 tags = Array[StringName]([&"armadura", &"comum"])

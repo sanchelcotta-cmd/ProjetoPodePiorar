@@ -1,13 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://d1pfrgjra8qq1"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_nvakf"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_xifba"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_1l1ck"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_nvakf"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_xifba"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_1l1ck"]
 [ext_resource type="Resource" uid="uid://8ta6ag3ik530" path="res://resources/skills/passives/causa_queimaduras_50.tres" id="4_nvakf"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="5_jxciv"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="5_jxciv"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armas_epicas_1.png" id="ppp_icon_sheet"]
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(28, 22, 47, 101)
 
 [resource]
 script = ExtResource("1_nvakf")
+icon = SubResource("ppp_item_icon")
+id = &"aa_00006"
 display_name = "Espada Irada Flamejante"
 description = "Pode causar Queimadura."
 rarity = 4

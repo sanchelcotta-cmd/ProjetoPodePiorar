@@ -1,14 +1,21 @@
 [gd_resource type="Resource" script_class="DebuffData" format=3 uid="uid://cvi1f182rpjig"]
 
-[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/sc_resources/debuffs_data.gd" id="1_rsxgv"]
+[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/resources/status/debuffs_data.gd" id="1_rsxgv"]
+[ext_resource type="Texture2D" uid="uid://chb81bkerek7r" path="res://sprites/debuffs/debuffs_1x.png" id="2_sheet"]
+
+[sub_resource type="AtlasTexture" id="Icon"]
+atlas = ExtResource("2_sheet")
+region = Rect2(42, 15, 35, 31)
 
 [resource]
 script = ExtResource("1_rsxgv")
 id = &"db_00004"
 display_name = "Doença, doença"
-description = "A doença progride para o próximo nível ao mudar de Dia: de leve, para doença, para grave.
-Esse efeito dura até encontrar e consumir um item de Cura."
+description = "Reduz a Vida máxima em 3 e o Ataque em 2. A cada virada de Rodada, tem 25% de chance de transmitir Doença Leve ao aliado mais próximo. Evolui para Doença Grave na próxima virada de Dia. Dura até ser curada."
+icon = SubResource("Icon")
 duration_type = 3
 max_health_modifier = -3
 attack_modifier = -2
+contagion_chance_per_round = 0.25
+contagion_result_id = &"db_00003"
 metadata/_custom_type_script = "uid://drp24ngc2nn0y"

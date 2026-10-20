@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://emqwjyud2kl7"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_ban2g"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
 
 [sub_resource type="Resource" id="Effect_max_hp"]
 script = ExtResource("3_effect")
@@ -12,11 +13,13 @@ math_operation = 1
 
 [sub_resource type="Resource" id="Outcome"]
 script = ExtResource("2_outcome")
+id = &"ev_00021_out_01"
 display_name = "Você é atingido."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_max_hp")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00021"
 display_name = "Ataque Sobrenatural"
 description = "O personagem ativo perde 5 pontos de Vida máxima permanentemente."
 narrative_description = "Escondido entre os escombros, existe um objeto que não parece pertencer a esse mundo. Assim que você o toca, alguma coisa responde. Um arranhão horrível sobe pelas suas costas... Você nunca mais se sentirá inteiro de novo."

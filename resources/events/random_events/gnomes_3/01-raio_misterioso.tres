@@ -1,0 +1,79 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://b255640rxp8gi"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_0oenp"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Resource" uid="uid://t5c1hs7mlm6q" path="res://resources/skills/passives/esquiva_60.tres" id="4_agility"]
+
+[sub_resource type="Resource" id="Effect_force_attack"]
+script = ExtResource("3_effect")
+effect_type = 2
+target = 2
+target_selection_group = &"gnome_3_force_target"
+statistic = 3
+amount = 2
+math_operation = 2
+
+[sub_resource type="Resource" id="Effect_force_current_hp"]
+script = ExtResource("3_effect")
+target = 2
+target_selection_group = &"gnome_3_force_target"
+amount = 2
+clamp_current_hp_to_max = true
+math_operation = 2
+
+[sub_resource type="Resource" id="Outcome_force"]
+script = ExtResource("2_outcome")
+id = &"gn_00001_out_01"
+display_name = "Força"
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_force_attack"), SubResource("Effect_force_current_hp")])
+
+[sub_resource type="Resource" id="Effect_teleport"]
+script = ExtResource("3_effect")
+effect_type = 36
+target = 2
+ignore_stamina_cost = true
+ignore_stamina_range = true
+
+[sub_resource type="Resource" id="Outcome_teleport"]
+script = ExtResource("2_outcome")
+id = &"gn_00001_out_02"
+display_name = "Teletransporte"
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_teleport")])
+
+[sub_resource type="Resource" id="Effect_agility"]
+script = ExtResource("3_effect")
+effect_type = 6
+target = 2
+passive = ExtResource("4_agility")
+
+[sub_resource type="Resource" id="Outcome_agility"]
+script = ExtResource("2_outcome")
+id = &"gn_00001_out_03"
+display_name = "Super-agilidade"
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_agility")])
+
+[sub_resource type="Resource" id="Effect_damage"]
+script = ExtResource("3_effect")
+target = 2
+dice_count = 1
+dice_sides = 6
+dice_result_multiplier = 2.0
+math_operation = 1
+
+[sub_resource type="Resource" id="Outcome_damage"]
+script = ExtResource("2_outcome")
+id = &"gn_00001_out_04"
+display_name = "Raio doloroso"
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_damage")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"gn_00001"
+display_name = "Gnomo Misterioso"
+description = "Um raio atinge um personagem aleatório: 25% de dobrar Ataque e Vida atuais, 25% de permitir movimento livre pelo mapa, 25% de conceder 60% de Esquiva em combate, ou 25% de causar o dobro de 1d6 de dano."
+narrative_description = "O gnomo aponta para o céu com um sorriso orgulhoso. Uma nuvem que não estava ali pisca em resposta."
+resolution_mode = 1
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome_force"), SubResource("Outcome_teleport"), SubResource("Outcome_agility"), SubResource("Outcome_damage")])
+tags = Array[StringName]([&"gnomes_3", &"lightning", &"random_character"])

@@ -1,0 +1,67 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Effect_movement_limit"]
+script = ExtResource("3_effect")
+effect_type = 34
+target = 3
+effect_scope = 1
+amount = 1
+has_duration = true
+expiration_mode = 1
+
+[sub_resource type="Resource" id="Effect_max_hp_penalty"]
+script = ExtResource("3_effect")
+effect_type = 2
+target = 3
+effect_scope = 1
+statistic = 2
+percent = 0.1
+value_source = 4
+rounding_mode = 1
+math_operation = 1
+clamp_current_hp_to_max = true
+clamp_stat_minimum = true
+stat_minimum = 1
+excluded_equipped_slot = 2
+excluded_equipped_rarity = 4
+has_duration = true
+expiration_mode = 1
+
+[sub_resource type="Resource" id="Effect_attack_penalty"]
+script = ExtResource("3_effect")
+effect_type = 2
+target = 3
+effect_scope = 1
+statistic = 3
+percent = 0.1
+value_source = 4
+rounding_mode = 1
+math_operation = 1
+clamp_stat_minimum = true
+stat_minimum = 0
+excluded_equipped_slot = 2
+excluded_equipped_rarity = 4
+has_duration = true
+expiration_mode = 1
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00072_out_01"
+id = &"ev_00072_out_01"
+display_name = "A nevasca tomou a cidade."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_movement_limit"), SubResource("Effect_max_hp_penalty"), SubResource("Effect_attack_penalty")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00072"
+display_name = "Nevasca"
+description = "Pelo restante do Dia, todos só podem mover 1 bloco por turno e sofrem -10% em Vida e Ataque, exceto quem estiver equipado com armadura Épica."
+narrative_description = "Flocos de neve começam a cair, cobrindo ruas, telhados e árvores. Você olha para o céu. Depois para o chão. Depois para o céu de novo. Neve... Aqui? É, tem alguma coisa que não tá normal."
+category = 2
+valence = 2
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"catastrophe", &"movement", &"stat_modifier", &"day_duration"])

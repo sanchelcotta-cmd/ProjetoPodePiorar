@@ -1,9 +1,11 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bfh0rr7b0nxpt"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_2bi75"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_wqcjp"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_3d35m"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_x486s"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_2bi75"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_wqcjp"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_3d35m"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_x486s"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/consumiveis_1.png" id="ppp_icon_sheet"]
 
 [sub_resource type="Resource" id="Resource_qr57e"]
 script = ExtResource("4_x486s")
@@ -14,8 +16,14 @@ percent = 1.0
 attribute_id = &"hp"
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(125, 50, 91, 52)
+
 [resource]
 script = ExtResource("1_2bi75")
+icon = SubResource("ppp_item_icon")
+id = &"cs_00002"
 display_name = "Almoção de Domingo"
 description = "Recupera 100% da vida de todos os aliados"
 item_type = 1

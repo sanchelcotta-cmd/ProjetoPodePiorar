@@ -1,0 +1,69 @@
+extends SceneTree
+
+var failures := 0
+
+
+func _initialize() -> void:
+	_run.call_deferred()
+
+
+func _run() -> void:
+	root.size = Vector2i(1152, 648)
+	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	root.add_child(scene)
+	await process_frame
+	var game := scene.get_node("GerenciaJogo") as GerenciaJogo
+	var choices: Array[EntityData] = [
+		load("res://resources/entities/entities_playable/jornalista.tres"),
+		load("res://resources/entities/entities_playable/pedreiro.tres"),
+		load("res://resources/entities/entities_playable/cozinheiro.tres"),
+	]
+	check(game.start_new_game(choices), "Campanha criada.")
+	var actor := game.campaign.active_entity_states[0]
+	actor.inventory_items.clear()
+	var inventory := (scene.get_node("SkillManager") as SkillManager).inventory_manager
+	var filler := load("res://resources/itens/consumables/bolinho_de_chuva.tres") as ItemData
+	while inventory.can_receive(actor, filler):
+		inventory.add_item(actor, filler)
+	var incoming := load("res://resources/itens/consumables/chocolate.tres") as ItemData
+	var group := (scene.get_node("CampaignTopBar") as CampaignTopBar).group_inventory
+	var confirmed := {"called": false}
+	var callback := func(outgoing: Array[InventoryItemState]) -> bool:
+		confirmed["called"] = true
+		return inventory.exchange_items(actor, outgoing, incoming)
+	check(group.begin_exchange(actor, incoming, callback, Callable(), false),
+		"Troca obrigatória abre Inventário do Grupo.")
+	check(not group._exchange_decline_button.visible and not group._close_button.visible,
+		"Troca obrigatória não oferece recusar nem X.")
+	group.close()
+	check(group.visible and not confirmed["called"],
+		"Fechar sem trocar não contorna a obrigação.")
+	var outgoing := actor.inventory_items[0] as InventoryItemState
+	var test_cell := Button.new()
+	group._on_carried_clicked(0, outgoing, test_cell)
+	test_cell.free()
+	check(not group._exchange_accept_button.disabled,
+		"Escolher item descartável habilita aceitar troca.")
+	group._ask_exchange_confirmation()
+	check(group._exchange_confirmation.visible and
+		outgoing.data.display_name in group._exchange_question.text and
+		incoming.display_name in group._exchange_question.text,
+		"Confirmação exibe nomes do item que sai e do que entra.")
+	group._exchange_confirmation.hide()
+	check(outgoing in actor.inventory_items and not confirmed["called"],
+		"Ainda não retorna à escolha sem descartar.")
+	group._ask_exchange_confirmation()
+	group._confirm_exchange()
+	check(confirmed["called"] and outgoing not in actor.inventory_items and
+		actor.inventory_items.any(func(entry: InventoryItemState) -> bool:
+			return entry.data == incoming) and not group.visible,
+		"Sim conclui uma única troca e fecha a janela.")
+	print("INVENTORY_EXCHANGE_TEST_OK" if failures == 0 else
+		"INVENTORY_EXCHANGE_TEST_FAILED: %d" % failures)
+	quit(1 if failures > 0 else 0)
+
+
+func check(condition: bool, message: String) -> void:
+	if not condition:
+		failures += 1
+		push_error(message)

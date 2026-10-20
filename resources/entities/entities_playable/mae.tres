@@ -1,16 +1,22 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://dv1vh5ipqpsu6"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_beckg"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_1gujt"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_beckg"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_1gujt"]
+[ext_resource type="Resource" path="res://resources/skills/passives/playables/mae/nao_mexe_com_meus_filhos.tres" id="3_passive"]
+[ext_resource type="Resource" path="res://resources/skills/actives/playables/mae/eu_ja_sabia.tres" id="4_active"]
+[ext_resource type="Resource" path="res://resources/entities/animations/mae_animation.tres" id="9_animation"]
 
 [resource]
 script = ExtResource("1_beckg")
 id = &"pj_00003"
 display_name = "Mãe"
 description = "Uma mãe cuidadosa."
+playable_animation = ExtResource("9_animation")
 vida_base = 30
 ataque_base = 6
 stamina_base = 4
 maestrias = Array[int]([3])
+skill_passivas = Array[ExtResource("2_1gujt")]([ExtResource("3_passive")])
+skill_ativas = Array[ExtResource("4_active")]([ExtResource("4_active")])
 tags = Array[StringName]([&"humano", &"jogavel"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

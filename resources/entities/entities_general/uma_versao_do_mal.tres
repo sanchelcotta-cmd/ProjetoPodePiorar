@@ -1,14 +1,17 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://btj6ywvwrb3qu"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_6jnfk"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_3xm8l"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_6jnfk"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_3xm8l"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_arh8u"]
 [ext_resource type="Resource" uid="uid://c5unglf0psv07" path="res://resources/skills/passives/causa_terror_inicio.tres" id="3_3xm8l"]
+[ext_resource type="Resource" path="res://resources/skills/passives/enemies/uma_versao_do_mal/copiar_personagem.tres" id="4_copy"]
 
 [resource]
 script = ExtResource("1_6jnfk")
+id = &"en_00031"
 display_name = "Uma versão igual a você só que do mal"
-description = "Ao iniciar o Encontro, copia a Maestria, o Ataque e a Vida base do personagem que ativou este bloco. Os valores copiados não são atualizados durante o Encontro. "
+description = "Ao iniciar o Encontro, copia Maestria, Ataque e Vida base do personagem que ativou este bloco, além da Stamina máxima atual dele (com modificadores). Os valores copiados não são atualizados durante o Encontro."
 narrative_description = "Um calafrio percorre seu corpo ao avistar, do outro lado da calçada, alguém. É como se olhar no espelho. Aquilo é idêntico a você rosto, os movimentos e até a postura são exatamente os mesmos, mas existe algo profundamente errado naquele olhar."
-skill_passivas = Array[ExtResource("2_3xm8l")]([ExtResource("3_3xm8l")])
+skill_passivas = Array[ExtResource("2_3xm8l")]([ExtResource("3_3xm8l"), ExtResource("4_copy")])
 tags = Array[StringName]([&"causa_terror", &"humanoide", &"baixo_centro", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://b30ex1kpxs746"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_y5i6r"]
 
 [sub_resource type="Resource" id="Effect_item"]
 script = ExtResource("3_effect")
@@ -12,13 +13,15 @@ tags_filter = Array[StringName]([&"arma"])
 
 [sub_resource type="Resource" id="Outcome"]
 script = ExtResource("2_outcome")
+id = &"ev_00047_out_01"
 display_name = "Escolha uma arma."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_item")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00047"
 display_name = "Loja de Ferramentas da Miss Fortuna"
 description = "O jogador escolhe e obtém qualquer arma disponível no jogo."
-narrative_description = "Uma pequena lojinha aparece onde, até alguns segundos atrás, não existia absolutamente nada. Na porta, uma plaquinha escrita à mão: 'Miss Fortuna'. Lá dentro, uma mulher elegante organiza armas de todos os tipos. Miss Fortuna limpa uma espada com um pano enquanto assovia baixinho. [fala_miss_fortuna]"
+narrative_description = "Uma pequena lojinha aparece onde, até alguns segundos atrás, não existia absolutamente nada. Na porta, uma plaquinha escrita à mão: 'Miss Fortuna'. Lá dentro, uma mulher elegante. As prateleiras estão cobertas por armas de todos os tipos. Miss Fortuna limpa uma espada com um pano enquanto assovia baixinho.\n[fala_miss_fortuna]"
 valence = 0
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

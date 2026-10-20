@@ -1,25 +1,31 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://bpuv5yacuwcv1"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_tg0gb"]
+[ext_resource type="Resource" uid="uid://sh5cqbyrgsbp" path="res://resources/skills/effects/debuffs/terror.tres" id="4_terror"]
 
 [sub_resource type="Resource" id="Effect"]
 script = ExtResource("3_effect")
-effect_type = 28
+effect_type = 3
 target = 3
-custom_rule = &"apply_terror_until_round_end"
+debuff = ExtResource("4_terror")
+has_duration = true
+duration_amount = 1
+duration_unit = 1
 
 [sub_resource type="Resource" id="Outcome"]
 script = ExtResource("2_outcome")
+id = &"ev_00040_out_01"
 display_name = "O grupo entra em Terror."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00040"
 display_name = "Dois Caras em uma Moto"
 description = "Todos os personagens do grupo sofrem Terror até o fim da Rodada."
 narrative_description = "O ronco de uma moto quebra o silêncio. Dois caras passam voando ao lado de vocês. Ninguém sabe o que eles queriam. Mas agora todo mundo está com medo."
 valence = 2
-custom_rule = &"apply_terror_until_round_end"
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

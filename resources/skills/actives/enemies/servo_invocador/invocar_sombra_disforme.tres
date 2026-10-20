@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/active_skill_data.gd" id="2_active"]
+
+[sub_resource type="Resource" id="Effect_summon"]
+script = ExtResource("1_effect")
+effect_type = 12
+entity_id = &"en_00030"
+amount = 1
+maximum_active_instances = 3
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[resource]
+script = ExtResource("2_active")
+id = &"enemy_active_011"
+display_name = "Invocar Sombra Disforme"
+description = "Nos turnos 3, 6, 9..., invoca uma Sombra Disforme se houver menos de três Sombras vivas invocadas por este Servo."
+target_mode = 1
+automatic_triggers = Array[int]([1])
+first_activation_turn = 3
+repeat_every_turns = 3
+ends_turn = true
+effects = Array[ExtResource("1_effect")]([SubResource("Effect_summon")])
+tags = Array[StringName]([&"servo_invocador_1", &"invocacao"])
+metadata/_custom_type_script = "res://scripts/resources/skills/active_skill_data.gd"

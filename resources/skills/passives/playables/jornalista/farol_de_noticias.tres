@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_passive"]
+
+[sub_resource type="Resource" id="Resource_mastery"]
+script = ExtResource("1_effect")
+effect_type = 16
+scaling_source = 1
+recalculate_bonus_instead_of_stacking = true
+first_threshold = 1
+initial_bonus = 2
+step_interval = 3
+step_bonus = 1
+max_total_bonus = 6
+mastery_options = Array[int]([3])
+
+[resource]
+script = ExtResource("2_passive")
+id = &"playable_passive_001"
+display_name = "Farol de Notícias"
+description = "Ao obter a primeira Informação, recebe +2 de Maestria. Depois, a cada 3 Informações obtidas pelo grupo, recebe +1 de Maestria, até o máximo total de +6."
+trigger = 16
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_mastery")])
+tags = Array[StringName]([&"jornalista"])

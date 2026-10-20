@@ -1,13 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://blj8qwbh3ptbg"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_36i07"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_388n2"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_36i07"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_388n2"]
 [ext_resource type="Resource" uid="uid://fcs634v3pnvm" path="res://resources/itens/equipments/acessorios/acessorio_epico_enciclopedia_sabe_tudo.tres" id="2_ry6eb"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_ry6eb"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_hne2b"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_ry6eb"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_hne2b"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/acessorios_simples_1.png" id="ppp_icon_sheet"]
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(292, 142, 66, 76)
 
 [resource]
 script = ExtResource("1_36i07")
+icon = SubResource("ppp_item_icon")
+id = &"ac_00010"
 display_name = "Bloco de Notas"
 description = "Serve pra anotar coisas."
 acquisition_sources = 3

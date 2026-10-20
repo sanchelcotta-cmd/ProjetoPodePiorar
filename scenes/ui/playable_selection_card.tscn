@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/playable_selection_card.gd" id="1_card"]
+[ext_resource type="PackedScene" path="res://scenes/visuals/playable_actor_visual.tscn" id="2_visual"]
+
+[node name="PlayableSelectionCard" type="Button"]
+custom_minimum_size = Vector2(144, 240)
+focus_mode = 2
+script = ExtResource("1_card")
+
+[node name="CharacterVisual" parent="." instance=ExtResource("2_visual")]
+
+[node name="CharacterName" type="Label" parent="."]
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="SlotLabel" type="Label" parent="."]
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.52, 0.91, 1, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1

@@ -1,12 +1,18 @@
 [gd_resource type="Resource" script_class="DebuffData" format=3 uid="uid://cko60s7wgmf1e"]
 
-[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/sc_resources/debuffs_data.gd" id="1_hs10n"]
+[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/resources/status/debuffs_data.gd" id="1_hs10n"]
+[ext_resource type="Texture2D" uid="uid://chb81bkerek7r" path="res://sprites/debuffs/debuffs_1x.png" id="2_sheet"]
+
+[sub_resource type="AtlasTexture" id="Icon"]
+atlas = ExtResource("2_sheet")
+region = Rect2(42, 56, 35, 33)
 
 [resource]
 script = ExtResource("1_hs10n")
 id = &"db_00006"
 display_name = "Enraizado"
 description = "Não pode se mover."
+icon = SubResource("Icon")
 duration_amount = 1
 control_effects = Array[int]([0])
 percent = 1.0

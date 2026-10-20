@@ -40,17 +40,8 @@ Da mesma forma, a aleatoriedade nunca deve substituir estratégia. O inesperado 
 - Git e GitHub — controle de versão
 
 - Pixel Studio — criação dos sprites
-- Pixelitita — aplicação de filtros e pós-processamento dos sprites
+
+Elementos de UI: SunGraphica — em: itch.io
 
 ## Estado do Desenvolvimento
-Atualmente o projeto encontra-se na fase de implementação da infraestrutura principal.
-Sistemas em desenvolvimento em Resources:
-* Entidades
-* Eventos
-* Informações
-* Itens
-* Habilidades ativas e passivas
-* Efeitos e condições
-* Sistema de combate
-* Inteligência Artificial
-* Geração procedural de mapas
+Implementação da infraestrutura principal.

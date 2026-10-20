@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/active_skill_data.gd" id="2_active"]
+
+[sub_resource type="Resource" id="Resource_reveal"]
+script = ExtResource("1_effect")
+effect_type = 8
+target = 8
+amount = 1
+
+[resource]
+script = ExtResource("2_active")
+id = &"playable_active_001"
+display_name = "Faro Jornalístico"
+description = "Pode revelar um bloco por uso. Cada bloco de Informação ativado pelo grupo aumenta permanentemente em 1 o limite de usos por Dia, sem teto fixo. Os usos disponíveis recomeçam a cada virada de Dia."
+use_context = 1
+target_mode = 5
+usage_allowance_source = 1
+uses_per_source_unit = 1
+usage_reset_moment = 1
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_reveal")])
+tags = Array[StringName]([&"jornalista"])

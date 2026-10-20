@@ -1,35 +1,42 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://p7gk8852bha1"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_mnll5"]
 
 [sub_resource type="Resource" id="Effect_blessing"]
 script = ExtResource("3_effect")
 effect_type = 28
 custom_rule = &"florzinha_blessing"
 
+[sub_resource type="Resource" id="Outcome_blessing"]
+script = ExtResource("2_outcome")
+id = &"ev_00045_out_01"
+display_name = "A flor concede uma bênção."
+narrative_description = "Uma luz suave envolve você. A flor concede +5 de Ataque ou Vida e proteção contra Doença ou Terror até o fim do Dia."
+weight = 50
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_blessing")])
+
 [sub_resource type="Resource" id="Effect_spores"]
 script = ExtResource("3_effect")
 effect_type = 28
 custom_rule = &"florzinha_spores"
 
-[sub_resource type="Resource" id="Outcome_blessing"]
-script = ExtResource("2_outcome")
-display_name = "A flor concede uma bênção."
-weight = 50
-effects = Array[ExtResource("3_effect")]([SubResource("Effect_blessing")])
-
 [sub_resource type="Resource" id="Outcome_spores"]
 script = ExtResource("2_outcome")
+id = &"ev_00045_out_02"
 display_name = "A flor solta esporos."
+narrative_description = "A flor sacode as pétalas e lança esporos num raio de três hexágonos. Quem estiver perto pode adoecer."
 weight = 50
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_spores")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00045"
 display_name = "Florzinha Misteriosa"
 description = "A flor sorteia uma bênção de um dia ou libera esporos que adoecem todos num raio de 3 blocos."
+narrative_description = "No meio do caminho, uma pequena flor começa a balançar sozinha. Aos poucos, ela gira como se estivesse dançando uma música que só ela consegue ouvir. Quando percebe que você está olhando, ela faz uma pequena reverência. Que... Simpática?"
 resolution_mode = 1
-custom_rule = &"florzinha_misteriosa"
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome_blessing"), SubResource("Outcome_spores")])
+custom_rule = &"florzinha_misteriosa"

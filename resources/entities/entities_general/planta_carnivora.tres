@@ -1,16 +1,22 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://cs58l0rbrwh1m"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_xy3aq"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_42tev"]
+[ext_resource type="Script" uid="uid://d4h5vr8s5voli" path="res://scripts/resources/entities/sprite_sheet_animation_data.gd" id="1_gr4jq"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_xy3aq"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_42tev"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_po7uy"]
 [ext_resource type="Resource" uid="uid://diqhj3kyn2evv" path="res://resources/skills/passives/nao_se_move.tres" id="3_po7uy"]
+[ext_resource type="Resource" uid="uid://ciheq6w6gfdvs" path="res://resources/skills/actives/enemies/planta_carnivora/invocacao_elemental.tres" id="4_summon"]
 
 [resource]
 script = ExtResource("1_xy3aq")
+id = &"en_00024"
 display_name = "Planta Carnívora"
+description = "Não pode se mover. No início do combate, possui 50% de chance de trazer uma Dama Elemental ou Raízes Mutantes; a criatura trazida não repete essa invocação."
 narrative_description = "À primeira vista, parece apenas uma planta exótica crescendo entre as rachaduras da cidade. Então o enorme botão floral se abre lentamente, revelando fileiras de dentes afiados escondidos entre as pétalas.”"
-vida_base = 36
-ataque_base = 12
+vida_base = 32
+ataque_base = 8
 maestrias = Array[int]([1])
 skill_passivas = Array[ExtResource("2_42tev")]([ExtResource("3_po7uy")])
-tags = Array[StringName]([&"criatura", &"elemental", &"nao_se_move", &"baixo_centro", &"centro"])
+skill_ativas = Array[ExtResource("2_po7uy")]([ExtResource("4_summon")])
+tags = Array[StringName]([&"criatura", &"elemental", &"nao_se_move", &"invocador", &"baixo_centro", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

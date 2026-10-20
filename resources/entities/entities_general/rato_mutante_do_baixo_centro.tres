@@ -1,11 +1,13 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://d06mm3c6vcg46"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_swinp"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_heh75"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_swinp"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_3pmi1"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_heh75"]
 [ext_resource type="Resource" uid="uid://6qqyc0ayls8h" path="res://resources/skills/passives/causa_doenca_50.tres" id="3_heh75"]
 
 [resource]
 script = ExtResource("1_swinp")
+id = &"en_00027"
 display_name = "Rato-Mutante do Baixo-Centro"
 description = "Criatura que pode causar doença ao atacar."
 narrative_description = "Eles são grandes como cães, magros a ponto de parecerem doentes e se movem rápido demais para algo daquele tamanho. Antes que você consiga contar quantos são, eles já estão correndo na sua direção."

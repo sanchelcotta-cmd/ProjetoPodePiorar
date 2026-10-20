@@ -1,8 +1,9 @@
 [gd_resource type="Resource" script_class="EventData" format=3 uid="uid://dxaopoaogolb4"]
 
-[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_5qnyl"]
-[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_0j18a"]
-[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="2_fswfu"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="1_5qnyl"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="2_0j18a"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="2_fswfu"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_fswfu"]
 
 [sub_resource type="Resource" id="Resource_grant_information"]
 script = ExtResource("2_fswfu")
@@ -21,6 +22,7 @@ metadata/_custom_type_script = "uid://bknff8de8c2u0"
 
 [sub_resource type="Resource" id="Resource_su5xn"]
 script = ExtResource("1_5qnyl")
+id = &"ev_00017_out_01"
 display_name = "Você aceita o acordo."
 narrative_description = "Garante uma Informação, mas o personagem ativo perde 5 pontos de vida máximo."
 effects = Array[ExtResource("2_fswfu")]([SubResource("Resource_grant_information"), SubResource("Resource_remove_max_hp")])
@@ -28,12 +30,15 @@ metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [sub_resource type="Resource" id="Resource_gfnhu"]
 script = ExtResource("1_5qnyl")
+id = &"ev_00017_out_02"
 display_name = "Você não aceita o acordo."
 narrative_description = "Ele vai embora. Nada acontece."
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [resource]
 script = ExtResource("2_0j18a")
+id = &"ev_00017"
+tags = Array[StringName]([&"somente_campanha_completa"])
 display_name = "O Informante"
 description = "Um informante oferece uma Informação aleatória, mas em troca, o personagem ativo perde 5 pontos de vida máxima permanente."
 narrative_description = "É um cara de sobretudo cáqui, chapéu e cachimbo. Encostado à sombra de uma entrada daquele beco... Ao trocar olhares com [personagem_ativo], ele sopra fumaça e acena levemente. Antes mesmo de você chegar perto, ele já estende a mão, esperando alguma coisa em troca."

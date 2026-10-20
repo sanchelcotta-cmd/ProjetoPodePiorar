@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Resource" path="res://resources/skills/effects/debuffs/tristeza.tres" id="4_sadness"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 3
+target = 3
+debuff = ExtResource("4_sadness")
+has_duration = true
+duration_amount = 1
+duration_unit = 2
+expiration_mode = 1
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00075_out_01"
+id = &"ev_00075_out_01"
+display_name = "A Áurea Fúnebre se espalha."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00075"
+display_name = "Áurea Fúnebre"
+description = "Pelo restante do Dia, todos os personagens sofrem os efeitos padrão de Tristeza."
+narrative_description = "De repente, tudo parece ter perdido a graça. Tá tudo num filtro meio azulado, meio capenga, sem brilho. Até respirar ficou cansativo."
+category = 2
+valence = 2
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"catastrophe", &"sadness", &"group", &"day_duration"])

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/active_skill_data.gd" id="2_active"]
+
+[sub_resource type="Resource" id="Resource_custom"]
+script = ExtResource("1_effect")
+effect_type = 46
+target = 2
+revive_with_full_hp = true
+consume_source_item_on_success = true
+
+[resource]
+script = ExtResource("2_active")
+id = &"item_active_002"
+display_name = "Sacrifício Divino"
+description = "Quando um aliado morrer, o jogador pode quebrar o Amuleto Divino para ressuscitá-lo com a Vida máxima completa. O item é destruído e não pode ser criado novamente nesta partida."
+use_context = 2
+target_mode = 2
+allow_dead_targets = true
+requires_player_confirmation = true
+automatic_triggers = Array[int]([4])
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_custom")])
+tags = Array[StringName]([&"amuleto_divino"])

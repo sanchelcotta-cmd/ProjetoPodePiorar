@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dk2josxbmqysd"]
+
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_item"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_0t1p7"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="2_effect"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_xapmx"]
+
+[sub_resource type="Resource" id="Effect_plus_attack"]
+script = ExtResource("2_effect")
+effect_type = 9
+amount = 3
+permanent_attribute_change = true
+random_choice_group = &"frutinha_magica_ataque"
+attribute_id = &"attack"
+
+[sub_resource type="Resource" id="Effect_minus_attack"]
+script = ExtResource("2_effect")
+effect_type = 9
+modify_mode = 3
+amount = 3
+permanent_attribute_change = true
+random_choice_group = &"frutinha_magica_ataque"
+attribute_id = &"attack"
+
+[resource]
+script = ExtResource("1_item")
+id = &"cs_00017"
+display_name = "Frutinha Mágica"
+description = "Ao consumir, altera permanentemente o Ataque em +3 ou -3, com 50% de chance para cada resultado."
+item_type = 1
+rarity = 3
+tags = Array[StringName]([&"gnomes_3", &"consumivel", &"raro"])
+use_effects = Array[ExtResource("2_effect")]([SubResource("Effect_plus_attack"), SubResource("Effect_minus_attack")])

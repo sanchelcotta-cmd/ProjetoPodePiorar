@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_passive"]
+
+[sub_resource type="Resource" id="Resource_custom"]
+script = ExtResource("1_effect")
+effect_type = 47
+activation_chance = 0.5
+excludes_destination_encounter_block = true
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[sub_resource type="Resource" id="Effect_double_destination_encounter"]
+script = ExtResource("1_effect")
+effect_type = 48
+target = 11
+requires_destination_encounter_block = true
+multiplier = 2.0
+
+[resource]
+script = ExtResource("2_passive")
+id = &"ps_00029"
+display_name = "Maldição: Caixinha de Músicas"
+description = "Ao parar após mover-se na Exploração, há 50% de chance de iniciar um Encontro Indesejado se o destino não for um bloco de Encontro. Se for um bloco de Encontro, os inimigos dele são dobrados sempre."
+trigger = 24
+activation_context = 2
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_custom"), SubResource("Effect_double_destination_encounter")])
+metadata/_custom_type_script = "res://scripts/resources/skills/passive_skill_data.gd"

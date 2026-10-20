@@ -1,22 +1,134 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://wmqe6h6gr7v5"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="4_choice"]
 
 [sub_resource type="Resource" id="Effect_passive"]
 script = ExtResource("3_effect")
 effect_type = 6
 selection_mode = 1
+exclude_passives_already_owned = true
+
+[sub_resource type="Resource" id="Outcome_passive"]
+script = ExtResource("2_outcome")
+id = &"new_passive"
+display_name = "Desejo: uma passiva nova."
+narrative_description = "O Gênio lhe concede uma Passiva inata de outro personagem jogável, à sua escolha. Você só pode escolher uma que ainda não possui."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_passive")])
+
+[sub_resource type="Resource" id="Effect_immunity_disease"]
+script = ExtResource("3_effect")
+effect_type = 29
+status_ids = Array[StringName]([&"db_00003", &"db_00004", &"db_00005"])
+
+[sub_resource type="Resource" id="Choice_immunity_disease"]
+script = ExtResource("4_choice")
+id = &"disease"
+display_name = "Imunidade à Doença"
+description = "Remove imediatamente Doença Leve, Doença e Doença Grave. Impede novas aplicações desses três estágios permanentemente."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_immunity_disease")])
+
+[sub_resource type="Resource" id="Effect_immunity_sadness"]
+script = ExtResource("3_effect")
+effect_type = 29
+status_ids = Array[StringName]([&"db_00010"])
+
+[sub_resource type="Resource" id="Choice_immunity_sadness"]
+script = ExtResource("4_choice")
+id = &"sadness"
+display_name = "Imunidade à Tristeza"
+description = "Remove a Tristeza ativa e impede que ela volte a ser aplicada permanentemente."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_immunity_sadness")])
+
+[sub_resource type="Resource" id="Effect_immunity_terror"]
+script = ExtResource("3_effect")
+effect_type = 29
+status_ids = Array[StringName]([&"db_00009"])
+
+[sub_resource type="Resource" id="Choice_immunity_terror"]
+script = ExtResource("4_choice")
+id = &"terror"
+display_name = "Imunidade ao Terror"
+description = "Remove o Terror ativo e impede novas aplicações permanentemente."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_immunity_terror")])
+
+[sub_resource type="Resource" id="Outcome_immunity_status"]
+script = ExtResource("2_outcome")
+id = &"status_immunity"
+display_name = "Desejo: imunidade a Doença, Tristeza ou Terror."
+narrative_description = "Escolha uma imunidade permanente: Doença, Tristeza ou Terror. O Debuff correspondente já ativo também será removido."
+effect_choices = Array[ExtResource("4_choice")]([SubResource("Choice_immunity_disease"), SubResource("Choice_immunity_sadness"), SubResource("Choice_immunity_terror")])
+
+[sub_resource type="Resource" id="Effect_immunity_ranged_critical"]
+script = ExtResource("3_effect")
+effect_type = 32
+incoming_attack_range = 2
+
+[sub_resource type="Resource" id="Choice_immunity_ranged_critical"]
+script = ExtResource("4_choice")
+id = &"ranged_critical"
+display_name = "Manter a penalidade de distância contra crítico de Distância"
+description = "Quando receber um crítico de Maestria Distância, a distância continua reduzindo o dano. Críticos de Distância não dobram dano."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_immunity_ranged_critical")])
+
+[sub_resource type="Resource" id="Effect_immunity_stun"]
+script = ExtResource("3_effect")
+effect_type = 29
+status_ids = Array[StringName]([&"db_00002"])
+
+[sub_resource type="Resource" id="Choice_immunity_stun"]
+script = ExtResource("4_choice")
+id = &"stun"
+display_name = "Imunidade ao Atordoamento"
+description = "Remove o Atordoamento ativo e impede novas aplicações permanentemente."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_immunity_stun")])
+
+[sub_resource type="Resource" id="Effect_immunity_bleeding"]
+script = ExtResource("3_effect")
+effect_type = 29
+status_ids = Array[StringName]([&"db_00008"])
+
+[sub_resource type="Resource" id="Choice_immunity_bleeding"]
+script = ExtResource("4_choice")
+id = &"bleeding"
+display_name = "Imunidade ao Sangramento"
+description = "Remove o Sangramento ativo e impede novas aplicações permanentemente."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_immunity_bleeding")])
+
+[sub_resource type="Resource" id="Outcome_immunity_combat"]
+script = ExtResource("2_outcome")
+id = &"combat_protection"
+display_name = "Desejo: proteção contra crítico de Distância, Atordoamento ou Sangramento."
+narrative_description = "Escolha uma proteção permanente: manter a penalidade de distância contra críticos de Distância, imunidade ao Atordoamento ou imunidade ao Sangramento."
+effect_choices = Array[ExtResource("4_choice")]([SubResource("Choice_immunity_ranged_critical"), SubResource("Choice_immunity_stun"), SubResource("Choice_immunity_bleeding")])
 
 [sub_resource type="Resource" id="Effect_curse"]
 script = ExtResource("3_effect")
 effect_type = 25
+remove_all_curses = true
+
+[sub_resource type="Resource" id="Outcome_curse"]
+script = ExtResource("2_outcome")
+id = &"remove_curses"
+display_name = "Desejo: remover todas as suas maldições."
+narrative_description = "Todas as Maldições carregadas pelo desejante são purificadas e deixam seu inventário. Os efeitos concedidos por elas também são removidos."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_curse")])
 
 [sub_resource type="Resource" id="Effect_item"]
 script = ExtResource("3_effect")
 effect_type = 10
+item_acceptance_required = true
 selection_mode = 1
+excluded_item_category = 3
+
+[sub_resource type="Resource" id="Outcome_item"]
+script = ExtResource("2_outcome")
+id = &"choose_item"
+display_name = "Desejo: qualquer item à escolha, exceto amaldiçoado."
+narrative_description = "Escolha um item não amaldiçoado no catálogo. Depois de confirmar, ele será entregue ao inventário do desejante; se estiver cheio, será preciso liberar espaço."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_item")])
 
 [sub_resource type="Resource" id="Effect_information"]
 script = ExtResource("3_effect")
@@ -24,62 +136,89 @@ effect_type = 14
 selection_mode = 2
 tags_filter = Array[StringName]([&"informacao"])
 
-[sub_resource type="Resource" id="Effect_immunity_a"]
-script = ExtResource("3_effect")
-effect_type = 28
-custom_rule = &"genio_immunity_status"
-
-[sub_resource type="Resource" id="Effect_immunity_b"]
-script = ExtResource("3_effect")
-effect_type = 28
-custom_rule = &"genio_immunity_combat"
-
-[sub_resource type="Resource" id="Effect_double_stat"]
-script = ExtResource("3_effect")
-effect_type = 28
-custom_rule = &"genio_double_attribute"
-
-[sub_resource type="Resource" id="Outcome_passive"]
-script = ExtResource("2_outcome")
-display_name = "Desejo: uma passiva nova."
-effects = Array[ExtResource("3_effect")]([SubResource("Effect_passive")])
-
-[sub_resource type="Resource" id="Outcome_immunity_status"]
-script = ExtResource("2_outcome")
-display_name = "Desejo: imunidade a Doença, Tristeza ou Terror."
-effects = Array[ExtResource("3_effect")]([SubResource("Effect_immunity_a")])
-
-[sub_resource type="Resource" id="Outcome_immunity_combat"]
-script = ExtResource("2_outcome")
-display_name = "Desejo: imunidade a crítico de Distância, Atordoamento ou Sangramento."
-effects = Array[ExtResource("3_effect")]([SubResource("Effect_immunity_b")])
-
-[sub_resource type="Resource" id="Outcome_curse"]
-script = ExtResource("2_outcome")
-display_name = "Desejo: quebrar uma maldição ativa."
-effects = Array[ExtResource("3_effect")]([SubResource("Effect_curse")])
-
-[sub_resource type="Resource" id="Outcome_item"]
-script = ExtResource("2_outcome")
-display_name = "Desejo: um item à escolha."
-effects = Array[ExtResource("3_effect")]([SubResource("Effect_item")])
-
 [sub_resource type="Resource" id="Outcome_information"]
 script = ExtResource("2_outcome")
+id = &"random_information"
+tags = Array[StringName]([&"somente_campanha_completa"])
 display_name = "Desejo: uma Informação aleatória."
+narrative_description = "Uma Informação ainda desconhecida pelo grupo será sorteada, registrada na campanha e lida em seguida."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_information")])
+
+[sub_resource type="Resource" id="Effect_double_attack"]
+script = ExtResource("3_effect")
+effect_type = 2
+statistic = 3
+amount = 2
+math_operation = 2
+
+[sub_resource type="Resource" id="Choice_double_attack"]
+script = ExtResource("4_choice")
+id = &"attack"
+display_name = "Dobrar Ataque"
+description = "Multiplica por 2 o Ataque atual do desejante, incluindo os modificadores que já fazem parte do valor atual."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_double_attack")])
+
+[sub_resource type="Resource" id="Effect_double_max_hp"]
+script = ExtResource("3_effect")
+effect_type = 1
+statistic = 2
+amount = 2
+math_operation = 2
+
+[sub_resource type="Resource" id="Effect_double_current_hp"]
+script = ExtResource("3_effect")
+statistic = 1
+amount = 2
+clamp_current_hp_to_max = true
+math_operation = 2
+
+[sub_resource type="Resource" id="Choice_double_life"]
+script = ExtResource("4_choice")
+id = &"life"
+display_name = "Dobrar Vida máxima e atual"
+description = "Multiplica por 2 a Vida máxima e a Vida atual do desejante."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_double_max_hp"), SubResource("Effect_double_current_hp")])
+
+[sub_resource type="Resource" id="Effect_double_stamina"]
+script = ExtResource("3_effect")
+effect_type = 2
+statistic = 4
+amount = 2
+math_operation = 2
+
+[sub_resource type="Resource" id="Choice_double_stamina"]
+script = ExtResource("4_choice")
+id = &"stamina"
+display_name = "Dobrar Estamina"
+description = "Multiplica por 2 a Estamina máxima do desejante. A Estamina restante não recebe movimento grátis neste turno."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_double_stamina")])
 
 [sub_resource type="Resource" id="Outcome_stat"]
 script = ExtResource("2_outcome")
+id = &"double_stat"
 display_name = "Desejo: dobrar Ataque, Vida ou Estamina."
-effects = Array[ExtResource("3_effect")]([SubResource("Effect_double_stat")])
+narrative_description = "Escolha qual atributo do desejante será dobrado permanentemente: Ataque, Vida máxima e atual ou Estamina máxima."
+effect_choices = Array[ExtResource("4_choice")]([SubResource("Choice_double_attack"), SubResource("Choice_double_life"), SubResource("Choice_double_stamina")])
+
+[sub_resource type="Resource" id="Effect_revive_dead"]
+script = ExtResource("3_effect")
+effect_type = 41
+
+[sub_resource type="Resource" id="Outcome_revive_dead"]
+script = ExtResource("2_outcome")
+id = &"revive_dead_playable"
+display_name = "Desejo: ressuscitar um personagem morto."
+narrative_description = "Escolha alguém que morreu nesta campanha. O personagem volta sem itens, inclusive Maldições, e torna-se permanentemente imune a Tristeza, Doença e Terror. Se a vaga original já estiver ocupada, volta como aliado humano de quem fez o desejo."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_revive_dead")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00049"
+tags = Array[StringName]([&"contem_outcomes_restritos_por_modo"])
 display_name = "Gênio da Lâmpada"
-description = "O jogador escolhe um entre sete desejos: passiva, imunidade, quebra de maldição, item, Informação ou atributo dobrado."
-narrative_description = "Uma velha lamparina repousa sobre um balcão. Ao lado dela, um homem de gravata organiza uma pilha de papéis. Carimbo vermelho numa folha. Carimbo verde na outra. Ele alinha as pilhas com cuidado. Quando percebe sua presença, pega mais um formulário e pergunta: — Atendimento para desejo ou renovação de bênção? Reclamações é na Seção C. Sala 42."
+description = "O jogador escolhe um entre oito desejos. Ressurreição só aparece se houver um personagem morto; o desejante vira dono se ele retornar como aliado. Imunidades e atributos oferecem uma segunda escolha. O item pode ser qualquer um exceto amaldiçoado; a purificação remove todas as maldições do personagem."
+narrative_description = "Uma velha lamparina repousa sobre um balcão. Ao lado dela, um homem de gravata organiza uma pilha de papéis. Carimbo vermelho numa folha. Carimbo verde na outra. Ele alinha as pilhas com cuidado. Quando percebe sua presença, pega mais um formulário e pergunta:
+— Atendimento para desejo ou renovação de bênção? Reclamações é na Seção C. Sala 42."
 valence = 0
 resolution_mode = 2
-custom_rule = &"genio_da_lampada"
-outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome_passive"), SubResource("Outcome_immunity_status"), SubResource("Outcome_immunity_combat"), SubResource("Outcome_curse"), SubResource("Outcome_item"), SubResource("Outcome_information"), SubResource("Outcome_stat")])
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome_passive"), SubResource("Outcome_immunity_status"), SubResource("Outcome_immunity_combat"), SubResource("Outcome_curse"), SubResource("Outcome_item"), SubResource("Outcome_information"), SubResource("Outcome_stat"), SubResource("Outcome_revive_dead")])

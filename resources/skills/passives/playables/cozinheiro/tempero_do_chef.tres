@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_passive"]
+
+[sub_resource type="Resource" id="Resource_vampirismo"]
+script = ExtResource("1_effect")
+effect_type = 3
+target = 0
+percent = 0.3
+
+[resource]
+script = ExtResource("2_passive")
+id = &"playable_passive_006"
+display_name = "Tempero do Chef"
+description = "Ao acertar um ataque corpo a corpo, recupera como Vida 30% do dano causado."
+trigger = 7
+activation_context = 1
+requires_melee_attack = true
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_vampirismo")])
+tags = Array[StringName]([&"cozinheiro"])

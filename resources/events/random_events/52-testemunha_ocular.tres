@@ -1,23 +1,31 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://b8r2gluyif3xs"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_0dfus"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Resource" uid="uid://sh5cqbyrgsbp" path="res://resources/skills/effects/debuffs/terror.tres" id="4_terror"]
 
 [sub_resource type="Resource" id="Effect"]
 script = ExtResource("3_effect")
-effect_type = 28
-custom_rule = &"testemunha_ocular_terror_once_per_entity"
+effect_type = 3
+debuff = ExtResource("4_terror")
+has_duration = true
+duration_amount = 1
+duration_unit = 1
+expiration_mode = 2
+max_applications_per_entity_per_campaign = 1
 
 [sub_resource type="Resource" id="Outcome"]
 script = ExtResource("2_outcome")
+id = &"ev_00052_out_01"
 display_name = "Você vê algo impossível."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00052"
 display_name = "Testemunha Ocular"
 description = "O personagem ativo sofre Terror até o fim da Rodada apenas na primeira ocorrência deste evento para ele na campanha."
 narrative_description = "No fim da rua existe uma mesa de xadrez. Uma capivara com tentáculos encara um alienígena completamente sério. Em volta, goblins assistem em silêncio absoluto. A capivara anuncia um xeque-mate. Antes que você entenda qualquer coisa, ela simplesmente engole o extraterrestre inteiro. Quando você olha para os lados, ninguém mais parece ter visto aquilo... Contar isso para os outros não vai ser fácil."
-custom_rule = &"testemunha_ocular_terror_once_per_entity"
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

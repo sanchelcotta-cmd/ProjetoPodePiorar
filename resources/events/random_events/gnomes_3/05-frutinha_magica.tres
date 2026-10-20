@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://oeehcx5q1cej"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_2kva3"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Resource" uid="uid://dk2josxbmqysd" path="res://resources/itens/consumables/frutinha_magica.tres" id="4_fruit"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 10
+item = ExtResource("4_fruit")
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"gn_00005_out_01"
+display_name = "Uma frutinha mágica foi recebida."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"gn_00005"
+display_name = "Gnomo Misterioso"
+description = "Concede uma frutinha mágica Rara. Ao ser consumida, altera permanentemente o Ataque: 50% de chance de +3 e 50% de chance de -3."
+narrative_description = "O gnomo enterra uma semente num piscar de olhos. Quando tira a mão, uma frutinha impossível já está pronta."
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"gnomes_3", &"consumivel", &"ataque"])

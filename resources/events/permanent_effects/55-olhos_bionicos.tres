@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://rhi5yi2teop5"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_x6qhr"]
+[ext_resource type="Resource" uid="uid://dw7u537fo2m4x" path="res://resources/skills/actives/permanent_effects/olhos_bionicos_revelar.tres" id="4_active"]
+[ext_resource type="Resource" uid="uid://dx0ddbbp7h6pc" path="res://resources/skills/passives/permanent_effects/olhos_bionicos.tres" id="5_passive"]
+
+[sub_resource type="Resource" id="Effect_active"]
+script = ExtResource("3_effect")
+effect_type = 8
+active_skill = ExtResource("4_active")
+
+[sub_resource type="Resource" id="Effect_passive"]
+script = ExtResource("3_effect")
+effect_type = 6
+passive = ExtResource("5_passive")
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00055_out_01"
+id = &"ev_00055_out_01"
+display_name = "Visão ampliada."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_active"), SubResource("Effect_passive")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00055"
+display_name = "Olhos Biônicos"
+description = "Uma vez por turno, permite revelar o tipo de um bloco ao alcance da Estamina. Concede Maestria em Distância ou +1 se já a possuir, e ignora o limite de alcance em ataques à distância."
+narrative_description = "Você passa a mão nos olhos por causa de um cisco que nem existia. Quando abre de novo, enxerga uma moeda esquecida do outro lado da rua. Depois uma rachadura numa janela lá na frente. Depois uma formiga carregando uma folha, tão longe que nem faz sentido. Você pisca. Tem certeza de que ouviu um pequeno 'clic' vindo dos próprios olhos."
+category = 1
+valence = 0
+can_repeat = false
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"permanent_effect", &"reveal", &"ranged_mastery"])

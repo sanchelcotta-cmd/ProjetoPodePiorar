@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/active_skill_data.gd" id="2_active"]
+
+[sub_resource type="Resource" id="Effect_summon"]
+script = ExtResource("1_effect")
+effect_type = 12
+entity_id = &"en_00008"
+amount = 1
+maximum_active_instances = 3
+summoned_acts_immediately = true
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[resource]
+script = ExtResource("2_active")
+id = &"enemy_active_012"
+display_name = "Chamar Capanga do Mal"
+description = "No início do combate e de cada turno, possui 50% de chance de invocar um Capanga do Mal, até o máximo de três. O Capanga atua no turno atual."
+target_mode = 1
+automatic_triggers = Array[int]([0, 1])
+activation_chance = 0.5
+effects = Array[ExtResource("1_effect")]([SubResource("Effect_summon")])
+tags = Array[StringName]([&"vilao_tipicamente_do_mal", &"invocacao"])
+metadata/_custom_type_script = "res://scripts/resources/skills/active_skill_data.gd"

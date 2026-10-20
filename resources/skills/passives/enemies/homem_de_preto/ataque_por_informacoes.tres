@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_passive"]
+
+[sub_resource type="Resource" id="Effect_attack"]
+script = ExtResource("1_effect")
+effect_type = 35
+attribute_id = &"attack"
+context_tags = Array[StringName]([&"suburbio", &"baixo_centro", &"centro"])
+context_caps = Array[int]([5, 10, 15])
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[sub_resource type="Resource" id="Effect_stamina"]
+script = ExtResource("1_effect")
+effect_type = 35
+attribute_id = &"stamina"
+context_tags = Array[StringName]([&"suburbio", &"baixo_centro", &"centro"])
+context_caps = Array[int]([5, 10, 15])
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[resource]
+script = ExtResource("2_passive")
+id = &"enemy_passive_006"
+display_name = "Eles Sabem Demais"
+description = "Define Ataque e Stamina pela quantidade de Informações do grupo: máximo 5 no Subúrbio, 10 no Baixo-Centro e 15 no Centro. A Stamina determina quantos hexes pode andar no turno."
+trigger = 21
+activation_context = 1
+minimum_group_information_count = 1
+effects = Array[ExtResource("1_effect")]([SubResource("Effect_attack"), SubResource("Effect_stamina")])
+tags = Array[StringName]([&"homem_de_preto", &"informacao", &"atributo_variavel"])
+metadata/_custom_type_script = "res://scripts/resources/skills/passive_skill_data.gd"

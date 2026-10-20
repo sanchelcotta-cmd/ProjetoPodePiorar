@@ -1,24 +1,27 @@
 [gd_resource type="Resource" script_class="EventData" format=3 uid="uid://buoikp5pltngm"]
 
-[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_1vepk"]
-[ext_resource type="Script" uid="uid://dhvkyqk4odn4i" path="res://scripts/sc_resources/event_condition_data.gd" id="2_kfol6"]
-[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="3_q2fm3"]
-[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="7_ckit5"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="1_1vepk"]
+[ext_resource type="Script" uid="uid://dhvkyqk4odn4i" path="res://scripts/resources/events/event_condition_data.gd" id="2_kfol6"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_q2fm3"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="4_jwaom"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="7_ckit5"]
 
 [sub_resource type="Resource" id="Resource_0nf3y"]
 script = ExtResource("2_kfol6")
 negate = true
-tag = &"homens_de_preto"
+tag = &"controle_da_mente"
 metadata/_custom_type_script = "uid://dhvkyqk4odn4i"
 
 [sub_resource type="Resource" id="Resource_l4puh"]
 script = ExtResource("3_q2fm3")
-effect_type = 17
-target = 4
+effect_type = 28
+custom_rule = &"start_dancing_zombie_horde_by_district"
 metadata/_custom_type_script = "uid://bknff8de8c2u0"
 
 [sub_resource type="Resource" id="Resource_pvbcc"]
 script = ExtResource("1_1vepk")
+id = &"ev_00004_out_01"
+id = &"ev_00004_out_01"
 display_name = "Consequência Ruim"
 narrative_description = "... Um passinho. Dois passinhos. A música continua tocando enquanto uma horda de zumbis dançarinos dobra a esquina e avança na direção do grupo."
 condition = SubResource("Resource_0nf3y")
@@ -27,16 +30,21 @@ metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [sub_resource type="Resource" id="Resource_r81tr"]
 script = ExtResource("1_1vepk")
+id = &"ev_00004_out_02"
+id = &"ev_00004_out_02"
 display_name = "Consequência Boa"
 narrative_description = "Silêncio?"
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [resource]
 script = ExtResource("7_ckit5")
+id = &"ev_00004"
 display_name = "Termos de Uso"
 description = "Se o grupo não tiver nenhuma Informação do tipo \"Controle da Mente\", o evento invoca uma horda de zumbis dançarinos, em quantidade equivalente ao Distrito atual."
 narrative_description = "Sem motivo algum, um celular começa a tocar uma música chiclete no meio da rua. Logo depois, outro toca. Depois mais um. Em poucos segundos, o som ecoa por toda a vizinhança. Um arrepio percorre sua espinha. Alguma coisa está prestes a acontecer..."
 resolution_mode = 4
 selection_weight = 2
 outcomes = Array[ExtResource("1_1vepk")]([SubResource("Resource_pvbcc"), SubResource("Resource_r81tr")])
+custom_rule = &"start_dancing_zombie_horde_by_district"
+tags = Array[StringName]([&"controle_da_mente", &"combat", &"zumbi_dancarino", &"script_personalizado", &"somente_campanha_completa"])
 metadata/_custom_type_script = "uid://cos7c56kjihyx"

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_passive"]
+
+[sub_resource type="Resource" id="Effect_counter"]
+script = ExtResource("1_effect")
+effect_type = 11
+target = 3
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[resource]
+script = ExtResource("2_passive")
+id = &"enemy_passive_014"
+display_name = "Contra-Ataque do Vilão"
+description = "Tem 50% de chance de contra-atacar imediatamente um atacante adjacente que o atingir corpo a corpo."
+trigger = 8
+activation_context = 1
+activation_chance = 0.5
+incoming_attack_type = 1
+damage_source_must_be_adjacent = true
+effects = Array[ExtResource("1_effect")]([SubResource("Effect_counter")])
+tags = Array[StringName]([&"vilao_tipicamente_do_mal", &"contra_ataque"])
+metadata/_custom_type_script = "res://scripts/resources/skills/passive_skill_data.gd"

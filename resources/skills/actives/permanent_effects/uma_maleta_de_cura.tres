@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" format=3 uid="uid://cmkhbmay2e1dl"]
+
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="1_active"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Remove_doencas"]
+script = ExtResource("2_effect")
+effect_type = 1
+target = 6
+status_ids = Array[StringName]([&"db_00003", &"db_00004", &"db_00005"])
+
+[resource]
+script = ExtResource("1_active")
+id = &"permanent_active_069"
+display_name = "Uma Maleta de Cura"
+description = "Use uma vez para curar todos os estágios de Doença de todos os personagens do grupo. Depois, a maleta desaparece."
+use_context = 1
+target_mode = 1
+consume_skill_on_success = true
+effects = Array[ExtResource("2_effect")]([SubResource("Remove_doencas")])
+tags = Array[StringName]([&"permanent_effect", &"disease", &"group", &"single_use"])

@@ -1,15 +1,23 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://b6kxy3fbqn6i0"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_by2l0"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_3db2r"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_by2l0"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_3db2r"]
 [ext_resource type="Resource" uid="uid://btcjiiyvg2gg3" path="res://resources/itens/equipments/acessorios/acessorio_epico_asas_iradas.tres" id="2_3w65e"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_scbbo"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_3w65e"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_scbbo"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_3w65e"]
 [ext_resource type="Resource" uid="uid://b0ijvyvuhberq" path="res://resources/skills/passives/voar_movimento.tres" id="4_scbbo"]
 [ext_resource type="Resource" uid="uid://c8xfj7mnvbnt3" path="res://resources/skills/passives/voar_afastar.tres" id="5_3w65e"]
 
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/acessorios_simples_1.png" id="ppp_icon_sheet"]
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(19, 44, 87, 82)
+
 [resource]
 script = ExtResource("1_by2l0")
+icon = SubResource("ppp_item_icon")
+id = &"ac_00011"
 display_name = "Capa de Lençol"
 description = "Na real você não voa, mas recebe a passiva “Voar\"."
 acquisition_sources = 3

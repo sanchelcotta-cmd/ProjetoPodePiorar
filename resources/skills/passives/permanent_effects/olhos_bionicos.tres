@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3 uid="uid://dx0ddbbp7h6pc"]
+
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="1_passive"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_ignore_ranged_range"]
+script = ExtResource("2_effect")
+effect_type = 51
+mastery_options = Array[int]([3])
+
+[sub_resource type="Resource" id="Effect_ranged_mastery"]
+script = ExtResource("2_effect")
+effect_type = 16
+amount = 1
+mastery_grant_mode = 1
+mastery_options = Array[int]([3])
+
+[resource]
+script = ExtResource("1_passive")
+id = &"permanent_passive_055"
+display_name = "Olhos Biônicos"
+description = "Concede Maestria em Distância; se o personagem já a possui, aumenta-a em +1. Ignora o limite de alcance dos ataques à distância."
+on_granted_effects = Array[ExtResource("2_effect")]([SubResource("Effect_ranged_mastery")])
+continuous_effects = Array[ExtResource("2_effect")]([SubResource("Effect_ignore_ranged_range")])
+tags = Array[StringName]([&"permanent_effect", &"olhos_bionicos", &"ranged_mastery"])

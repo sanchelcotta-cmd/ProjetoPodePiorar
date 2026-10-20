@@ -1,12 +1,13 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://cj2ee118ecg1a"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_lxvd4"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_6gcck"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_dpoj7"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_lxvd4"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_6gcck"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_dpoj7"]
 [ext_resource type="Resource" uid="uid://c4ueuiwdrdl42" path="res://resources/skills/passives/protecao_25.tres" id="3_uqayj"]
 
 [resource]
 script = ExtResource("1_lxvd4")
+id = &"en_00011"
 display_name = "Cultista Encapuzado"
 description = "Cultista com ataque a distância que tem proteção."
 narrative_description = "É uma pessoa com um manto vermelho e capuz cobrindo a cara. Tá usando um cabo de vassoura... Como um cajado? A confiança com que ela faz isso é suficiente para fazer você duvidar de que seja apenas um pedaço de madeira."

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_passive"]
+
+[sub_resource type="Resource" id="Effect_terror"]
+script = ExtResource("1_effect")
+target = 10
+debuff_id = &"db_00009"
+ignore_resistance = true
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[sub_resource type="Resource" id="Effect_damage"]
+script = ExtResource("1_effect")
+effect_type = 25
+target = 10
+amount = 3
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[resource]
+script = ExtResource("2_passive")
+id = &"enemy_passive_008"
+display_name = "Emboscada do Mímico I"
+description = "Ao iniciar o Encontro, aplica Terror sem Resistência e causa 3 de dano ao personagem que ativou o bloco."
+trigger = 21
+activation_context = 1
+max_activations_per_combat = 1
+effects = Array[ExtResource("1_effect")]([SubResource("Effect_terror"), SubResource("Effect_damage")])
+tags = Array[StringName]([&"mimico_1", &"terror_garantido", &"dano_fixo"])
+metadata/_custom_type_script = "res://scripts/resources/skills/passive_skill_data.gd"

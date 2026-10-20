@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" format=3 uid="uid://b4wsgr45upw6p"]
+
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_active"]
+
+[sub_resource type="Resource" id="Resource_unavailable"]
+script = ExtResource("1_effect")
+effect_type = 21
+has_duration = true
+duration_turns = 2
+
+[sub_resource type="Resource" id="Resource_item"]
+script = ExtResource("1_effect")
+effect_type = 20
+target = 9
+amount = 1
+tags_filter = Array[StringName]([&"consumivel"])
+excluded_tags = Array[StringName]([&"raro"])
+delay_turns = 2
+
+[resource]
+script = ExtResource("2_active")
+id = &"companion_active_002"
+display_name = "Vai Pegar!"
+description = "Envia o Doguinho para buscar um Consumível aleatório que não seja Raro. Ele fica inacessível por 2 turnos e, ao retornar, coloca o item no inventário de quem o recrutou. Pode ser usada até 3 vezes por Rodada."
+use_context = 1
+target_mode = 1
+usable_while_owner_inactive = true
+max_uses_per_round = 3
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_unavailable"), SubResource("Resource_item")])
+tags = Array[StringName]([&"doguinho_caramelo"])

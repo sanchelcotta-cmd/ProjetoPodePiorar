@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/active_skill_data.gd" id="2_active"]
+
+[sub_resource type="Resource" id="Effect_reveal"]
+script = ExtResource("1_effect")
+effect_type = 8
+target = 0
+scaling_source = 1
+selection_mode = 1
+max_items_affected = 10
+
+[resource]
+script = ExtResource("2_active")
+id = &"item_active_traje_espiao"
+display_name = "Revelação de Espião"
+description = "Uma vez por Rodada, revela automaticamente até X blocos ainda ocultos do mapa, sendo X o número de Informações já obtidas pelo grupo, limitado a 10."
+use_context = 1
+target_mode = 1
+max_uses_per_round = 1
+effects = Array[ExtResource("1_effect")]([SubResource("Effect_reveal")])
+tags = Array[StringName]([&"traje_espiao", &"revelacao"])

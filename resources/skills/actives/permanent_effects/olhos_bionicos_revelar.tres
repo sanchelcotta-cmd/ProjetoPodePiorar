@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" format=3 uid="uid://dw7u537fo2m4x"]
+
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="1_active"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_reveal"]
+script = ExtResource("2_effect")
+effect_type = 8
+target = 8
+amount = 1
+
+[resource]
+script = ExtResource("1_active")
+id = &"permanent_active_055"
+display_name = "Visão Biônica"
+description = "Revela o tipo de um bloco escolhido dentro do alcance da Estamina atual."
+use_context = 1
+target_mode = 5
+range_mode = 1
+max_uses_per_turn = 1
+effects = Array[ExtResource("2_effect")]([SubResource("Effect_reveal")])
+tags = Array[StringName]([&"permanent_effect", &"olhos_bionicos", &"exploration"])

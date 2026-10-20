@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SpriteSheetAnimationData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/entities/sprite_sheet_animation_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://sprites/entities_allies/doguinho_idle_sit_1x.png" id="2_sheet"]
+[ext_resource type="Texture2D" path="res://sprites/entities_allies/doguinho_idle_scratch_1x.png" id="3_sheet"]
+[ext_resource type="Texture2D" path="res://sprites/entities_allies/doguinho_walk_1x.png" id="4_sheet"]
+[ext_resource type="Texture2D" path="res://sprites/entities_allies/doguinho_attack_1x.png" id="5_sheet"]
+
+[resource]
+script = ExtResource("1_script")
+idle_sheet = ExtResource("2_sheet")
+idle_alternative_sheet = ExtResource("3_sheet")
+walk_sheet = ExtResource("4_sheet")
+attack_sheet = ExtResource("5_sheet")
+canvas_size = Vector2i(96, 80)
+subject_height = 58
+maximum_subject_width = 82
+palette = 5
+idle_fps = 6.0
+walk_fps = 6.0
+action_fps = 6.0
+irregular_idle = true

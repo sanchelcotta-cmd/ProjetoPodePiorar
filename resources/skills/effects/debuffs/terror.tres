@@ -1,12 +1,18 @@
 [gd_resource type="Resource" script_class="DebuffData" format=3 uid="uid://sh5cqbyrgsbp"]
 
-[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/sc_resources/debuffs_data.gd" id="1_2450w"]
+[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/resources/status/debuffs_data.gd" id="1_2450w"]
+[ext_resource type="Texture2D" uid="uid://chb81bkerek7r" path="res://sprites/debuffs/debuffs_1x.png" id="2_sheet"]
+
+[sub_resource type="AtlasTexture" id="Icon"]
+atlas = ExtResource("2_sheet")
+region = Rect2(118, 10, 39, 36)
 
 [resource]
 script = ExtResource("1_2450w")
 id = &"db_00009"
 display_name = "Terror"
-description = "Diminui o Dano e tem 50% de chance de fugir do causador da fonte de terror."
+description = "Reduz o Ataque em 3. No início de cada turno, há 50% de chance base de resistir e encerrar o Terror; se falhar, deve se afastar do causador. Cada resistência bem-sucedida aumenta em 5% a chance contra qualquer criatura do mesmo EntityData ou o mesmo Evento, até 100%."
+icon = SubResource("Icon")
 duration_type = 4
 attack_modifier = -3
 control_effects = Array[int]([2])

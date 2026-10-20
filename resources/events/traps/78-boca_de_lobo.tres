@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://bqy84o11nxoq8"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_vlue3"]
+[ext_resource type="Resource" uid="uid://cko60s7wgmf1e" path="res://resources/skills/effects/debuffs/enraizado.tres" id="4_debuff"]
+
+[sub_resource type="Resource" id="Effect_damage"]
+script = ExtResource("3_effect")
+dice_count = 1
+dice_sides = 6
+math_operation = 1
+
+[sub_resource type="Resource" id="Effect_root"]
+script = ExtResource("3_effect")
+effect_type = 3
+debuff = ExtResource("4_debuff")
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00078_out_01"
+display_name = "A armadilha fecha sobre sua perna."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_damage"), SubResource("Effect_root")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00078"
+display_name = "Boca de Lobo"
+description = "Causa 1d6 de dano e Enraiza o personagem ativo por 1 turno."
+narrative_description = "O metal escondido salta do chão com dentes velhos e uma vontade muito particular de segurar você ali."
+category = 3
+valence = 2
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"trap", &"damage", &"root", &"dice"])

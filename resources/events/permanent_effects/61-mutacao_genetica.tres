@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://c6akjfr0rs3yt"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_tjb0x"]
+[ext_resource type="Resource" uid="uid://cvyh5ydxf37ix" path="res://resources/skills/passives/permanent_effects/mutacao_genetica.tres" id="4_passive"]
+
+[sub_resource type="Resource" id="Effect_choose_enemy_and_grant_passive"]
+script = ExtResource("3_effect")
+effect_type = 6
+selection_mode = 1
+passive = ExtResource("4_passive")
+grant_binding_source = 2
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00061_out_01"
+id = &"ev_00061_out_01"
+display_name = "Características absorvidas."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_choose_enemy_and_grant_passive")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00061"
+display_name = "Mutação Genética"
+description = "Escolhe um inimigo do último Encontro e soma seus valores base de Vida máxima e Ataque aos do personagem, além de receber suas Maestrias e Passivas."
+narrative_description = "Você passa por uma vitrine e vê alguma coisa estranha no reflexo. Não é exatamente você. Também não é exatamente o último inimigo que enfrentaram. Mas basta olhar duas vezes para perceber que é um pouco dos dois."
+category = 1
+valence = 0
+requires_completed_encounter = true
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"permanent_effect", &"enemy_copy", &"passives"])

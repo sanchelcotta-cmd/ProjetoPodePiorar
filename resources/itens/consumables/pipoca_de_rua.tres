@@ -1,9 +1,11 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://cewleug1y5lvt"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_qr57e"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_5p5ki"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_s441v"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_lv5vd"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_qr57e"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_5p5ki"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_s441v"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_lv5vd"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/consumiveis_1.png" id="ppp_icon_sheet"]
 
 [sub_resource type="Resource" id="Resource_qr57e"]
 script = ExtResource("4_lv5vd")
@@ -12,8 +14,14 @@ amount = 3
 attribute_id = &"hp"
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(142, 119, 62, 74)
+
 [resource]
 script = ExtResource("1_qr57e")
+icon = SubResource("ppp_item_icon")
+id = &"cs_00014"
 display_name = "Pipoca de Rua"
 description = "Recupera 3 de Vida."
 item_type = 1

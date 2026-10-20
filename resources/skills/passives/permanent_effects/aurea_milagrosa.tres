@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="1_passive"]
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Status_immunity"]
+script = ExtResource("2_effect")
+effect_type = 42
+status_ids = Array[StringName]([&"db_00003", &"db_00004", &"db_00005", &"db_00010", &"db_00009"])
+
+[resource]
+script = ExtResource("1_passive")
+id = &"permanent_passive_060"
+display_name = "Áurea Milagrosa"
+description = "O personagem fica imune a Doença, Tristeza, Terror e Maldições. Remove esses efeitos que já possuía ao receber a bênção."
+continuous_effects = Array[ExtResource("2_effect")]([SubResource("Status_immunity")])
+tags = Array[StringName]([&"permanent_effect", &"immunity", &"curses"])

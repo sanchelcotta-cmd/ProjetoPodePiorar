@@ -1,16 +1,21 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://ck0mihtrhjy1c"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_dctp0"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_ishlg"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_dctp0"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_ishlg"]
+[ext_resource type="Resource" path="res://resources/skills/actives/playables/professora/silencio_turma.tres" id="3_active_combat"]
+[ext_resource type="Resource" path="res://resources/skills/actives/playables/professora/artesanato_com_eva.tres" id="4_active_exploration"]
+[ext_resource type="Resource" path="res://resources/entities/animations/professora_animation.tres" id="9_animation"]
 
 [resource]
 script = ExtResource("1_dctp0")
 id = &"pj_00005"
 display_name = "Professora do Primário"
 description = "Uma professora criativa. "
+playable_animation = ExtResource("9_animation")
 vida_base = 26
 ataque_base = 5
 stamina_base = 3
 maestrias = Array[int]([1])
+skill_ativas = Array[ExtResource("3_active_combat")]([ExtResource("3_active_combat"), ExtResource("4_active_exploration")])
 tags = Array[StringName]([&"humano", &"jogavel"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

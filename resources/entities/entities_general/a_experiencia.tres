@@ -1,13 +1,17 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://c7ogxk0w0ytbp"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_p2gh8"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_gt8if"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_p2gh8"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_2xnj5"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_gt8if"]
 [ext_resource type="Resource" uid="uid://dlp5nfrpuby5u" path="res://resources/skills/passives/esquiva_30.tres" id="3_10312"]
 [ext_resource type="Resource" uid="uid://bi7qkkp5atpu0" path="res://resources/skills/passives/ataque_extra.tres" id="4_2xnj5"]
 [ext_resource type="Resource" uid="uid://b3irs3mvphhvq" path="res://resources/skills/passives/protecao_75.tres" id="5_8myhm"]
+[ext_resource type="Resource" path="res://resources/skills/passives/enemies/a_experiencia/recrutamento_uma_informacao.tres" id="6_recruit_one"]
+[ext_resource type="Resource" path="res://resources/skills/passives/enemies/a_experiencia/recrutamento_duas_informacoes.tres" id="7_recruit_two"]
 
 [resource]
 script = ExtResource("1_p2gh8")
+id = &"en_00004"
 display_name = "A Experiência"
 description = "Ao iniciar o Encontro e antes do combate, caso o grupo possua as Informações \"Orchestra 2/5\" e/ou \"Orchestra 3/5\", é possível tentar convencer A Experiência a se aliar ao grupo. 
 • Se o grupo possuir apenas uma dessas Informações, a chance de sucesso é de 50%. 
@@ -20,6 +24,6 @@ vida_base = 60
 ataque_base = 12
 stamina_base = 6
 maestrias = Array[int]([2])
-skill_passivas = Array[ExtResource("2_gt8if")]([ExtResource("3_10312"), ExtResource("4_2xnj5"), ExtResource("5_8myhm")])
+skill_passivas = Array[ExtResource("2_gt8if")]([ExtResource("3_10312"), ExtResource("4_2xnj5"), ExtResource("5_8myhm"), ExtResource("6_recruit_one"), ExtResource("7_recruit_two")])
 tags = Array[StringName]([&"core_orchestra", &"humanoide", &"especial", &"esquiva_30", &"ataque_extra", &"protecao_75", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

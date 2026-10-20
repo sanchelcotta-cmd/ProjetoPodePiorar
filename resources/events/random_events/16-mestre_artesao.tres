@@ -1,14 +1,19 @@
 [gd_resource type="Resource" script_class="EventData" format=3 uid="uid://buh0ueryuwch0"]
 
-[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_07v3h"]
-[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_72u7j"]
-[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/sc_resources/event_effect_data.gd" id="2_jts2s"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="1_07v3h"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="2_72u7j"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="2_jts2s"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_jts2s"]
 
 [sub_resource type="Resource" id="Resource_wlj0d"]
 script = ExtResource("2_jts2s")
-effect_type = 2
+effect_type = 39
 selection_mode = 1
-tags_filter = Array[StringName]([&"armadura", &"arma"])
+item_category_filter = 1
+required_item_equipment_slots = Array[int]([1, 2])
+modify_selected_item_instance = true
+item_statistic_for_weapon = 1
+item_statistic_for_armor = 2
 dice_count = 1
 dice_sides = 6
 math_operation = 0
@@ -16,20 +21,19 @@ metadata/_custom_type_script = "uid://bknff8de8c2u0"
 
 [sub_resource type="Resource" id="Resource_q72j0"]
 script = ExtResource("1_07v3h")
+id = &"ev_00016_out_01"
 display_name = "Item aprimorado."
+narrative_description = "[resposta_artesao]"
 effects = Array[ExtResource("2_jts2s")]([SubResource("Resource_wlj0d")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [resource]
 script = ExtResource("2_72u7j")
+id = &"ev_00016"
 display_name = "Mestre Artesão"
 description = "O jogador escolhe um item equipado (arma ou armadura) e adiciona o resultado de um dado de 6 lados ao seu valor de Ataque (se arma) ou de Vida (se armadura)."
-narrative_description = "Um velho de barba comprida segura [sem item] como quem já viu milhares iguais. Sem dizer uma única palavra, ele bate nela algumas vezes com um martelo, devolve o equipamento e vai embora...
-(Se for roupa/vestimenta):
-“... Meio estranho martelar uma roupa. Mas ela parece... melhor.\"
-(Se for arma):
-Ela parece... melhor.\"
-"
+narrative_description = "Um velho de barba comprida examina o equipamento que você deseja aprimorar, como quem já viu milhares iguais. Ele pega um martelo e espera que você escolha uma arma ou armadura."
 valence = 0
 outcomes = Array[ExtResource("1_07v3h")]([SubResource("Resource_q72j0")])
+tags = Array[StringName]([&"equipment", &"weapon", &"armor", &"dice"])
 metadata/_custom_type_script = "uid://cos7c56kjihyx"

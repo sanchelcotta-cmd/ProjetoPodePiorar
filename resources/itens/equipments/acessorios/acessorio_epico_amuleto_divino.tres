@@ -1,34 +1,46 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://d1vyyl0rxpnfs"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_i4qyf"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_vre7k"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_6oeeo"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="7_nuq77"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_i4qyf"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_vre7k"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_6oeeo"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="7_nuq77"]
+[ext_resource type="Resource" path="res://resources/skills/actives/items/ressurreicao_amuleto_divino.tres" id="8_active"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/acessorios_epicos_1.png" id="ppp_icon_sheet"]
 
 [sub_resource type="Resource" id="Resource_mfpx3"]
 script = ExtResource("7_nuq77")
-effect_type = 15
-modify_mode = 2
-percent = 1.0
+effect_type = 42
+effect_lifetime = 1
+status_ids = Array[StringName]([&"db_00003", &"db_00004", &"db_00005", &"db_00009", &"db_00010"])
+immunity_item_tags = Array[StringName]([&"cursed"])
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [sub_resource type="Resource" id="Resource_5vmoc"]
 script = ExtResource("3_6oeeo")
-display_name = "Imunidade"
-description = "Não pode ser afetado por doenças, tristeza, terror ou maldições."
-trigger = 19
-effects = Array[ExtResource("7_nuq77")]([SubResource("Resource_mfpx3")])
+id = &"item_passive_004"
+display_name = "Imunidade Divina"
+description = "Não pode ser afetado por Doença, Tristeza, Terror ou Maldições."
+continuous_effects = Array[ExtResource("7_nuq77")]([SubResource("Resource_mfpx3")])
+tags = Array[StringName]([&"amuleto_divino"])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(129, 31, 49, 87)
 
 [resource]
 script = ExtResource("1_i4qyf")
-display_name = "Prótese das Asas Iradas"
-description = "Imunidade: doença, terror, tristeza, maldições."
+icon = SubResource("ppp_item_icon")
+id = &"ac_00001"
+display_name = "Amuleto Divino"
+description = "Imunidade a Doença, Tristeza, Terror e Maldições. Quando um aliado morrer, pode quebrar o amuleto para ressuscitá-lo com a Vida máxima completa. O Amuleto Divino não pode ser criado novamente nesta partida."
 rarity = 4
 acquisition_sources = 4
 tags = Array[StringName]([&"acessorio", &"epica", &"imunidade"])
 equipment_slot = 3
-bonus_stamina = 4
-granted_passives = Array[ExtResource("3_6oeeo")]([SubResource("Resource_5vmoc"), null])
+granted_passives = Array[ExtResource("3_6oeeo")]([SubResource("Resource_5vmoc")])
+granted_active_skills = Array[ExtResource("2_vre7k")]([ExtResource("8_active")])
 consumed_on_use = false
+cannot_craft_after_consumed = true
 metadata/_custom_type_script = "uid://bql64fe8a0w24"

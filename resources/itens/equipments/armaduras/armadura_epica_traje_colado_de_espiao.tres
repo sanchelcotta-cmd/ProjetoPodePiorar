@@ -1,16 +1,24 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://oha4rof5wea6"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_142cu"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_5oo6j"]
-[ext_resource type="Resource" uid="uid://dsa3dwjhjlfye" path="res://resources/skills/actives/revela_blocos_1.tres" id="3_5oo6j"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_dvr3c"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="5_27u3r"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_142cu"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_5oo6j"]
+[ext_resource type="Resource" path="res://resources/skills/actives/items/revelacao_traje_espiao.tres" id="3_5oo6j"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_dvr3c"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="5_27u3r"]
 [ext_resource type="Resource" uid="uid://t5c1hs7mlm6q" path="res://resources/skills/passives/esquiva_60.tres" id="5_dvr3c"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armaduras_epicas_1.png" id="ppp_icon_sheet"]
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(149, 135, 83, 92)
 
 [resource]
 script = ExtResource("1_142cu")
+icon = SubResource("ppp_item_icon")
+id = &"ar_00003"
 display_name = "Traje Colado de Espião"
-description = "Pode esquivar de ataques."
+description = "Pode revelar uma vez por Rodada até 10 blocos ainda ocultos, sorteando X conforme a quantidade de Informações obtidas pelo grupo. Tem 60% de chance de esquivar de um ataque, movendo para um bloco adjacente."
 rarity = 4
 acquisition_sources = 4
 tags = Array[StringName]([&"armadura", &"epica", &"sinergia_espiao"])

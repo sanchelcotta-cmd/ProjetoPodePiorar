@@ -1,13 +1,15 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://xjvgsdswil66"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_7568b"]
-[ext_resource type="Resource" uid="uid://db8xx3150mvqj" path="res://resources/skills/actives/invocacao_3.tres" id="2_6vcgq"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_wx5nj"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_7568b"]
+[ext_resource type="Resource" path="res://resources/skills/actives/enemies/zumbi_que_taca_gosma/invocar_zumbis_dancarinos.tres" id="2_6vcgq"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_wx5nj"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_wx5nj"]
 [ext_resource type="Resource" uid="uid://6qqyc0ayls8h" path="res://resources/skills/passives/causa_doenca_50.tres" id="4_renvt"]
 
 [resource]
 script = ExtResource("1_7568b")
-display_name = "Zumbi Que taca gosma"
+id = &"en_00034"
+display_name = "Zumbi que Taca Gosma"
 description = "Criatura zumbificada que atira gosma que pode causar doença.
 Ao início do 3º turno do Encontro, caso pelo menos um Zumbi que Taca Gosma tenha permanecido vivo durante os dois primeiros turnos completos do combate, são invocados Zumbis Dançarinos. "
 narrative_description = "É difícil dizer onde termina o zumbi e onde começa a meleca. Em alguns momentos, parece que a gosma é quem está carregando o moribundo, e não o contrário."
@@ -16,6 +18,6 @@ ataque_base = 4
 stamina_base = 4
 maestrias = Array[int]([3])
 skill_passivas = Array[ExtResource("3_wx5nj")]([ExtResource("4_renvt")])
-skill_ativas = Array[Resource]([ExtResource("2_6vcgq")])
+skill_ativas = Array[ExtResource("2_wx5nj")]([ExtResource("2_6vcgq")])
 tags = Array[StringName]([&"core_controle_da_mente", &"humanoide", &"causa_doenca", &"baixo_centro", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

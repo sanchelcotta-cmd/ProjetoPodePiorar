@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="PassiveSkillData" format=3 uid="uid://b3irs3mvphhvq"]
 
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="1_wn5hl"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_8y3dq"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_wn5hl"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_8y3dq"]
 
 [sub_resource type="Resource" id="Resource_i5m1h"]
 script = ExtResource("1_wn5hl")

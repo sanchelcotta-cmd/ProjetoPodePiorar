@@ -1,13 +1,15 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://cqd82jhohjihu"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_0kmo1"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_ef7ia"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_0kmo1"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_ef7ia"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_gvcht"]
 [ext_resource type="Resource" uid="uid://b0ijvyvuhberq" path="res://resources/skills/passives/voar_movimento.tres" id="3_vama3"]
 [ext_resource type="Resource" uid="uid://c8xfj7mnvbnt3" path="res://resources/skills/passives/voar_afastar.tres" id="4_0cicq"]
 [ext_resource type="Resource" uid="uid://bpdlvsx7xmqcf" path="res://resources/skills/passives/causa_doenca_25.tres" id="5_sfwtb"]
 
 [resource]
 script = ExtResource("1_0kmo1")
+id = &"en_00025"
 display_name = "Pomba Maligna"
 description = "Criatura voadora que pode causar doença ao atacar."
 narrative_description = "Parece que ela sempre foi cruel e maligna, e só estava esperando o momento oportuno para mostrar as asinhas."

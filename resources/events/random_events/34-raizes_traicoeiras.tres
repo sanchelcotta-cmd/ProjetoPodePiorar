@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://b71nmcqjqmgom"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
-[ext_resource type="Resource" path="res://resources/skills/effects/debuffs/enraizado.tres" id="4_enraizado"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_nq8x0"]
+[ext_resource type="Resource" uid="uid://cko60s7wgmf1e" path="res://resources/skills/effects/debuffs/enraizado.tres" id="4_enraizado"]
 
 [sub_resource type="Resource" id="Effect"]
 script = ExtResource("3_effect")
@@ -12,11 +13,13 @@ debuff = ExtResource("4_enraizado")
 
 [sub_resource type="Resource" id="Outcome"]
 script = ExtResource("2_outcome")
+id = &"ev_00034_out_01"
 display_name = "As raízes o prendem."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00034"
 display_name = "Raízes Traiçoeiras"
 description = "Enraíza o personagem ativo no bloco atual, impedindo seu movimento no próximo turno."
 narrative_description = "Você sente alguma coisa encostar no seu tornozelo. Quando olha para baixo, já é tarde demais. As raízes apertam devagar, como se tivessem esperado por esse momento o dia inteiro."

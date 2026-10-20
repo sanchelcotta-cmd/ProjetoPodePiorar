@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3 uid="uid://e36nug1p4q6d"]
+
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="1_passive"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_double_incoming_damage"]
+script = ExtResource("2_effect")
+effect_type = 27
+multiplier = 2.0
+requires_counterparty_entity_data_matches_bound_id = true
+
+[resource]
+script = ExtResource("1_passive")
+id = &"permanent_passive_070_defense"
+display_name = "Arqui-Inimigo: Risco"
+description = "Dobra o dano recebido de qualquer inimigo do tipo declarado como arqui-inimigo."
+trigger = 8
+activation_context = 1
+effects = Array[ExtResource("2_effect")]([SubResource("Effect_double_incoming_damage")])
+tags = Array[StringName]([&"permanent_effect", &"archenemy", &"incoming_damage"])

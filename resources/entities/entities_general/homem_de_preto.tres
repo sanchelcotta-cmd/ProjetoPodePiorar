@@ -1,14 +1,20 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://cps1gd8q2664f"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_lqeph"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_c1om5"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_lqeph"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_c1om5"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_v3c48"]
+[ext_resource type="Resource" path="res://resources/skills/passives/enemies/homem_de_preto/sortear_maestria.tres" id="3_mastery"]
+[ext_resource type="Resource" path="res://resources/skills/passives/enemies/homem_de_preto/ataque_por_informacoes.tres" id="4_attack"]
+[ext_resource type="Resource" path="res://resources/skills/passives/enemies/homem_de_preto/encerrar_sem_informacoes.tres" id="5_end"]
 
 [resource]
 script = ExtResource("1_lqeph")
+id = &"en_00019"
 display_name = "Homem de Preto"
-description = "Se o grupo não possuir nenhuma Informação, o Homem de Preto não realiza ataques, e o Encontro é encerrado imediatamente."
+description = "Se o grupo não possuir nenhuma Informação, o Homem de Preto não realiza ataques, e o Encontro é encerrado imediatamente. Caso contrário, Ataque e Stamina são definidos pelo número de Informações do grupo, limitados conforme o distrito."
 narrative_description = "Vestindo um terno impecável, chapéu preto e uma expressão completamente vazia, ele permanece parado como se já esperasse pela chegada de vocês. A pele excessivamente pálida e a ausência de sobrancelhas tornam seu rosto difícil de esquecer. Enquanto vocês observam a figura, ela continua encarando o grupo, como se estivesse calculando alguma coisa."
 vida_base = 55
 maestrias = Array[int]([1, 3])
+skill_passivas = Array[ExtResource("2_c1om5")]([ExtResource("3_mastery"), ExtResource("4_attack"), ExtResource("5_end")])
 tags = Array[StringName]([&"core_homens_de_preto", &"humanoide", &"atributo_variavel", &"suburbio", &"baixo_centro", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

@@ -1,24 +1,27 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://ubbdb6l01uye"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_8ptqk"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
 
 [sub_resource type="Resource" id="Effect"]
 script = ExtResource("3_effect")
-effect_type = 28
-custom_rule = &"start_nearest_undesired_encounter"
+effect_type = 17
+encounter_selection = 1
+randomize_equal_distance = true
 
 [sub_resource type="Resource" id="Outcome"]
 script = ExtResource("2_outcome")
+id = &"ev_00033_out_01"
 display_name = "O barulho atrai perigo."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00033"
 display_name = "Tropeço Perigoso"
 description = "O personagem ativo enfrenta o inimigo do bloco de Encontro Indesejado mais próximo no mapa."
 narrative_description = "Quem diria que tropeçar em uma lixeira e derrubar uma tampa criaria uma verdadeira sinfonia de percussão? A barulheira com certeza vai ser a trilha sonora dos seus próximos pesadelos... Se você sobreviver ao que ela acabou de atrair."
 valence = 2
-custom_rule = &"start_nearest_undesired_encounter"
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

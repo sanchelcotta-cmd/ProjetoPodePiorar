@@ -1,23 +1,28 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://le87fjbgp5ik"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_rqy4t"]
 
 [sub_resource type="Resource" id="Effect"]
 script = ExtResource("3_effect")
-effect_type = 28
-custom_rule = &"teleporte_e_ativa_bloco"
+effect_type = 19
+destination_mode = 1
+activate_destination_event = true
+destination_must_be_unactivated = true
+destination_must_differ_from_origin = true
 
 [sub_resource type="Resource" id="Outcome"]
 script = ExtResource("2_outcome")
+id = &"ev_00030_out_01"
 display_name = "Você é teletransportado."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00030"
 display_name = "Você Foi Teletransportado"
 description = "O personagem ativo é levado a outro bloco aleatório do mapa atual e ativa imediatamente o efeito desse bloco."
 narrative_description = "Primeiro você sente como se sua pele fosse esticada até um poste. Depois sente os órgãos se encolhendo e um gosto agridoce subindo pela garganta. Tem cheiro de azeitonas. Mas antes de conseguir pensar no porquê... tudo mudou. Quando percebe seus pés tocando o chão novamente, você já não está mais no mesmo lugar."
-custom_rule = &"teleporte_e_ativa_bloco"
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

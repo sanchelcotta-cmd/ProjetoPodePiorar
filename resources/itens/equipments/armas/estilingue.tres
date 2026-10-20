@@ -1,13 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bt7xfiqfcsvi7"]
 
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="1_rngqw"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_pfkhw"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="1_rngqw"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_pfkhw"]
 [ext_resource type="Resource" uid="uid://cpvafbi4bcprm" path="res://resources/itens/equipments/armas/arma_epica_arco_da_precisao.tres" id="2_qeqmc"]
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="3_qeqmc"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_gn45v"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="3_qeqmc"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_gn45v"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armas_simples_1.png" id="ppp_icon_sheet"]
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(213, 48, 57, 68)
 
 [resource]
 script = ExtResource("3_qeqmc")
+icon = SubResource("ppp_item_icon")
+id = &"aa_00010"
 display_name = "Estilingue"
 description = "Um estilingue.
 Maestria: Distância"

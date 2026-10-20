@@ -1,0 +1,227 @@
+[gd_scene format=3 uid="uid://cyep5adxwju4i"]
+
+[ext_resource type="Texture2D" uid="uid://ctwx4o0jq4jrh" path="res://sprites/map/ground.png" id="1_m8ctg"]
+[ext_resource type="Texture2D" uid="uid://d4i3j0foj6lv0" path="res://sprites/background/cena_baixocentro_0001.png" id="2_gdakp"]
+[ext_resource type="Texture2D" uid="uid://vj25vcpvltnm" path="res://sprites/map/hex-ref.png" id="3_xpvjt"]
+
+[node name="Node2D" type="Node2D" unique_id=667174039]
+
+[node name="Ground" type="Sprite2D" parent="." unique_id=602161460]
+position = Vector2(234.99998, 483)
+scale = Vector2(0.30751634, 0.30040884)
+texture = ExtResource("1_m8ctg")
+
+[node name="Ground" type="Sprite2D" parent="Ground" unique_id=111194542]
+position = Vector2(1472.8352, -7.1555376e-05)
+scale = Vector2(0.93876576, 1.0001537)
+texture = ExtResource("1_m8ctg")
+
+[node name="Ground" type="Sprite2D" parent="Ground/Ground" unique_id=774379764]
+position = Vector2(1472.8352, -7.1555376e-05)
+scale = Vector2(0.93876576, 1.0001537)
+texture = ExtResource("1_m8ctg")
+
+[node name="CenaBaixocentro0001" type="Sprite2D" parent="Ground/Ground" unique_id=102503155]
+position = Vector2(-105.59893, -1104.2565)
+scale = Vector2(2.2537012, 2.0339372)
+texture = ExtResource("2_gdakp")
+
+[node name="HexRef1" type="Sprite2D" parent="." unique_id=1382741515]
+position = Vector2(331, 363)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef2" type="Sprite2D" parent="." unique_id=312367465]
+position = Vector2(331, 469.99997)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef3" type="Sprite2D" parent="." unique_id=612524833]
+position = Vector2(378.33997, 415.4)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef4" type="Sprite2D" parent="." unique_id=365895017]
+position = Vector2(378.00003, 521.99994)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef5" type="Sprite2D" parent="." unique_id=2042863558]
+position = Vector2(335, 580.99994)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef6" type="Sprite2D" parent="." unique_id=459615712]
+position = Vector2(431, 365)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef7" type="Sprite2D" parent="." unique_id=2034284262]
+position = Vector2(429, 470)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef10" type="Sprite2D" parent="." unique_id=541110023]
+position = Vector2(429, 580.99994)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef11" type="Sprite2D" parent="." unique_id=1946732241]
+position = Vector2(481, 415.99997)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef12" type="Sprite2D" parent="." unique_id=2018664279]
+position = Vector2(475, 524)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef13" type="Sprite2D" parent="." unique_id=106992452]
+position = Vector2(523, 366)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef14" type="Sprite2D" parent="." unique_id=1695807499]
+position = Vector2(525, 470)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef15" type="Sprite2D" parent="." unique_id=1257846711]
+position = Vector2(575, 414.99997)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef16" type="Sprite2D" parent="." unique_id=905238580]
+position = Vector2(568, 522)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef17" type="Sprite2D" parent="." unique_id=570867622]
+position = Vector2(524, 583.99994)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef18" type="Sprite2D" parent="." unique_id=1844350969]
+position = Vector2(624, 366)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef20" type="Sprite2D" parent="." unique_id=1884760597]
+position = Vector2(615, 583)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef21" type="Sprite2D" parent="." unique_id=431685846]
+position = Vector2(985, 473.99997)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef22" type="Sprite2D" parent="." unique_id=832311291]
+position = Vector2(1029, 417.99997)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef23" type="Sprite2D" parent="." unique_id=928683776]
+position = Vector2(665.00006, 415.99997)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef24" type="Sprite2D" parent="." unique_id=422350883]
+position = Vector2(666.00006, 523)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef25" type="Sprite2D" parent="." unique_id=1867136954]
+position = Vector2(718, 364)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef26" type="Sprite2D" parent="." unique_id=712388803]
+position = Vector2(718.00006, 470)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef27" type="Sprite2D" parent="." unique_id=658109440]
+position = Vector2(762.00006, 415.99997)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef28" type="Sprite2D" parent="." unique_id=1121843626]
+position = Vector2(763, 522)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef29" type="Sprite2D" parent="." unique_id=511142671]
+position = Vector2(714, 581)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef30" type="Sprite2D" parent="." unique_id=1803247640]
+position = Vector2(810, 363)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef31" type="Sprite2D" parent="." unique_id=2120246476]
+position = Vector2(815.00006, 468.99997)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef32" type="Sprite2D" parent="." unique_id=814736362]
+position = Vector2(796.33997, 584.4)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef33" type="Sprite2D" parent="." unique_id=346854121]
+position = Vector2(987, 359)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef34" type="Sprite2D" parent="." unique_id=1717119943]
+position = Vector2(975, 582)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef35" type="Sprite2D" parent="." unique_id=1466576315]
+position = Vector2(856, 413.99997)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef36" type="Sprite2D" parent="." unique_id=1601902318]
+position = Vector2(854, 527)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef37" type="Sprite2D" parent="." unique_id=1337511539]
+position = Vector2(901, 360)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef38" type="Sprite2D" parent="." unique_id=923024631]
+position = Vector2(894, 469.99997)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef39" type="Sprite2D" parent="." unique_id=886622203]
+position = Vector2(896, 584)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef40" type="Sprite2D" parent="." unique_id=1222635115]
+position = Vector2(936, 526)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef41" type="Sprite2D" parent="." unique_id=1800514317]
+position = Vector2(942, 416.99997)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef19" type="Sprite2D" parent="." unique_id=1972528510]
+position = Vector2(624, 471.99997)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")
+
+[node name="HexRef42" type="Sprite2D" parent="." unique_id=1759290976]
+position = Vector2(1031, 534)
+scale = Vector2(0.14168744, 0.12312494)
+texture = ExtResource("3_xpvjt")

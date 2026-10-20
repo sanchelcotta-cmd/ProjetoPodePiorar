@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EventData" format=3]
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://cx0vwnohtkrdy"]
 
-[ext_resource type="Script" path="res://scripts/sc_resources/event_data.gd" id="1_event"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_outcome_data.gd" id="2_outcome"]
-[ext_resource type="Script" path="res://scripts/sc_resources/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_bin4u"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
 
 [sub_resource type="Resource" id="Effect"]
 script = ExtResource("3_effect")
@@ -11,13 +12,16 @@ custom_rule = &"solo_active_entity_for_three_turns"
 
 [sub_resource type="Resource" id="Outcome"]
 script = ExtResource("2_outcome")
+id = &"ev_00054_out_01"
 display_name = "Você fica sozinho."
+narrative_description = "O grupo desaparece do mapa por seus próximos três turnos. Encontros Indesejados não ativam nesse período; depois, os companheiros retornam às posições de onde sumiram."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]
 script = ExtResource("1_event")
+id = &"ev_00054"
 display_name = "Ninguém Além de Você"
 description = "Por 3 turnos, só o personagem ativo permanece no mapa. Encontros Indesejados não ativam; depois, o grupo retorna às posições originais."
 narrative_description = "Você finalmente conseguiu alguns minutos de paz. Seus companheiros desapareceram, e curiosamente, não há mais nenhuma criatura perigosa à espreita. Curta enquanto dura. Coachs motivacionais chamariam isso de 'tempo de qualidade consigo mesmo', mas você chama de 'estranho pra caramba'."
-custom_rule = &"solo_active_entity_for_three_turns"
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+custom_rule = &"solo_active_entity_for_three_turns"

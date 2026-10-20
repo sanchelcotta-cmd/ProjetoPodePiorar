@@ -1,13 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://b2pa8ivheklsw"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_2mofb"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_uaxo4"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_2mofb"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_uaxo4"]
 [ext_resource type="Resource" uid="uid://bxbk10kr5uavn" path="res://resources/itens/equipments/armaduras/armadura_epica_armadura_de_protecao.tres" id="2_w3bu4"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_w3bu4"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_qktok"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_w3bu4"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_qktok"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armaduras_simples_1.png" id="ppp_icon_sheet"]
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(34, 127, 91, 110)
 
 [resource]
 script = ExtResource("1_2mofb")
+icon = SubResource("ppp_item_icon")
+id = &"ar_00001"
 display_name = "Armadura Improvisada de Papelão"
 acquisition_sources = 27
 tags = Array[StringName]([&"armadura", &"comum"])

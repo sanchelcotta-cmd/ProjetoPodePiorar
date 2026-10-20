@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://d1jcqqdmjwgga"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_ej8rg"]
+[ext_resource type="Resource" path="res://resources/skills/passives/permanent_effects/pele_endurecida.tres" id="4_passive"]
+
+[sub_resource type="Resource" id="Effect_status_immunity"]
+script = ExtResource("3_effect")
+effect_type = 29
+status_ids = Array[StringName]([&"db_00008", &"db_00002"])
+
+[sub_resource type="Resource" id="Effect_ranged_critical_protection"]
+script = ExtResource("3_effect")
+effect_type = 32
+incoming_attack_range = 2
+
+[sub_resource type="Resource" id="Effect_grant_passive"]
+script = ExtResource("3_effect")
+effect_type = 6
+passive = ExtResource("4_passive")
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00059_out_01"
+id = &"ev_00059_out_01"
+display_name = "A pele ficou resistente."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_status_immunity"), SubResource("Effect_ranged_critical_protection"), SubResource("Effect_grant_passive")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00059"
+display_name = "Pele Endurecida"
+description = "Concede imunidade a Sangramento e Atordoamento. Contra críticos de Maestria Distância, mantém a redução de dano pela distância ao alvo."
+narrative_description = "Você acaba tropeçando numa placa. Arqueia a sobrancelha quando percebe que ela entortou. Os outros te olham confusos. Meio sem entender, você sente seu corpo mais pesado. É como se sua pele tivesse decidido não ser mais pele... e sim alguma coisa muito mais dura."
+category = 1
+valence = 0
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"permanent_effect", &"immunity", &"defense"])

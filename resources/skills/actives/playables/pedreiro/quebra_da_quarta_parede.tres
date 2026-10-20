@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/active_skill_data.gd" id="2_active"]
+
+[sub_resource type="Resource" id="Resource_destroy_current_event"]
+script = ExtResource("1_effect")
+effect_type = 31
+target = 11
+allowed_event_categories = Array[int]([0, 1, 2, 3])
+allowed_event_valences = Array[int]([1, 2])
+
+[resource]
+script = ExtResource("2_active")
+id = &"playable_active_008"
+display_name = "Quebra da (Quarta) Parede"
+description = "Ao chegar a um bloco de Evento Ambíguo ou Ruim, Efeito Permanente Ambíguo ou Ruim, Catástrofe ou Armadilha, pode destruí-lo antes da ativação. Seus efeitos não acontecem. Uma vez por Dia; o evento impedido fica fora dos sorteios por 3 Rodadas."
+consequence_button_label = "CANCELAR / Quebra 4ª Parede"
+use_context = 1
+requires_player_confirmation = true
+max_uses_per_day = 1
+usage_reset_moment = 1
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_destroy_current_event")])
+tags = Array[StringName]([&"pedreiro", &"exploracao", &"destruir_evento"])

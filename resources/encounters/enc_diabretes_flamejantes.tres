@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EncounterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/encounters/encounter_data.gd" id="1_encounter"]
+[ext_resource type="Script" path="res://scripts/resources/encounters/encounter_member_data.gd" id="2_member"]
+[ext_resource type="Resource" path="res://resources/entities/entities_general/diabretes_flamejantes.tres" id="3_entity"]
+
+[sub_resource type="Resource" id="Resource_member_1"]
+script = ExtResource("2_member")
+entity = ExtResource("3_entity")
+minimum = 3
+maximum = 3
+
+[resource]
+script = ExtResource("1_encounter")
+id = &"enc_00020"
+display_name = "Diabretes Flamejantes"
+description = "Encontro Indesejado: Diabretes Flamejantes."
+districts = Array[StringName]([&"baixo_centro"])
+night_only = true
+members = Array[ExtResource("2_member")]([SubResource("Resource_member_1")])
+selection_weight = 1
+tags = Array[StringName]([&"baixo_centro", &"coisa_do_capeta"])

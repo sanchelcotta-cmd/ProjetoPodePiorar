@@ -1,11 +1,13 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://pe1qhbd3vc0o"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_igc6f"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_6iwmx"]
-[ext_resource type="Resource" uid="uid://c5unglf0psv07" path="res://resources/skills/passives/causa_terror_inicio.tres" id="3_qfndq"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_igc6f"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_6iwmx"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_n3ha4"]
+[ext_resource type="Resource" path="res://resources/skills/passives/enemies/mimicos/emboscada_mimico_1.tres" id="3_qfndq"]
 
 [resource]
 script = ExtResource("1_igc6f")
+id = &"en_00020"
 display_name = "Mímico"
 description = "Ao iniciar o Encontro, o personagem que ativou o bloco sofre Terror, sem direito ao teste de Resistência, e recebe 3 de dano."
 narrative_description = "Parecia apenas uma mochila abandonada em um canto. Mas, ao chegar perto o suficiente, você percebe que o zíper era, na verdade, uma boca. Muito grande, e cheia de dentes extremamente afiados..."

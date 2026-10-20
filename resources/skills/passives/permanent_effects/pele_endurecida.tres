@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="1_passive"]
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Status_immunity"]
+script = ExtResource("2_effect")
+effect_type = 42
+status_ids = Array[StringName]([&"db_00008", &"db_00002"])
+
+[resource]
+script = ExtResource("1_passive")
+id = &"permanent_passive_059"
+display_name = "Pele Endurecida"
+description = "O personagem fica imune a Sangramento e Atordoamento. Contra críticos de Maestria Distância, a penalidade por hex de distância continua reduzindo o dano."
+continuous_effects = Array[ExtResource("2_effect")]([SubResource("Status_immunity")])
+tags = Array[StringName]([&"permanent_effect", &"immunity", &"defense"])

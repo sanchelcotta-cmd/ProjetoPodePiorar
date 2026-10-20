@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://ygkykurip1tj"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_25eti"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Resource" path="res://resources/skills/passives/permanent_effects/aurea_milagrosa.tres" id="4_passive"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 29
+status_ids = Array[StringName]([&"db_00003", &"db_00004", &"db_00005", &"db_00010", &"db_00009"])
+immunity_item_tags = Array[StringName]([&"cursed"])
+
+[sub_resource type="Resource" id="Effect_grant_passive"]
+script = ExtResource("3_effect")
+effect_type = 6
+passive = ExtResource("4_passive")
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00060_out_01"
+id = &"ev_00060_out_01"
+display_name = "Uma proteção milagrosa aparece."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect"), SubResource("Effect_grant_passive")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00060"
+display_name = "Áurea Milagrosa"
+description = "Concede imunidade a Doença, Tristeza, Terror e Maldições."
+narrative_description = "Uma memória vem à sua mente, como um lampejo. Era sua vó, na janela de madeira azulada, levantando a mão com um paninho de prato, enquanto evocava uma benção. E então, do nada, você percebe pequenos anjinhos dourados voando acima de sua cabeça."
+category = 1
+valence = 0
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"permanent_effect", &"immunity", &"curses"])

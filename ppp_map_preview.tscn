@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/maps/ppp_map_view.gd" id="1_map"]
+
+[node name="PPPMapPreview" type="Node2D"]
+script = ExtResource("1_map")
+
+[node name="MapRoot" type="Node2D" parent="."]
+
+[node name="Background" type="Sprite2D" parent="MapRoot"]
+z_index = -30
+
+[node name="Ground" type="Node2D" parent="MapRoot"]
+z_index = -20
+
+[node name="StartZone" type="Node2D" parent="MapRoot"]
+z_index = -10
+
+[node name="Hexes" type="Node2D" parent="MapRoot"]
+z_index = -9

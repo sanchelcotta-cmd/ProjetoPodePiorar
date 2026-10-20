@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://b0ex5nqpbcxrr"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_x5fkr"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 12
+selection_mode = 2
+tags_filter = Array[StringName]([&"epica"])
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"gn_00004_out_01"
+display_name = "Um item Épico foi encontrado."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"gn_00004"
+display_name = "Gnomo Misterioso"
+description = "O personagem que ativa o gnomo recebe um item Épico aleatório."
+narrative_description = "O gnomo abre a mão e entrega um embrulho brilhante demais para caber na palma minúscula dele."
+valence = 0
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"gnomes_3", &"epic_item", &"active_entity"])

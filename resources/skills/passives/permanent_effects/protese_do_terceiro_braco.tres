@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3 uid="uid://rilplmmk2tw0"]
+
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="1_passive"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_extra_weapon_slot"]
+script = ExtResource("2_effect")
+effect_type = 52
+amount = 1
+equipment_slot_id = &"weapon"
+
+[sub_resource type="Resource" id="Effect_extra_attack"]
+script = ExtResource("2_effect")
+effect_type = 10
+amount = 1
+
+[resource]
+script = ExtResource("1_passive")
+id = &"permanent_passive_056"
+display_name = "Prótese do Terceiro Braço"
+description = "Permite equipar uma arma adicional e realizar um ataque extra por turno de combate. A Maestria escolhida é concedida separadamente pelo evento; se já existir, aumenta em 1."
+trigger = 1
+activation_context = 1
+effects = Array[ExtResource("2_effect")]([SubResource("Effect_extra_attack")])
+continuous_effects = Array[ExtResource("2_effect")]([SubResource("Effect_extra_weapon_slot")])
+tags = Array[StringName]([&"permanent_effect", &"third_arm", &"extra_weapon_slot", &"extra_attack"])

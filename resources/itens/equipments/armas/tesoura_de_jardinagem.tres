@@ -1,13 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bay8hci283gk6"]
 
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="1_213r3"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="1_213r3"]
 [ext_resource type="Resource" uid="uid://bpca4cthkefrp" path="res://resources/itens/equipments/armas/arma_epica_adaga_de_sombra_e_luz.tres" id="2_ljel6"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_nj727"]
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="3_ljel6"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_ojh16"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_nj727"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="3_ljel6"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_ojh16"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armas_simples_1.png" id="ppp_icon_sheet"]
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(120, 41, 52, 77)
 
 [resource]
 script = ExtResource("3_ljel6")
+icon = SubResource("ppp_item_icon")
+id = &"aa_00013"
 display_name = "Tesoura de Jardinagem"
 description = "Uma tesoura de jardinagem.
 Maestria: Lâmina"

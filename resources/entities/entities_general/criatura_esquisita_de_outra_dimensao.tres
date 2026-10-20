@@ -1,10 +1,12 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://1w7tmp1ii7vr"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_pq831"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_woj3p"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_pq831"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_woj3p"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_yeyal"]
 
 [resource]
 script = ExtResource("1_pq831")
+id = &"en_00010"
 display_name = "Criatura Esquisita de Outra Dimensão"
 description = "Inimigo corpo a corpo."
 narrative_description = "Você nunca viu nada parecido. A criatura tem pouco mais de um metro de altura, caminha sobre seis patas e um enorme olho vermelho brilha no centro da cabeça. As duas patas dianteiras terminam em enormes pinças, que se abrem e fecham lentamente, como se estivessem ansiosas para testar a própria força."

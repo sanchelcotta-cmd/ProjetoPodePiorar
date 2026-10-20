@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://cb1q07i6lbufj"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_di6u7"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Resource" uid="uid://bvep44t7w5s2u" path="res://resources/skills/actives/permanent_effects/declarar_arqui_inimigo.tres" id="4_active"]
+
+[sub_resource type="Resource" id="Effect_grant_active"]
+script = ExtResource("3_effect")
+effect_type = 8
+active_skill = ExtResource("4_active")
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00070_out_01"
+id = &"ev_00070_out_01"
+display_name = "Arqui-inimigo pode ser declarado."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_grant_active")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00070"
+display_name = "Arqui-Inimigo"
+description = "O personagem pode declarar um tipo de inimigo de Encontro Indesejado como arqui-inimigo. Ele causa dano dobrado a todos os inimigos daquele EntityData e recebe dano dobrado deles; a escolha é permanente."
+narrative_description = "Você encontra um caderno velho. Todas as páginas estão em branco, menos uma. No topo dela está escrito: 'Lista de Inimigos'. O resto da folha espera, pacientemente, pelo primeiro nome."
+category = 1
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"permanent_effect", &"combat", &"archenemy"])

@@ -1,9 +1,11 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://i4qe0osw2l5o"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_cyosg"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_ix48m"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_beqwr"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_18ulv"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_cyosg"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_ix48m"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_beqwr"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_18ulv"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/consumiveis_2.png" id="ppp_icon_sheet"]
 
 [sub_resource type="Resource" id="Resource_qr57e"]
 script = ExtResource("4_18ulv")
@@ -37,8 +39,14 @@ percent = 1.0
 debuff_id = &"db_00010"
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(129, 138, 70, 53)
+
 [resource]
 script = ExtResource("1_cyosg")
+icon = SubResource("ppp_item_icon")
+id = &"cs_00008"
 display_name = "Chá de Ervas"
 description = "Remove debuffs de tristeza e de doença."
 item_type = 1

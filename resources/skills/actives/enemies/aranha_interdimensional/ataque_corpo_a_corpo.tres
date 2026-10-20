@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/active_skill_data.gd" id="2_active"]
+
+[sub_resource type="Resource" id="Effect_attack"]
+script = ExtResource("1_effect")
+effect_type = 34
+target = 2
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[resource]
+script = ExtResource("2_active")
+id = &"enemy_active_005"
+display_name = "Ataque Interdimensional"
+description = "Uma das duas ações possíveis de cada ataque da Aranha. Prioriza personagens Enraizados."
+target_mode = 3
+automatic_triggers = Array[int]([3])
+random_choice_group = &"aranha_interdimensional_ataque"
+target_priority = 5
+required_target_debuff_id = &"db_00006"
+mastery_override = 2
+effects = Array[ExtResource("1_effect")]([SubResource("Effect_attack")])
+tags = Array[StringName]([&"aranha_interdimensional", &"ataque_corpo_a_corpo"])
+metadata/_custom_type_script = "res://scripts/resources/skills/active_skill_data.gd"

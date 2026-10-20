@@ -1,25 +1,38 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://fcs634v3pnvm"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_ly8ju"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_6uris"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="3_whsm5"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="4_vpvsk"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_ly8ju"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_6uris"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_whsm5"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_vpvsk"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/acessorios_epicos_1.png" id="ppp_icon_sheet"]
 
 [sub_resource type="Resource" id="Resource_ly8ju"]
 script = ExtResource("4_vpvsk")
-effect_type = 9
+effect_type = 40
+effect_lifetime = 1
+attribute_ids = Array[StringName]([&"max_hp", &"attack"])
+recalculate_bonus_instead_of_stacking = true
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [sub_resource type="Resource" id="Resource_6uris"]
 script = ExtResource("3_whsm5")
 display_name = "Aprimora por Informação"
 description = "Aplica o valor equivalente à quantidade de informações nos atributos de Vida e Ataque."
-trigger = 16
+trigger = 20
+additional_triggers = Array[int]([16])
 effects = Array[ExtResource("4_vpvsk")]([SubResource("Resource_ly8ju")])
+tags = Array[StringName]([&"enciclopedia"])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"
+
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(299, 136, 70, 82)
 
 [resource]
 script = ExtResource("1_ly8ju")
+icon = SubResource("ppp_item_icon")
+id = &"ac_00004"
 display_name = "Enciclopédia Sabe-Tudo da Miss Fortuna"
 description = "Adiciona resultado igual à quantidade de informações nos atributos de Vida e Ataque."
 rarity = 4

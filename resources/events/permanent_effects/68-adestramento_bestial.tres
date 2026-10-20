@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://cagps2f4urkwn"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_p85al"]
+[ext_resource type="Resource" uid="uid://nxktfc8k1obw" path="res://resources/skills/actives/permanent_effects/adestramento_bestial.tres" id="4_active"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 8
+active_skill = ExtResource("4_active")
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00068_out_01"
+id = &"ev_00068_out_01"
+display_name = "Adestramento Bestial disponível."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00068"
+display_name = "Adestramento Bestial"
+description = "Em combate, permite tentar adestrar um inimigo-alvo com 50% de chance. Sucesso concede um aliado; falha bloqueia a tentativa somente naquele combate."
+narrative_description = "Você encontra um borrifador de plástico meio transparente. Dentro dele, um líquido brilhante balança devagar, como se fosse mais pesado que água. O rótulo diz apenas: 'Adestramento'. Você não sabe quem fez aquilo, mas tem certeza de que consegue dominar qualquer coisa com isso. Ou pelo menos, tentar."
+category = 1
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"permanent_effect", &"combat", &"taming"])

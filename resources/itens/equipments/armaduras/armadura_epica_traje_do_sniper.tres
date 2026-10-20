@@ -1,29 +1,41 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://btuclq5fn0n78"]
 
-[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/sc_resources/item_data.gd" id="1_2ocvw"]
-[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/sc_resources/active_skill_data.gd" id="2_kkjrk"]
-[ext_resource type="Resource" uid="uid://dsa3dwjhjlfye" path="res://resources/skills/actives/revela_blocos_1.tres" id="3_ob7vu"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="4_esjtr"]
-[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/sc_resources/skill_effect_data.gd" id="5_khcht"]
+[ext_resource type="Script" uid="uid://bql64fe8a0w24" path="res://scripts/resources/items/item_data.gd" id="1_2ocvw"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="4_esjtr"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="5_khcht"]
+
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armaduras_epicas_1.png" id="ppp_icon_sheet"]
 
 [sub_resource type="Resource" id="Resource_5uyal"]
 script = ExtResource("5_khcht")
-effect_type = 15
-percent = 1.0
+effect_type = 50
+stealth_breaks_on_attack = true
+stealth_restores_on_next_owner_turn = true
+stealth_prevents_attack_targeting = true
+stealth_prevents_trap_activation = true
+has_duration = true
+duration_turns = 1
+duration_unit = 2
 metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [sub_resource type="Resource" id="Resource_ovyrk"]
 script = ExtResource("4_esjtr")
 display_name = "Invisibilidade"
-description = "Enquanto invisível pode se mover, mas se atacar, perde invisibilidade até o próximo turno. Enquanto invisivel, não pode ser alvo de ataques ou acionar armadilhas."
+description = "No início do Combate, fica invisível. Pode mover-se enquanto invisível. Atacar suspende a invisibilidade até o início do próximo turno próprio. Enquanto invisível, não pode ser alvo de ataques nem acionar armadilhas. O efeito termina com o Combate."
 trigger = 0
 effects = Array[ExtResource("5_khcht")]([SubResource("Resource_5uyal")])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"
 
+[sub_resource type="AtlasTexture" id="ppp_item_icon"]
+atlas = ExtResource("ppp_icon_sheet")
+region = Rect2(258, 31, 85, 93)
+
 [resource]
 script = ExtResource("1_2ocvw")
+icon = SubResource("ppp_item_icon")
+id = &"ar_00004"
 display_name = "Traje do Sniper"
-description = "No início do combate, fica invisível. Enquanto invisível pode se mover, mas se atacar, perde invisibilidade até o próximo turno. Enquanto invisivel, não pode ser alvo de ataques ou acionar armadilhas.
+description = "No início do Combate, fica invisível. Pode mover-se enquanto invisível. Atacar suspende a invisibilidade até o próximo turno próprio. Enquanto invisível, não pode ser alvo de ataques nem acionar armadilhas. O efeito termina com o Combate.
 
 Sinergia com Maestria a distância: +4"
 rarity = 4
@@ -34,6 +46,5 @@ mastery_granted = 3
 mastery_bonus = 4
 bonus_life = 12
 granted_passives = Array[ExtResource("4_esjtr")]([SubResource("Resource_ovyrk")])
-granted_active_skills = Array[ExtResource("2_kkjrk")]([ExtResource("3_ob7vu")])
 consumed_on_use = false
 metadata/_custom_type_script = "uid://bql64fe8a0w24"

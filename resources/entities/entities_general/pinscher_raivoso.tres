@@ -1,19 +1,23 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://hgce36iodqxo"]
 
-[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/sc_resources/entity_data.gd" id="1_jwl35"]
-[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/sc_resources/passive_skill_data.gd" id="2_plm58"]
+[ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_jwl35"]
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_2wbmv"]
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_plm58"]
 [ext_resource type="Resource" uid="uid://dlp5nfrpuby5u" path="res://resources/skills/passives/esquiva_30.tres" id="3_tew7l"]
 [ext_resource type="Resource" uid="uid://q7qmrdf1jiiv" path="res://resources/skills/passives/causa_terror_ao_atacar.tres" id="4_2wbmv"]
+[ext_resource type="Resource" path="res://resources/skills/passives/enemies/pinscher_raivoso/destruir_consumivel.tres" id="5_destroy"]
+[ext_resource type="Resource" path="res://resources/skills/passives/enemies/pinscher_raivoso/rivalidade_animal.tres" id="6_rivalry"]
 
 [resource]
 script = ExtResource("1_jwl35")
-display_name = "Pìnscher Raivoso"
+id = &"en_00023"
+display_name = "Pinscher Raivoso"
 description = "Pode destruir consumíveis ao atacar."
 narrative_description = "É pequeno, nervoso e faz muito mais barulho do que qualquer criatura daquele tamanho deveria conseguir. Os latidos parecem atravessar a alma, enquanto os olhos arregalados demonstram um ódio completamente desproporcional ao próprio corpo."
 vida_base = 40
 ataque_base = 7
 stamina_base = 7
 maestrias = Array[int]([1])
-skill_passivas = Array[ExtResource("2_plm58")]([ExtResource("3_tew7l"), ExtResource("4_2wbmv")])
+skill_passivas = Array[ExtResource("2_plm58")]([ExtResource("3_tew7l"), ExtResource("4_2wbmv"), ExtResource("5_destroy"), ExtResource("6_rivalry")])
 tags = Array[StringName]([&"criatura", &"causa_terror", &"centro"])
 metadata/_custom_type_script = "uid://8ma4cswg5n35"

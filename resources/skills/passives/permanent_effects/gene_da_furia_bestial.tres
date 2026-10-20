@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3 uid="uid://cckc53aj8xy0l"]
+
+[ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="1_passive"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_melee_attack"]
+script = ExtResource("2_effect")
+effect_type = 9
+modify_mode = 1
+rounding_mode = 1
+multiplier = 1.5
+attribute_id = &"attack"
+requires_melee_weapon_equipped = true
+apply_to_current_attack_only = true
+
+[sub_resource type="Resource" id="Effect_unarmed_attack"]
+script = ExtResource("2_effect")
+effect_type = 9
+modify_mode = 1
+multiplier = 3.0
+attribute_id = &"attack"
+requires_no_weapon_equipped = true
+apply_to_current_attack_only = true
+
+[resource]
+script = ExtResource("1_passive")
+id = &"permanent_passive_057"
+display_name = "Gene da Fúria Bestial"
+description = "Ataque corpo a corpo com arma recebe +50% do valor de Ataque, arredondado para cima. Desarmado, o Ataque final é triplicado. A Vida máxima foi dobrada ao receber o evento, sem aumentar a Vida atual."
+trigger = 5
+activation_context = 1
+effects = Array[ExtResource("2_effect")]([SubResource("Effect_melee_attack"), SubResource("Effect_unarmed_attack")])
+tags = Array[StringName]([&"permanent_effect", &"bestial_fury", &"attack"])

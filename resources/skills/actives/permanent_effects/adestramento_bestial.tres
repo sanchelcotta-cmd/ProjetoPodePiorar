@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" format=3 uid="uid://nxktfc8k1obw"]
+
+[ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="1_active"]
+[ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_tame"]
+script = ExtResource("2_effect")
+effect_type = 33
+target = 2
+activation_chance = 0.5
+attach_converted_entity_as_companion = true
+converted_companion_moves_in_exploration = false
+
+[resource]
+script = ExtResource("1_active")
+id = &"permanent_active_068"
+display_name = "Adestramento Bestial"
+description = "Uma tentativa por combate contra um inimigo escolhido. Há 50% de chance de convertê-lo em companheiro, preservando seus atributos, itens e Skills. Em caso de sucesso, esta habilidade é consumida; em caso de falha, volta a ficar disponível no próximo combate."
+target_mode = 3
+consume_skill_on_success = true
+max_uses_per_combat = 1
+effects = Array[ExtResource("2_effect")]([SubResource("Effect_tame")])
+tags = Array[StringName]([&"permanent_effect", &"adestramento_bestial", &"taming"])

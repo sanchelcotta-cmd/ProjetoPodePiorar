@@ -1,12 +1,18 @@
 [gd_resource type="Resource" script_class="DebuffData" format=3 uid="uid://che8qy2xount2"]
 
-[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/sc_resources/debuffs_data.gd" id="1_78ntv"]
+[ext_resource type="Script" uid="uid://drp24ngc2nn0y" path="res://scripts/resources/status/debuffs_data.gd" id="1_78ntv"]
+[ext_resource type="Texture2D" uid="uid://chb81bkerek7r" path="res://sprites/debuffs/debuffs_1x.png" id="2_sheet"]
+
+[sub_resource type="AtlasTexture" id="Icon"]
+atlas = ExtResource("2_sheet")
+region = Rect2(157, 14, 36, 32)
 
 [resource]
 script = ExtResource("1_78ntv")
 id = &"db_00010"
 display_name = "Tristeza"
 description = "Diminui o ataque, o movimento, e o valor de bônus dos consumíveis."
+icon = SubResource("Icon")
 duration_type = 1
 attack_modifier = -2
 stamina_modifier = -1

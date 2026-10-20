@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SpriteSheetAnimationData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/entities/sprite_sheet_animation_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://sprites/duendes/duende_caos_5.png" id="2_sheet"]
+
+[resource]
+script = ExtResource("1_script")
+idle_sheet = ExtResource("2_sheet")
+layout = 1
+canvas_size = Vector2i(64, 64)
+subject_height = 48
+maximum_subject_width = 48

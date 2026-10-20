@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_passive"]
+
+[sub_resource type="Resource" id="Resource_custom"]
+script = ExtResource("1_effect")
+effect_type = 25
+target = 6
+dice_count = 2
+dice_sides = 6
+roll_per_target = true
+metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
+
+[sub_resource type="Resource" id="Resource_target_priority"]
+script = ExtResource("1_effect")
+effect_type = 43
+target = 0
+amount = 5000
+effect_lifetime = 2
+
+[resource]
+script = ExtResource("2_passive")
+id = &"ps_00027"
+display_name = "Maldição: Bonequinha de Pano"
+description = "Na virada de cada Dia, causa 2d6 de dano a cada personagem do grupo do portador. Enquanto carregada, concede Prioridade Forçada (+5000 de ameaça) ao portador na seleção de alvo de inimigos hostis."
+trigger = 23
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_custom")])
+continuous_effects = Array[ExtResource("1_effect")]([SubResource("Resource_target_priority")])
+metadata/_custom_type_script = "res://scripts/resources/skills/passive_skill_data.gd"

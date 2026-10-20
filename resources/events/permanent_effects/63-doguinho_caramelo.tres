@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EventData" format=3 uid="uid://syq5o45swnrv"]
+
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="1_event"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="2_outcome"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_s6cyl"]
+[ext_resource type="Resource" uid="uid://biyu37muhqxpp" path="res://resources/entities/entities_general/companions/doguinho_caramelo.tres" id="4_companion"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("3_effect")
+effect_type = 16
+entity = ExtResource("4_companion")
+bind_companion_to_active_entity = true
+
+[sub_resource type="Resource" id="Outcome"]
+script = ExtResource("2_outcome")
+id = &"ev_00063_out_01"
+id = &"ev_00063_out_01"
+display_name = "Doguinho Caramelo entrou no grupo."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
+
+[resource]
+script = ExtResource("1_event")
+id = &"ev_00063"
+display_name = "Doguinho Caramelo"
+description = "Adiciona o Doguinho Caramelo como companheiro: 20 de Vida, 4 de Ataque corpo-a-corpo e a ativa Vai Pegar!, exibida na caixa complementar do companheiro vinculada a quem o recrutou."
+narrative_description = "Você escuta patinhas correndo atrás de você. Quando olha para trás, um Doguinho caramelo já está ali, abanando o rabo como se finalmente tivesse encontrado quem procurava. Ninguém sabe de onde ele veio, mas por um ou dois petiscos, ele parece disposto a permanecer com vocês."
+category = 1
+valence = 0
+outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])
+tags = Array[StringName]([&"permanent_effect", &"companion", &"doguinho_caramelo"])

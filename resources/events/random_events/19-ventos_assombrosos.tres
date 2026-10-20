@@ -1,12 +1,50 @@
 [gd_resource type="Resource" script_class="EventData" format=3 uid="uid://d082l53gy8d5b"]
 
-[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/sc_resources/event_outcome_data.gd" id="1_4v3tx"]
-[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/sc_resources/event_data.gd" id="2_bbxnr"]
+[ext_resource type="Script" uid="uid://bt744s7p4h7ks" path="res://scripts/resources/events/event_outcome_data.gd" id="1_4v3tx"]
+[ext_resource type="Script" uid="uid://cos7c56kjihyx" path="res://scripts/resources/events/event_data.gd" id="2_bbxnr"]
+[ext_resource type="Script" uid="uid://bknff8de8c2u0" path="res://scripts/resources/events/event_effect_data.gd" id="2_effect"]
+[ext_resource type="Resource" uid="uid://sh5cqbyrgsbp" path="res://resources/skills/effects/debuffs/terror.tres" id="3_terror"]
+[ext_resource type="Script" uid="uid://ccoi7q6onxdd5" path="res://scripts/resources/events/event_effect_choice_data.gd" id="3_ykdga"]
+
+[sub_resource type="Resource" id="Effect_stamina"]
+script = ExtResource("2_effect")
+effect_type = 2
+target = 3
+statistic = 4
+amount = 2
+math_operation = 1
+has_duration = true
+duration_amount = 2
+
+[sub_resource type="Resource" id="Outcome_wind"]
+script = ExtResource("1_4v3tx")
+id = &"ev_00019_out_01"
+display_name = "Os ventos enfraquecem o grupo."
+narrative_description = "O vento pesa sobre todos: -2 de Estamina pelos próximos dois turnos de cada personagem."
+weight = 50
+effects = Array[ExtResource("2_effect")]([SubResource("Effect_stamina")])
+
+[sub_resource type="Resource" id="Effect_terror"]
+script = ExtResource("2_effect")
+effect_type = 3
+target = 3
+debuff = ExtResource("3_terror")
+
+[sub_resource type="Resource" id="Outcome_terror"]
+script = ExtResource("1_4v3tx")
+id = &"ev_00019_out_02"
+display_name = "Os ventos também causam Terror."
+narrative_description = "O vento pesa sobre todos: -2 de Estamina pelos próximos dois turnos de cada personagem. O assobio também desperta Terror."
+weight = 50
+effects = Array[ExtResource("2_effect")]([SubResource("Effect_stamina"), SubResource("Effect_terror")])
 
 [resource]
 script = ExtResource("2_bbxnr")
+id = &"ev_00019"
 display_name = "Ventos Assombrosos"
 description = "Pelos próximos 2 turnos, todos os personagens perdem -2 de Estamina. Há 50% de chance de o evento também causar Terror em todos."
 narrative_description = "O vento começa fraco, mas logo parece atravessar seu corpo inteiro. Cada passo fica mais pesado. O vento agora assobia... Aquela música assustadora. Sim. Aquela mesma. (-- nossos advogados pediram para não especificar qual.)"
 valence = 2
+resolution_mode = 1
+outcomes = Array[ExtResource("1_4v3tx")]([SubResource("Outcome_wind"), SubResource("Outcome_terror")])
 metadata/_custom_type_script = "uid://cos7c56kjihyx"
