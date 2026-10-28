@@ -49,8 +49,11 @@ func _on_actor_will_arrive(_actor: EntityState, destination: Vector2i) -> void:
 		var sprite := marker.get_child(0) as AnimatedSprite2D
 		if sprite != null:
 			var puff := create_tween().set_parallel(true)
-			puff.tween_property(sprite, "modulate:a", 0.0, 0.14)
-			puff.tween_property(sprite, "scale", Vector2(1.28, 1.28), 0.14)
+			var comfort := get_node_or_null("/root/VisualComfort")
+			var reduced := comfort != null and bool(comfort.get("enabled"))
+			puff.tween_property(sprite, "modulate:a", 0.0, 0.35 if reduced else 0.14)
+			if not reduced:
+				puff.tween_property(sprite, "scale", Vector2(1.28, 1.28), 0.14)
 			puff.chain().tween_callback(marker.hide)
 	_spawned_map.set_ppp_map_visual(destination, null)
 
@@ -151,7 +154,10 @@ func _on_event_requested(context: Dictionary) -> void:
 	_shuffle(available)
 	var generated: Array[EventData] = []
 	# Recursos colocados por outro Evento seguem a política da campanha.
-	for child in event.generated_events:
+	for raw_child in event.generated_events:
+		var child := raw_child as EventData
+		if child == null:
+			continue
 		if EventCampaignEligibility.allows_event(child,
 				gerencia.campaign.campaign_mode):
 			generated.append(child)

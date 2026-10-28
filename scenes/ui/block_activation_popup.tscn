@@ -162,7 +162,15 @@ layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="Narrative" type="Label" parent="Overlay/Center/FrameArea/Content/Body/NarrativeScroll"]
+[node name="NarrativeInset" type="MarginContainer" parent="Overlay/Center/FrameArea/Content/Body/NarrativeScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 8
+
+[node name="Narrative" type="Label" parent="Overlay/Center/FrameArea/Content/Body/NarrativeScroll/NarrativeInset"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.95, 0.95, 0.97, 1)

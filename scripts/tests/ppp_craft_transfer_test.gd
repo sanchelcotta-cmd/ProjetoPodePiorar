@@ -58,8 +58,8 @@ func _run_test() -> void:
 	root.add_child(player)
 	root.add_child(exploration)
 	var craft_options := player.get_craft_options(teacher, grant, exploration)
-	check(craft_options.size() == 1 and craft_options[0]["results"].size() == 2,
-		"A caixa oferece a Faca e deixa escolher entre os dois Épicos cadastrados.")
+	check(craft_options.size() == 1 and craft_options[0]["results"].size() == 3,
+		"A caixa oferece a Faca e deixa escolher entre os três Épicos cadastrados.")
 	check(not manager.use_exploration_active(teacher, teacher, grant, campaign,
 		EntityState.UNPLACED, null, null, false,
 		{"ingredient_id": knife.id, "result_id": &"nao_existe"}), "Resultado inválido não consome itens.")

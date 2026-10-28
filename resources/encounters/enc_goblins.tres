@@ -1,28 +1,22 @@
-[gd_resource type="Resource" script_class="EncounterData" format=3]
+[gd_resource type="Resource" script_class="EncounterData" format=3 uid="uid://cxyhx3ahewc2k"]
 
-[ext_resource type="Script" path="res://scripts/resources/encounters/encounter_data.gd" id="1_encounter"]
-[ext_resource type="Script" path="res://scripts/resources/encounters/encounter_member_data.gd" id="2_member"]
-[ext_resource type="Resource" path="res://resources/entities/entities_general/goblin_1.tres" id="3_entity"]
-[ext_resource type="Resource" path="res://resources/entities/entities_general/goblin_2.tres" id="4_entity"]
-[ext_resource type="Resource" path="res://resources/entities/entities_general/goblin_3.tres" id="5_entity"]
+[ext_resource type="Script" uid="uid://dhce6dhgmgajf" path="res://scripts/resources/encounters/encounter_data.gd" id="1_encounter"]
+[ext_resource type="Script" uid="uid://byg0mnegm8bqm" path="res://scripts/resources/encounters/encounter_member_data.gd" id="2_member"]
+[ext_resource type="Resource" uid="uid://cq45veunscrtk" path="res://resources/entities/entities_general/goblin_1.tres" id="3_entity"]
+[ext_resource type="Resource" uid="uid://17s211mdi2s7" path="res://resources/entities/entities_general/goblin_2.tres" id="4_entity"]
+[ext_resource type="Resource" uid="uid://deu2qndnt7qhk" path="res://resources/entities/entities_general/goblin_3.tres" id="5_entity"]
 
 [sub_resource type="Resource" id="Resource_member_1"]
 script = ExtResource("2_member")
 entity = ExtResource("3_entity")
-minimum = 1
-maximum = 1
 
 [sub_resource type="Resource" id="Resource_member_2"]
 script = ExtResource("2_member")
 entity = ExtResource("4_entity")
-minimum = 1
-maximum = 1
 
 [sub_resource type="Resource" id="Resource_member_3"]
 script = ExtResource("2_member")
 entity = ExtResource("5_entity")
-minimum = 1
-maximum = 1
 
 [resource]
 script = ExtResource("1_encounter")
@@ -31,5 +25,4 @@ display_name = "São tipo Goblins"
 description = "Encontro Indesejado: São tipo Goblins."
 districts = Array[StringName]([&"suburbio"])
 members = Array[ExtResource("2_member")]([SubResource("Resource_member_1"), SubResource("Resource_member_2"), SubResource("Resource_member_3")])
-selection_weight = 1
 tags = Array[StringName]([&"suburbio"])

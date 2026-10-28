@@ -11,6 +11,12 @@ func _run() -> void:
 	root.size = Vector2i(1152, 648)
 	var gerencia := GerenciaJogo.new()
 	root.add_child(gerencia)
+	var selected: Array[EntityData] = [
+		load("res://resources/entities/entities_playable/cozinheiro.tres"),
+		load("res://resources/entities/entities_playable/pedreiro.tres"),
+		load("res://resources/entities/entities_playable/mae.tres")]
+	check(gerencia.start_new_game(selected),
+		"Arquivo de Informações acompanha uma campanha ativa.")
 	var top_bar := load("res://scenes/ui/campaign_top_bar.tscn").instantiate() as CampaignTopBar
 	top_bar.gerencia = gerencia
 	root.add_child(top_bar)
@@ -20,11 +26,13 @@ func _run() -> void:
 		"O botão fica na barra de Dia e abre o arquivo.")
 	var day_panel := top_bar.get_node("Bar/Items/Day") as Control
 	var button_gap := day_panel.global_position.x \
-		- top_bar.group_inventory_button.get_global_rect().end.x
+		- top_bar.journal_button.get_global_rect().end.x
 	check(top_bar.information_button.global_position.x \
 		< top_bar.group_inventory_button.global_position.x \
+		and top_bar.group_inventory_button.global_position.x \
+		< top_bar.journal_button.global_position.x \
 		and button_gap >= 50.0 and button_gap <= 60.0,
-		"Informações e Inventário ficam antes do Dia, com a folga combinada.")
+		"Informações, Inventário e Registros ficam antes do Dia, com a folga combinada.")
 	var catalog := gerencia.get_information_catalog()
 	check(catalog.size() == 20, "O catálogo contém as 20 Informações dos quatro desfechos.")
 	top_bar.information_button.pressed.emit()
@@ -46,9 +54,6 @@ func _run() -> void:
 	archive._input(drag_release)
 	check(archive.window.position.is_equal_approx(archive_before_drag + drag_motion.relative),
 		"Arrastar a faixa superior move a janela de Informações.")
-	check(archive.free_space_trace.position.is_equal_approx(archive.window.position \
-		+ Vector2(24.0, archive.window.size.y - archive.free_space_trace.size.y - 20.0)),
-		"A decoração de Informações acompanha a janela arrastada.")
 	archive._layout_window()
 	check(archive.window.position.is_equal_approx(archive_before_drag + drag_motion.relative),
 		"Atualizar o arquivo preserva sua posição arrastada.")
@@ -57,10 +62,8 @@ func _run() -> void:
 	check(clamped_archive.x >= 15.0 and clamped_archive.y \
 		<= archive_viewport.y - archive.window.size.y - 15.0,
 		"A janela de Informações fica dentro da câmera ao arrastar.")
-	check(archive.free_space_trace.visible \
-		and archive.free_space_trace.mouse_filter == Control.MOUSE_FILTER_IGNORE \
-		and is_equal_approx(archive.free_space_trace.modulate.a, 0.18),
-		"O espaço vazio recebe circuito discreto sem interceptar cliques.")
+	check(archive.window.get_theme_stylebox("panel") is StyleBoxFlat,
+		"O arquivo mantém margem simples sem decoração de canto.")
 	check(archive.document_buttons[0].disabled and not archive.notebook.visible,
 		"Documento desconhecido não pode abrir a anotação.")
 	check(archive.window.size.x < root.size.x and archive.window.size.y < root.size.y,
@@ -93,8 +96,6 @@ func _run() -> void:
 	future.resource_path = "res://resources/informacoes/pasta_futura/informacao_1.tres"
 	archive.catalog.append(future)
 	archive._collect_folders()
-	check(not archive.free_space_trace.visible,
-		"Se surgir mais uma pasta, a decoração sai para não poluir a lista.")
 	archive._rebuild_folder_list()
 	archive._refresh()
 	check("pasta_futura" in archive.folder_keys

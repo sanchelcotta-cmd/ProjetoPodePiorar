@@ -31,6 +31,24 @@ func get_common_starting_items(item_type: ItemData.ItemType) -> Array[ItemData]:
 	return result
 
 
+## A criação da campanha precisa dos dois tipos. Uma única varredura evita
+## carregar e validar todos os Resources de itens duas vezes no mesmo quadro.
+func get_common_starting_catalog() -> Dictionary:
+	var equipment: Array[ItemData] = []
+	var consumables: Array[ItemData] = []
+	for path in _item_paths(ITEM_DIRECTORY):
+		var item := load(path) as ItemData
+		if item == null or item.id == &"" or item.rarity != ItemData.Rarity.COMMON \
+				or item.inventory_space != 1 or &"cursed" in item.tags:
+			continue
+		if item.item_type == ItemData.ItemType.EQUIPMENT \
+				and item.equipment_slot != ItemData.EquipmentSlot.NONE:
+			equipment.append(item)
+		elif item.item_type == ItemData.ItemType.CONSUMABLE:
+			consumables.append(item)
+	return {"equipment": equipment, "consumables": consumables}
+
+
 func get_equipment_by_rarity(rarity: ItemData.Rarity,
 		slot: ItemData.EquipmentSlot) -> Array[ItemData]:
 	var result: Array[ItemData] = []
@@ -236,25 +254,38 @@ static func _type_sort_key(item: ItemData) -> int:
 
 
 func can_receive(recipient: EntityState, item: ItemData) -> bool:
-	return recipient != null and item != null and recipient.current_health > 0 \
-		and recipient.owner_instance_id == &"" \
-		and recipient.inventory_used_space() + item.inventory_space <= recipient.inventory_capacity()
+	if recipient == null or item == null or recipient.current_health <= 0 \
+			or recipient.owner_instance_id != &"":
+		return false
+	if campaign != null and campaign.has_sacred_temple_blessing() \
+			and CampaignState.is_cursed_item(item):
+		return true
+	if recipient.is_curse_immune() and CampaignState.is_cursed_item(item):
+		return true
+	return recipient.inventory_used_space() + item.inventory_space <= recipient.inventory_capacity()
 
 
 func add_item(recipient: EntityState, item: ItemData) -> bool:
 	if not can_receive(recipient, item):
 		return false
+	# Recebimento consumado, porém a bênção destrói a cópia antes de entrar
+	# no inventário. Não emite item_delivered nem aplica maldição.
+	if campaign != null and campaign.has_sacred_temple_blessing() \
+			and CampaignState.is_cursed_item(item):
+		return true
+	if recipient.is_curse_immune() and CampaignState.is_cursed_item(item):
+		return true
 	recipient.inventory_items.append(InventoryItemState.new(item))
 	item_delivered.emit(recipient, item)
 	return true
 
 
-## Troca atômica usada por recompensas com inventário cheio. Nenhuma cópia
+## Recebimento atômico usado por recompensas com inventário cheio. Se um
+## remanejamento liberar espaço, outgoing pode ficar vazio. Nenhuma cópia
 ## é descartada até o jogador confirmar explicitamente a lista exibida.
 func can_exchange_items(owner: EntityState, outgoing: Array[InventoryItemState],
 		incoming: ItemData) -> bool:
-	if owner == null or incoming == null or owner.current_health <= 0 \
-			or outgoing.is_empty():
+	if owner == null or incoming == null or owner.current_health <= 0:
 		return false
 	var freed := 0
 	var seen: Dictionary = {}
@@ -286,7 +317,8 @@ func exchange_items(owner: EntityState, outgoing: Array[InventoryItemState],
 
 ## Descarta uma cópia concreta escolhida pelo jogador. Maldições e itens
 ## marcados como não descartáveis nunca saem por este caminho.
-func discard_item(owner: EntityState, entry: InventoryItemState) -> bool:
+func discard_item(owner: EntityState, entry: InventoryItemState,
+		campaign: CampaignState = null) -> bool:
 	if owner == null or entry == null or entry.data == null \
 			or entry not in owner.inventory_items \
 			or not entry.data.can_be_discarded \
@@ -299,10 +331,12 @@ func discard_item(owner: EntityState, entry: InventoryItemState) -> bool:
 
 ## Move a própria cópia, com seus estados, entre os três jogáveis. Não cria
 ## outra cópia nem apaga atributos como "apodrecido". Maldição não troca de dono.
-func transfer_item(source: EntityState, recipient: EntityState, entry: InventoryItemState, campaign: CampaignState) -> bool:
+func transfer_item(source: EntityState, recipient: EntityState, entry: InventoryItemState,
+		campaign: CampaignState, allow_dead_source: bool = false) -> bool:
 	if source == null or recipient == null or entry == null or entry.data == null \
 			or campaign == null or source == recipient \
-			or source not in campaign.active_entity_states \
+			or (source not in campaign.active_entity_states \
+				and not (allow_dead_source and source in campaign.dead_playable_states)) \
 			or recipient not in campaign.active_entity_states \
 			or entry not in source.inventory_items \
 			or entry.data.item_type == ItemData.ItemType.CURSED \
@@ -330,6 +364,7 @@ func use_consumable(owner: EntityState, entry: InventoryItemState,
 	if not skill_manager.debuff_manager.can_use_consumable(owner):
 		return {"success": false, "reason": "Este personagem não pode usar consumíveis agora."}
 	var target := recipient if recipient != null else owner
+	var health_before := target.current_health
 	if target != owner:
 		if owner not in campaign.active_entity_states \
 				or target not in campaign.companion_states \
@@ -339,7 +374,7 @@ func use_consumable(owner: EntityState, entry: InventoryItemState,
 	for state in entry.states:
 		if state != null and state.id == &"apodrecido":
 			return {"success": false, "reason": "Este consumível apodreceu."}
-	var effects := _chosen_use_effects(entry.data.use_effects)
+	var effects := _chosen_use_effects(entry.data.use_effects, campaign.world_rng)
 	if effects.is_empty():
 		return {"success": false, "reason": "Este item ainda não tem efeito utilizável."}
 	for effect in effects:
@@ -350,14 +385,21 @@ func use_consumable(owner: EntityState, entry: InventoryItemState,
 			and not skill_manager.catastrophe_manager.before_action(owner):
 		return {"success": false, "reason": "A catástrofe impediu esta ação."}
 	var chance_results: Array[String] = []
+	var journal_effects: Array[Dictionary] = []
 	for effect in effects:
 		if target == owner and effect.activation_chance < 1.0 \
-				and randf() >= effect.activation_chance:
-			chance_results.append("Não foi dessa vez...")
+				and campaign.world_rng.randf() >= effect.activation_chance:
+			if not _is_negative_chance_effect(effect):
+				chance_results.append("Não foi dessa vez.")
+				journal_effects.append({"text": "não foi dessa vez", "tone": "negative"})
+			else:
+				journal_effects.append({"text": "não causou alteração", "tone": "text"})
 			continue
-		var chance_applied := target == owner and effect.activation_chance < 1.0
+		var chance_applied := target == owner and (effect.activation_chance < 1.0 \
+			or effect.random_choice_group != &"")
 		match effect.effect_type:
 			SkillEffectData.EffectType.HEAL_FIXED:
+				var health_before_effect := target.current_health
 				var targets: Array[EntityState] = [target]
 				if effect.target == SkillEffectData.Target.ALL_ALLIES:
 					targets.assign(campaign.active_entity_states)
@@ -370,6 +412,8 @@ func use_consumable(owner: EntityState, entry: InventoryItemState,
 						restored = ceili(healed.max_health * effect.percent)
 					restored = maxi(0, restored + skill_manager.debuff_manager.consumable_modifier(healed))
 					healed.current_health = mini(healed.max_health, healed.current_health + restored)
+				if chance_applied and target.current_health > health_before_effect:
+					chance_results.append("Recuperou %d de Vida." % (target.current_health - health_before_effect))
 			SkillEffectData.EffectType.MODIFY_ATTRIBUTE:
 				# Oferecer comida não transmite seus efeitos negativos/debuffs ao
 				# companheiro; a cópia consumida ainda pertence ao jogável.
@@ -385,22 +429,46 @@ func use_consumable(owner: EntityState, entry: InventoryItemState,
 						"amount": actual,
 						"source": entry.data.display_name,
 						"expires_at": target.turn_serial + effect.duration_turns})
-				if chance_applied:
-					chance_results.append("Você obteve sucesso: %s de %d em %s aplicado." % [
-						"bônus" if actual >= 0 else "redução", absi(actual),
-						String(effect.attribute_id).capitalize()])
+				if chance_applied and actual != 0:
+					var duration := " por %d %s" % [effect.duration_turns,
+						"turno" if effect.duration_turns == 1 else "turnos"] \
+						if effect.duration_turns > 0 else " permanentemente"
+					var attribute_name := _chance_attribute_name(effect.attribute_id)
+					var gender_suffix := "o" if effect.attribute_id == &"attack" else "a"
+					if actual < 0:
+						chance_results.append("Algo não caiu bem. Agora %s foi reduzid%s em %d%s." % [
+							attribute_name, gender_suffix, -actual, duration])
+					else:
+						chance_results.append("%s aumentad%s em %d%s." % [
+							attribute_name, gender_suffix, actual, duration])
+				if actual != 0 and not (effect.attribute_id == &"hp" and actual > 0):
+					var attribute_name := _chance_attribute_name(effect.attribute_id)
+					var time_text := " por %d %s" % [effect.duration_turns,
+						"turno" if effect.duration_turns == 1 else "turnos"] \
+						if effect.duration_turns > 0 else ""
+					journal_effects.append({"text": "%s %s em %d%s" % [attribute_name,
+						"diminuiu" if actual < 0 else "aumentou", abs(actual), time_text],
+						"tone": "negative" if actual < 0 else "positive"})
 			SkillEffectData.EffectType.REMOVE_DEBUFF:
 				if target == owner and effect.percent > 0.0 and effect.percent < 1.0 \
-						and randf() >= effect.percent:
-					chance_results.append("Não foi dessa vez...")
+						and campaign.world_rng.randf() >= effect.percent:
+					chance_results.append("Não foi dessa vez.")
+					journal_effects.append({"text": "não foi dessa vez", "tone": "negative"})
 					continue
 				var removed := skill_manager.debuff_manager.remove_debuff(target, effect.debuff_id)
 				if target == owner and effect.percent > 0.0 and effect.percent < 1.0:
 					var debuff := skill_manager.debuff_manager.find_debuff(effect.debuff_id)
 					var name := debuff.display_name if debuff != null else String(effect.debuff_id)
-					chance_results.append("Você obteve sucesso: %s removido." % name \
-						if removed else "A chance ocorreu, mas você não tinha %s para remover." % name)
+					if removed:
+						chance_results.append("Debuff %s removido." % name)
+				if removed:
+					var debuff := skill_manager.debuff_manager.find_debuff(effect.debuff_id)
+					journal_effects.append({"text": "removeu %s" % (
+						debuff.display_name if debuff != null else String(effect.debuff_id)),
+						"tone": "positive"})
 			SkillEffectData.EffectType.REMOVE_INVENTORY_ITEMS:
+				journal_effects.append({"text": "removeu a maldição %s" %
+					selected_curse.data.display_name, "tone": "positive"})
 				owner.inventory_items.erase(selected_curse)
 				item_lost.emit(selected_curse.data)
 	if entry.data.consumed_on_use:
@@ -424,7 +492,43 @@ func use_consumable(owner: EntityState, entry: InventoryItemState,
 		if granted > 0:
 			owner.extra_attacks_this_turn = before_extra
 			owner.extra_attacks_next_turn = maxi(owner.extra_attacks_next_turn, granted)
+	var journal_parts: Array = [
+		{"text": owner.visible_name(), "tone": "actor"},
+		{"text": " consumiu ", "tone": "text"},
+		{"text": entry.data.display_name, "tone": "item"},
+	]
+	if target != owner:
+		journal_parts.append({"text": " em ", "tone": "text"})
+		journal_parts.append({"text": target.visible_name(), "tone": "actor"})
+	var healed := maxi(0, target.current_health - health_before)
+	if healed > 0:
+		journal_parts.append({"text": " e recuperou %d de Vida" % healed,
+			"tone": "positive"})
+	for effect_result in journal_effects:
+		journal_parts.append({"text": "; " + str(effect_result["text"]),
+			"tone": str(effect_result["tone"])})
+	journal_parts.append({"text": ".", "tone": "text"})
+	campaign.append_journal_entry(&"consume_item", journal_parts, owner.instance_id,
+		{"item_id": str(entry.data.id), "target_id": str(target.instance_id),
+			"healed": healed})
 	return {"success": true, "chance_results": chance_results}
+
+
+func _is_negative_chance_effect(effect: SkillEffectData) -> bool:
+	if effect.effect_type != SkillEffectData.EffectType.MODIFY_ATTRIBUTE:
+		return false
+	var delta := -effect.amount if effect.modify_mode == SkillEffectData.ModifyMode.SUBTRACT \
+		else effect.amount
+	return delta < 0
+
+
+func _chance_attribute_name(attribute_id: StringName) -> String:
+	match attribute_id:
+		&"hp": return "sua Vida"
+		&"max_hp": return "sua Vida máxima"
+		&"attack": return "seu Ataque"
+		&"stamina": return "sua Estamina"
+	return "seu atributo"
 
 
 func _supports_use_effect(effect: SkillEffectData, owner: EntityState,
@@ -486,7 +590,8 @@ func _change_attribute(actor: EntityState, attribute_id: StringName, delta: int)
 	return 0
 
 
-func _chosen_use_effects(all_effects: Array[SkillEffectData]) -> Array[SkillEffectData]:
+func _chosen_use_effects(all_effects: Array[SkillEffectData],
+		rng: RandomNumberGenerator = null) -> Array[SkillEffectData]:
 	var chosen: Array[SkillEffectData] = []
 	var groups: Dictionary = {}
 	for effect in all_effects:
@@ -502,7 +607,7 @@ func _chosen_use_effects(all_effects: Array[SkillEffectData]) -> Array[SkillEffe
 		var total := 0
 		for option in group:
 			total += option.random_choice_weight
-		var draw := randi_range(1, total)
+		var draw := rng.randi_range(1, total) if rng != null else randi_range(1, total)
 		for option in group:
 			draw -= option.random_choice_weight
 			if draw <= 0:
@@ -605,7 +710,8 @@ func get_craftable_options(actor: EntityState, required_copies: int) -> Array[Di
 			continue
 		var ingredient := resources[item_id] as ItemData
 		var results: Array[ItemData] = []
-		for result in ingredient.craft_result:
+		for raw_result in ingredient.craft_result:
+			var result := raw_result as ItemData
 			if result != null and result.rarity == ItemData.Rarity.EPIC \
 					and can_craft(actor, ingredient.id, result.id, required_copies):
 				results.append(result)
@@ -621,7 +727,8 @@ func can_craft(actor: EntityState, ingredient_id: StringName, result_id: StringN
 	if matching.size() < required_copies:
 		return false
 	var ingredient := (matching[0] as InventoryItemState).data
-	for result in ingredient.craft_result:
+	for raw_result in ingredient.craft_result:
+		var result := raw_result as ItemData
 		if result != null and result.id == result_id and result.rarity == ItemData.Rarity.EPIC:
 			if result.cannot_craft_after_consumed and campaign != null \
 					and campaign.consumed_uncraftable_item_ids.has(result.id):
@@ -649,7 +756,8 @@ func craft(actor: EntityState, ingredient_id: StringName, result_id: StringName,
 		if entry not in actor.inventory_items and skill_manager == null:
 			return {"success": false, "reason": "Ingrediente equipado requer gestor de equipamento."}
 	var result: ItemData
-	for candidate in ingredient.craft_result:
+	for raw_candidate in ingredient.craft_result:
+		var candidate := raw_candidate as ItemData
 		if candidate != null and candidate.id == result_id:
 			result = candidate
 			break

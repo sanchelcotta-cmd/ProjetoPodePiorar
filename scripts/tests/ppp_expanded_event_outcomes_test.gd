@@ -192,6 +192,10 @@ func _run() -> void:
 		_check(exploration.get_available_destinations().has(far),
 			"Teletransportador alcança hex distante mesmo com Estamina zero.")
 	print("PPP expanded event outcomes: %d falha(s)" % failures)
+	await create_timer(2.6).timeout
+	scene.queue_free()
+	for _frame in 4:
+		await process_frame
 	quit(0 if failures == 0 else 1)
 
 

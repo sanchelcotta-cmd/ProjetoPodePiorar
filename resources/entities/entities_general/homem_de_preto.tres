@@ -11,7 +11,7 @@
 script = ExtResource("1_lqeph")
 id = &"en_00019"
 display_name = "Homem de Preto"
-description = "Se o grupo não possuir nenhuma Informação, o Homem de Preto não realiza ataques, e o Encontro é encerrado imediatamente. Caso contrário, Ataque e Stamina são definidos pelo número de Informações do grupo, limitados conforme o distrito."
+description = "Se o grupo não possuir nenhuma Informação, o Homem de Preto não realiza ataques, e o Encontro é encerrado imediatamente. Com 1 ou 2 Informações, tem Ataque e Stamina 2; a partir de 3, usa a quantidade de Informações do grupo, limitada conforme o distrito."
 narrative_description = "Vestindo um terno impecável, chapéu preto e uma expressão completamente vazia, ele permanece parado como se já esperasse pela chegada de vocês. A pele excessivamente pálida e a ausência de sobrancelhas tornam seu rosto difícil de esquecer. Enquanto vocês observam a figura, ela continua encarando o grupo, como se estivesse calculando alguma coisa."
 vida_base = 55
 maestrias = Array[int]([1, 3])

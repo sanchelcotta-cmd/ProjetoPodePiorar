@@ -72,6 +72,9 @@ func _run() -> void:
 	_find_button(panel.item_menu.rows, recipient.data.display_name).pressed.emit()
 	check(copy in recipient.inventory_items and copy not in actor.inventory_items,
 		"Transferência preserva a mesma cópia no outro personagem.")
+	check(not gerencia.campaign.journal_entries.any(func(entry: Dictionary) -> bool:
+		return str(entry.get("action_id", "")) == "transfer_item"),
+		"Transferência não ocupa linha no livro de registros.")
 	var food := load("res://resources/itens/consumables/arroz_com_feijao.tres") as ItemData
 	var food_copy := InventoryItemState.new(food)
 	actor.inventory_items.append(food_copy)
@@ -86,6 +89,8 @@ func _run() -> void:
 	_find_button(panel.item_menu.rows, "Consumir").pressed.emit()
 	check(actor.current_health == actor.max_health and food_copy not in actor.inventory_items,
 		"Consumir aplica a cura do Resource antes de retirar o item.")
+	check(str(gerencia.campaign.journal_entries.back().get("text", "")).contains(
+		"recuperou 5 de Vida"), "Livro registra a cura efetiva do consumível.")
 	var coffee := load("res://resources/itens/consumables/cafezin.tres") as ItemData
 	var coffee_copy := InventoryItemState.new(coffee)
 	actor.inventory_items.append(coffee_copy)
@@ -97,6 +102,9 @@ func _run() -> void:
 	check(actor.max_stamina == base_stamina + 2 and coffee_copy not in actor.inventory_items
 		and actor.consumable_timed_modifiers.size() == 1,
 		"Consumível temporário aumenta a Estamina e registra a duração.")
+	check(str(gerencia.campaign.journal_entries.back().get("text", "")).contains(
+		"Estamina aumentou em 2 por 2 turnos"),
+		"Livro registra o bônus concreto e a duração do consumível.")
 	check("temporário" in EntityStatBreakdown.colored_text(actor, "stamina"),
 		"A origem temporária aparece na explicação da Estamina.")
 	actor.turn_serial += 1

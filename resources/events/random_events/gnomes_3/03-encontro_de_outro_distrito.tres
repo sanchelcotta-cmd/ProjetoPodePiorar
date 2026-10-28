@@ -15,6 +15,7 @@ custom_rule = &"gnome_3_start_other_district_encounter"
 script = ExtResource("2_outcome")
 id = &"gn_00003_out_01"
 display_name = "Um encontro inesperado começou."
+narrative_description = "Um encontro inesperado começou.\nLutem!"
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

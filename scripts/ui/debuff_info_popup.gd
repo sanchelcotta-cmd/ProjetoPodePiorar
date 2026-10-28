@@ -4,7 +4,6 @@ extends PanelContainer
 ## Consulta rápida de uma condição aplicada. Hover é transitório; clique fixa
 ## a ficha até o próximo clique fora ou Esc.
 
-const FRAME := preload("res://sprites/ui/uielementx_00002.png")
 const FONT := preload("res://fonts/UbuntuSans-Regular.ttf")
 const BOLD := preload("res://fonts/UbuntuSans-Bold.ttf")
 
@@ -22,26 +21,15 @@ func _ready() -> void:
 	custom_minimum_size = Vector2(350, 0)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.18, 0.19, 0.21, 0.82)
-	style.border_color = Color(0.46, 0.08, 0.13, 0.9)
-	style.set_border_width_all(1)
+	style.bg_color = Color(0.075, 0.085, 0.10, 0.96)
+	style.border_color = Color(0.48, 0.08, 0.10, 0.9)
+	style.set_border_width_all(2)
 	add_theme_stylebox_override("panel", style)
-	var frame := TextureRect.new()
-	frame.name = "Frame"
-	frame.texture = FRAME
-	frame.modulate = Color(0.48, 0.08, 0.10, 0.72)
-	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	frame.stretch_mode = TextureRect.STRETCH_SCALE
-	add_child(frame)
-	frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var margin := MarginContainer.new()
-	# A moldura PNG entra mais fundo que a borda do PanelContainer. Reservar
-	# área segura inclusive para descrições longas e com quebra de linha.
-	margin.add_theme_constant_override("margin_left", 30)
-	margin.add_theme_constant_override("margin_right", 30)
-	margin.add_theme_constant_override("margin_top", 20)
-	margin.add_theme_constant_override("margin_bottom", 22)
+	margin.add_theme_constant_override("margin_left", 18)
+	margin.add_theme_constant_override("margin_right", 18)
+	margin.add_theme_constant_override("margin_top", 14)
+	margin.add_theme_constant_override("margin_bottom", 16)
 	add_child(margin)
 	var stack := VBoxContainer.new()
 	stack.add_theme_constant_override("separation", 4)
@@ -61,8 +49,7 @@ func _ready() -> void:
 	stack.add_child(type_label)
 	description_label = Label.new()
 	description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	description_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	description_label.add_theme_font_override("font", FONT)
+	UINarrativeFont.apply_label(description_label)
 	description_label.add_theme_font_size_override("font_size", 12)
 	description_label.add_theme_color_override("font_color", Color(0.94, 0.94, 0.95))
 	stack.add_child(description_label)

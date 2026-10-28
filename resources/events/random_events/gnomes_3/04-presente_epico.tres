@@ -15,6 +15,7 @@ tags_filter = Array[StringName]([&"epica"])
 script = ExtResource("2_outcome")
 id = &"gn_00004_out_01"
 display_name = "Um item Épico foi encontrado."
+narrative_description = "Um item Épico foi encontrado."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

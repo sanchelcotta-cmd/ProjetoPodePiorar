@@ -168,8 +168,8 @@ func _run_test() -> void:
 		"Homem de Preto pode reaparecer com Informação.")
 	(popup.buttons.get_child(0) as Button).pressed.emit()
 	check(combat.get("enemies").size() == 1
-		and (combat.get("enemies")[0] as EntityState).attack == 1
-		and (combat.get("enemies")[0] as EntityState).max_stamina == 1
+		and (combat.get("enemies")[0] as EntityState).attack == 2
+		and (combat.get("enemies")[0] as EntityState).max_stamina == 2
 		and (combat.get("pending_conclusion") as Dictionary).is_empty(),
 		"Com Informação, passiva define Ataque/Stamina e não encerra o Combate.")
 	var no_prizes: Array[Resource] = []

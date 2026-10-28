@@ -16,6 +16,7 @@ math_operation = 0
 script = ExtResource("2_outcome")
 id = &"gn_00002_out_01"
 display_name = "O grupo recuperou toda a Vida."
+narrative_description = "O grupo recuperou toda a Vida."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

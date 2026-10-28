@@ -39,7 +39,7 @@ duration_source = 1
 script = ExtResource("2_outcome")
 id = &"ev_00024_out_02"
 display_name = "Fantasmas do Mal"
-narrative_description = "Eles aparecem sem fazer barulho. O grito vem depois. Quando tudo acaba, o frio continua aí."
+narrative_description = "Eles aparecem sem fazer barulho. O grito vem depois — Buh!\nQuando tudo acaba, o terror ainda ecoa."
 weight = 70
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_bad_damage"), SubResource("Effect_bad_terror")])
 
@@ -48,5 +48,6 @@ script = ExtResource("1_event")
 id = &"ev_00024"
 display_name = "Fantasmas BUH!"
 description = "Fantasmas do bem oferecem um item aleatório (30%). Fantasmas do mal causam 2 de dano em todos e aplicam Terror por 1d4 turnos (70%)."
+narrative_description = "Os fantasmas podem ser bonzinhos. Mas nem todos... Alguns Outros, não são!"
 resolution_mode = 1
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome_good"), SubResource("Outcome_bad")])

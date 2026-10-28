@@ -15,6 +15,7 @@ destination_mode = 2
 script = ExtResource("2_outcome")
 id = &"ev_00031_out_01"
 display_name = "Você atravessa o portal."
+narrative_description = "Você atravessa o portal. Estão em um novo local, e é o mesmo dia, mesma hora."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [sub_resource type="Resource" id="Outcome_refuse"]

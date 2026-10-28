@@ -23,7 +23,7 @@ script = ExtResource("1_1vepk")
 id = &"ev_00004_out_01"
 id = &"ev_00004_out_01"
 display_name = "Consequência Ruim"
-narrative_description = "... Um passinho. Dois passinhos. A música continua tocando enquanto uma horda de zumbis dançarinos dobra a esquina e avança na direção do grupo."
+narrative_description = "... Um passinho. Dois passinhos. A música continua tocando enquanto uma horda de zumbis dançarinos dobra a esquina e avança na direção do grupo.\nVocês deverão enfrentar uma horda de zumbis dançarinos. Que azar!"
 condition = SubResource("Resource_0nf3y")
 effects = Array[ExtResource("3_q2fm3")]([SubResource("Resource_l4puh")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
@@ -33,7 +33,7 @@ script = ExtResource("1_1vepk")
 id = &"ev_00004_out_02"
 id = &"ev_00004_out_02"
 display_name = "Consequência Boa"
-narrative_description = "Silêncio?"
+narrative_description = "De repente, vem o... Silêncio?\nPelo menos dessa vez... Dá pra respirar aliviado."
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [resource]

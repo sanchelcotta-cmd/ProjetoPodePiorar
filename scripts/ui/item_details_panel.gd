@@ -7,7 +7,7 @@ extends PanelContainer
 signal close_requested
 
 const BOLD_FONT := preload("res://fonts/UbuntuSans-Bold.ttf")
-const TRACE_WIDE := preload("res://sprites/ui/uielementx_00007.png")
+const NARRATIVE_FONT := preload("res://scripts/ui/ui_narrative_font.gd")
 
 @onready var close_button: Button = $Margin/Content/Header/CloseButton
 @onready var drag_header: Control = $Margin/Content/Header
@@ -22,20 +22,10 @@ var entry: InventoryItemState
 var user_positioned := false
 var _dragging := false
 var _drag_offset := Vector2.ZERO
-var _show_free_space_trace := false
-
-
-func _draw() -> void:
-	if _show_free_space_trace and size.y >= 340.0:
-		# Só nos itens curtos: aproveita o canto inferior direito sem cobrir texto.
-		draw_texture_rect(TRACE_WIDE,
-			Rect2(size - Vector2(156.0, 98.0), Vector2(140.0, 78.0)),
-			false, Color(1, 1, 1, 0.15))
-
-
 func _ready() -> void:
 	drag_header.mouse_default_cursor_shape = Control.CURSOR_MOVE
 	name_label.add_theme_font_override("font", BOLD_FONT)
+	NARRATIVE_FONT.apply_label(effect_label)
 	close_button.add_theme_font_override("font", BOLD_FONT)
 	close_button.add_theme_font_size_override("font_size", 16)
 	close_button.add_theme_color_override("font_color", Color(0.92, 0.20, 0.25))
@@ -74,9 +64,6 @@ func _bind_item(item: ItemData, copy: InventoryItemState) -> void:
 	name_label.text = item.display_name
 	effect_label.text = _effect_text(item, copy)
 	stats_label.text = _stats_text(item, copy)
-	_show_free_space_trace = effect_label.text.length() < 80 \
-		and stats_label.text.count("\n") <= 2
-	queue_redraw()
 
 
 func _input(event: InputEvent) -> void:
@@ -120,6 +107,10 @@ func _effect_text(item: ItemData, copy: InventoryItemState) -> String:
 	if result.is_empty():
 		result = "Sem descrição cadastrada para este item."
 	if copy != null:
+		if item.id == &"ac_00001":
+			result += "\n\n%s" % ("Vínculo: %s." % copy.attuned_owner_name \
+				if copy.attuned_owner_instance_id != &"" else \
+				"Vínculo: ainda não sintonizado.")
 		for state in copy.states:
 			if state != null:
 				result += "\n\n%s: %s" % [state.display_name, state.description]

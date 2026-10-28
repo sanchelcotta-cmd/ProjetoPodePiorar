@@ -73,7 +73,14 @@ func _run() -> void:
 		and not alarm_result.get("effects", []).is_empty() \
 		and int(alarm_result["effects"][0].get("reinforcements", 0)) > 0,
 		"Fio de Alarme incorpora o Encontro mais próximo como reforço.")
+	_check(combat.request_victory() and combat.confirm_conclusion(),
+		"Combate de teste encerra após conferir as armadilhas.")
 	print("PPP combat trap: %d falhas" % failures)
+	# Aguarda as animações assíncronas do combate soltarem suas referências.
+	await create_timer(2.6).timeout
+	scene.queue_free()
+	for _frame in 4:
+		await process_frame
 	quit(0 if failures == 0 else 1)
 
 

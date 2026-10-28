@@ -1,0 +1,90 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
+[ext_resource type="Script" path="res://scripts/ui/menu_logo_controller.gd" id="2_logo"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="BlackBackground" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="BackgroundImage" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="FutureSlideOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.18)
+
+[node name="MenuLogo" type="TextureRect" parent="."]
+layout_mode = 1
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+script = ExtResource("2_logo")
+
+[node name="MenuArea" type="VBoxContainer" parent="."]
+layout_mode = 1
+theme_override_constants/separation = 7
+
+[node name="Heading" type="Label" parent="MenuArea"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "MENU PRINCIPAL"
+
+[node name="NewGame" type="Button" parent="MenuArea"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "NOVO JOGO"
+
+[node name="LoadGame" type="Button" parent="MenuArea"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "CARREGAR JOGO"
+
+[node name="CampaignRecords" type="Button" parent="MenuArea"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "REGISTROS DE CAMPANHAS"
+
+[node name="Settings" type="Button" parent="MenuArea"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "CONFIGURAÇÕES"
+
+[node name="Credits" type="Button" parent="MenuArea"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "CRÉDITOS"
+
+[node name="Quit" type="Button" parent="MenuArea"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "SAIR"

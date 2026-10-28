@@ -11,7 +11,7 @@
 script = ExtResource("1_v6jem")
 id = &"en_00012"
 display_name = "Dama Elemental"
-description = "Pode causar Charme ao atacar. No início do combate, traz aleatoriamente uma Planta Carnívora ou Raízes Mutantes; a criatura trazida não repete essa invocação."
+description = "Pode causar Charme ao atacar. No início do combate, possui 50% de chance de trazer uma única Planta Carnívora ou Raízes Mutantes; a criatura trazida não repete essa invocação."
 narrative_description = "Ela caminha com elegância sobrenatural, como se estivesse desfilando em um jardim que só ela consegue enxergar. A cada gesto delicado, o ambiente responde de uma forma diferente: pequenas chamas dançam ao seu redor, pedras estremecem, e rajadas de vento levantam folhas secas."
 vida_base = 35
 ataque_base = 8

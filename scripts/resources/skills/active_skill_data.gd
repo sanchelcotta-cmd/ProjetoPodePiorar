@@ -85,6 +85,9 @@ enum UsageResetMoment {
 @export_range(0, 99) var first_activation_turn: int = 0
 @export_range(0, 99) var repeat_every_turns: int = 0
 @export var activate_only_once: bool = false
+## Para ações coletivas de um Encontro: uma execução compartilhada entre
+## todas as instâncias com esta mesma Skill, não uma execução por membro.
+@export var activate_once_per_encounter: bool = false
 @export_range(0, 99) var minimum_owner_survived_combat_turns: int = 0
 # Habilidades com o mesmo grupo participam do mesmo sorteio.
 @export var random_choice_group: StringName

@@ -26,6 +26,7 @@ script = ExtResource("1_qp440")
 id = &"ev_00009_out_01"
 id = &"ev_00009_out_01"
 display_name = "Spawm Serelepe"
+narrative_description = "Spawm Serelepe\n\nEles estão ali. Saltitantes e despretensiosos.\nO que querem? Vai lá descobrir se tiver coragem."
 effects = Array[ExtResource("2_uq1f0")]([SubResource("Resource_hjaos")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 

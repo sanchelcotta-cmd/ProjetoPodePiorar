@@ -9,6 +9,7 @@ signal stat_hover_ended
 
 const ACQUIRED_PER_PAGE := 4
 const BOLD_FONT := preload("res://fonts/UbuntuSans-Bold.ttf")
+const NARRATIVE_FONT := preload("res://scripts/ui/ui_narrative_font.gd")
 const PORTRAIT_PROVIDER := preload("res://scripts/ui/entity_portrait_provider.gd")
 
 @onready var name_label: Label = $Margin/Content/Header/Name
@@ -41,6 +42,7 @@ var user_positioned := false
 func _ready() -> void:
 	drag_header.mouse_default_cursor_shape = Control.CURSOR_MOVE
 	name_label.add_theme_font_override("font", BOLD_FONT)
+	NARRATIVE_FONT.apply_label(description_label)
 	close_button.pressed.connect(func() -> void: close_requested.emit())
 	previous_button.pressed.connect(_previous_page)
 	next_button.pressed.connect(_next_page)
@@ -238,7 +240,7 @@ func _add_skill_entry(grant: SkillGrantState) -> void:
 	var card := PanelContainer.new()
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.09, 0.13, 0.16, 0.85)
+	style.bg_color = Color(0.055, 0.085, 0.11, 0.96)
 	style.border_color = Color(0.24, 0.48, 0.54, 0.8)
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(3)
@@ -270,6 +272,7 @@ func _add_skill_entry(grant: SkillGrantState) -> void:
 	description.text = skill.description.strip_edges() if not skill.description.strip_edges().is_empty() \
 		else "Sem descrição cadastrada."
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	NARRATIVE_FONT.apply_label(description)
 	description.add_theme_font_size_override("font_size", 11)
 	description.add_theme_color_override("font_color", Color(0.9, 0.92, 0.94))
 	content.add_child(description)

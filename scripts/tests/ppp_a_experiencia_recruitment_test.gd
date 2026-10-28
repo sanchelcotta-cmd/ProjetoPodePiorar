@@ -14,12 +14,43 @@ func _run() -> void:
 	await _scenario(["orchestra_2"], 50, false, -1.0, false)
 	await _scenario(["orchestra_3"], 50, true, 1.0, true)
 	await _scenario(["orchestra_2", "orchestra_3"], 75, true, 0.0, false)
+	await _scenario(["khaikonata_1"], 0, false, -1.0, false,
+		EventCampaignEligibility.Mode.SHORT, [&"khainokata"])
+	await _scenario(["khaikonata_1", "khaikonata_2"], 50,
+		false, -1.0, false, EventCampaignEligibility.Mode.SHORT, [&"khainokata"])
+	await _scenario(["khaikonata_1", "khaikonata_2"], 50,
+		true, 1.0, true, EventCampaignEligibility.Mode.SHORT, [&"khainokata"])
+	await _scenario(["khaikonata_1", "khaikonata_2", "khaikonata_3"],
+		0, false, -1.0, false, EventCampaignEligibility.Mode.MEDIUM,
+		[&"khainokata", &"homens_de_preto"])
+	await _scenario(["khaikonata_1", "khaikonata_2", "khaikonata_3",
+		"khaikonata_4"], 50, true, 0.0, false,
+		EventCampaignEligibility.Mode.MEDIUM,
+		[&"khainokata", &"homens_de_preto"])
+	# Orchestra escolhida sempre prevalece sobre o limiar global.
+	await _scenario(["orchestra_1", "orchestra_4"], 0, false, -1.0,
+		false, EventCampaignEligibility.Mode.SHORT, [&"orchestra"])
+	await _scenario(["orchestra_2"], 50, false, -1.0,
+		false, EventCampaignEligibility.Mode.SHORT, [&"orchestra"])
+	await _scenario(["orchestra_2", "orchestra_3"], 75, false, -1.0,
+		false, EventCampaignEligibility.Mode.SHORT, [&"orchestra"])
+	await _scenario(["orchestra_1", "orchestra_4", "orchestra_5",
+		"khaikonata_1"], 0, false, -1.0, false,
+		EventCampaignEligibility.Mode.MEDIUM, [&"orchestra", &"khainokata"])
+	await _scenario(["orchestra_2", "orchestra_4", "orchestra_5",
+		"khaikonata_1"], 50, false, -1.0, false,
+		EventCampaignEligibility.Mode.MEDIUM, [&"orchestra", &"khainokata"])
+	await _scenario(["orchestra_2", "orchestra_3", "orchestra_4",
+		"khaikonata_1"], 75, false, -1.0, false,
+		EventCampaignEligibility.Mode.MEDIUM, [&"orchestra", &"khainokata"])
 	print("PPP A Experiência recruitment: %d falha(s)" % failures)
 	quit(0 if failures == 0 else 1)
 
 
 func _scenario(information: Array[String], chance: int, accept: bool,
-		forced_chance: float, expected_recruited: bool) -> void:
+		forced_chance: float, expected_recruited: bool,
+		mode: int = EventCampaignEligibility.Mode.COMPLETE,
+		endings: Array[StringName] = []) -> void:
 	var scene := load("res://teste.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
@@ -34,11 +65,12 @@ func _scenario(information: Array[String], chance: int, accept: bool,
 		load("res://resources/entities/entities_playable/mae.tres"),
 		load("res://resources/entities/entities_playable/pedreiro.tres"),
 		load("res://resources/entities/entities_playable/jornalista.tres")]
-	_check(gerencia.start_new_game(choices) and rounds.start_first_map(),
+	_check(gerencia.start_new_game(choices, mode, endings) and rounds.start_first_map(),
 		"Campanha inicia (%s)." % str(information))
 	var actor := gerencia.campaign.active_entity_states[0]
 	for part in information:
-		var info := load("res://resources/informacoes/orchestra/%s.tres" % part) as Informacao
+		var folder := "khainokata" if part.begins_with("khaikonata_") else "orchestra"
+		var info := load("res://resources/informacoes/%s/%s.tres" % [folder, part]) as Informacao
 		_check(gerencia.campaign.record_information_obtained(info),
 			"Informação Orchestra foi registrada: %s." % part)
 	var encounter := load("res://resources/encounters/enc_a_experiencia.tres") as EncounterData
@@ -64,10 +96,22 @@ func _scenario(information: Array[String], chance: int, accept: bool,
 		_check(hud._recruitment_dialog.visible \
 			and hud._recruitment_dialog.dialog_text.contains("%d%%" % chance),
 			"A chance correta aparece antes do combate: %d%%." % chance)
-		for part in information:
-			var label := "Orchestra 2/5" if part == "orchestra_2" else "Orchestra 3/5"
-			_check(hud._recruitment_dialog.dialog_text.contains(label),
-				"A caixa identifica a Informação %s." % label)
+		if mode != EventCampaignEligibility.Mode.COMPLETE \
+				and &"orchestra" not in endings:
+			_check(hud._recruitment_dialog.dialog_text.contains("contagem global")
+				and hud._recruitment_dialog.dialog_text.contains(
+					"%d Informações" % information.size()),
+				"A caixa identifica a contagem global que liberou 50%.")
+		else:
+			_check(hud._recruitment_dialog.dialog_text.contains("pista Orchestra"),
+				"A caixa atribui a chance às pistas Orchestra.")
+			for part in information:
+				if part not in ["orchestra_2", "orchestra_3"]:
+					continue
+				var label := "Orchestra 2/5" if part == "orchestra_2" \
+					else "Orchestra 3/5"
+				_check(hud._recruitment_dialog.dialog_text.contains(label),
+					"A caixa identifica a Informação %s." % label)
 		_check(combat.current_actor == null and enemy in combat.enemies,
 			"Nenhum turno/rolagem ocorre antes da decisão.")
 		if not accept:

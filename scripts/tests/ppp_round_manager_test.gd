@@ -20,10 +20,12 @@ func _run_test() -> void:
 	var block := scene.get_node_or_null("BlockManager") as BlockManager
 	var rounds := scene.get_node_or_null("RoundManager") as RoundManager
 	var button := scene.get_node_or_null("RoundUI/NextPhaseButton") as Button
-	var dialog := scene.get_node_or_null("RoundUI/DestinationDialog") as ConfirmationDialog
-	var options := scene.get_node_or_null("RoundUI/DestinationDialog/DistrictOptions") as OptionButton
+	var picker: CampaignDestinationPicker = rounds.destination_picker if rounds != null else null
+	var top := scene.get_node("CampaignTopBar") as CampaignTopBar
+	var day_prompts := [0]
+	rounds.new_day_started.connect(func(_day: int) -> void: day_prompts[0] += 1)
 	check(gerencia != null and exploration != null and block != null and rounds != null \
-		and button != null and dialog != null and options != null,
+		and button != null and picker != null,
 		"A cena principal deve conter a máquina e o botão de próxima fase.")
 	if rounds == null or gerencia == null:
 		quit(1)
@@ -78,10 +80,15 @@ func _run_test() -> void:
 	await process_frame
 	check(rounds.can_advance(), "Depois da conclusão, a escolha volta a ser possível.")
 	button.pressed.emit()
-	check(options.item_count == 2 and dialog.visible,
-		"Clicar abre a escolha entre Subúrbio e Baixo-Centro.")
-	options.select(1)
-	dialog.confirmed.emit()
+	check(picker.is_open() and picker.displayed_districts().size() == 3 \
+		and picker.row_for(&"suburbio") != null \
+		and picker.row_for(&"baixo_centro") != null \
+		and picker.row_for(&"centro").disabled,
+		"Clicar mostra os três distritos, com Centro indisponível em cinza.")
+	check(picker.select_district(&"baixo_centro") \
+		and not picker.select_district(&"centro"),
+		"Só os distritos elegíveis podem ser escolhidos.")
+	picker.destination_confirmed.emit(picker.selected_district())
 	check(gerencia.campaign.day == 1 \
 		and gerencia.campaign.round_period == PPPMapGenerator.RoundPeriod.AFTERNOON \
 		and gerencia.campaign.district == &"baixo_centro",
@@ -119,6 +126,35 @@ func _run_test() -> void:
 		and gerencia.campaign.round_period == PPPMapGenerator.RoundPeriod.MORNING \
 		and gerencia.campaign.district == &"suburbio",
 		"Noite → Manhã incrementa o Dia e aplica a escolha de distrito.")
+	await process_frame
+	var transition := top._day_transition as CanvasLayer
+	var transition_screen := transition.get_node("Screen") as Control
+	check(day_prompts[0] == 1 and transition.call("is_open")
+		and transition.layer > top.pause_menu.layer
+		and (transition.get_node("Screen/BlackBackground") as ColorRect).color == Color.BLACK
+		and transition.get_node_or_null("Screen/ImageCenter/Artwork") is TextureRect,
+		"O novo Dia abre uma cena preta própria acima de todo HUD, com espaço para imagem.")
+	check(transition_screen.visible and paused,
+		"A cena intermediária deve bloquear o jogo até salvar ou continuar.")
+	check(transition.get_node("Screen/Actions/Save") is Button
+		and transition.get_node("Screen/Actions/Continue") is Button,
+		"Salvar e Continuar sem salvar devem estar disponíveis na cena própria.")
+	var map_after_day := gerencia.campaign.current_map
+	(transition.get_node("Screen/Actions/Continue") as Button).pressed.emit()
+	top._on_new_day_started(2)
+	await process_frame
+	check(day_prompts[0] == 1 and not transition.call("is_open")
+		and not paused and gerencia.campaign.current_map == map_after_day,
+		"Cancelar mantém o novo Dia e não repete a oferta ou o mapa.")
+	# Reabrir somente para testar o botão: o sinal da Rodada acima não se repete.
+	transition.call("open", 2)
+	(transition.get_node("Screen/Actions/Save") as Button).pressed.emit()
+	check(top.pause_menu.is_open() and top.pause_menu._save_panel.visible,
+		"Sim abre o seletor de três slots da campanha.")
+	top.pause_menu._save_panel.close()
+	await process_frame
+	check(not top.pause_menu.is_open(),
+		"Cancelar o seletor do novo Dia devolve ao jogo sem salvar.")
 	check(spoiled_copy not in owner.inventory_items and fresh_copy in owner.inventory_items,
 		"Na virada, apenas a cópia apodrecida é descartada.")
 	var health_after_day_start := owner.current_health

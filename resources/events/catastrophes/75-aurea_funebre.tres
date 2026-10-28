@@ -20,6 +20,7 @@ script = ExtResource("2_outcome")
 id = &"ev_00075_out_01"
 id = &"ev_00075_out_01"
 display_name = "A Áurea Fúnebre se espalha."
+narrative_description = "A Áurea Fúnebre se espalha.\nPelo restante do Dia, todos os personagens sofrem os efeitos da Tristeza."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

@@ -11,7 +11,7 @@ script = ExtResource("1_7568b")
 id = &"en_00034"
 display_name = "Zumbi que Taca Gosma"
 description = "Criatura zumbificada que atira gosma que pode causar doença.
-Ao início do 3º turno do Encontro, caso pelo menos um Zumbi que Taca Gosma tenha permanecido vivo durante os dois primeiros turnos completos do combate, são invocados Zumbis Dançarinos. "
+Ao início do 3º turno do Encontro, caso pelo menos um Zumbi que Taca Gosma tenha permanecido vivo durante os dois primeiros turnos completos do combate, a horda invoca uma única leva de 2 Zumbis Dançarinos no total. "
 narrative_description = "É difícil dizer onde termina o zumbi e onde começa a meleca. Em alguns momentos, parece que a gosma é quem está carregando o moribundo, e não o contrário."
 vida_base = 10
 ataque_base = 4

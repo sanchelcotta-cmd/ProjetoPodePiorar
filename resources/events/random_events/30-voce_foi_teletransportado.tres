@@ -17,6 +17,7 @@ destination_must_differ_from_origin = true
 script = ExtResource("2_outcome")
 id = &"ev_00030_out_01"
 display_name = "Você é teletransportado."
+narrative_description = "Você é teletransportado para um novo local!"
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

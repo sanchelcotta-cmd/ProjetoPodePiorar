@@ -16,7 +16,7 @@ var _layout_request := 0
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.045, 0.06, 0.08, 0.88)
+	style.bg_color = Color(0.045, 0.06, 0.08, 0.96)
 	style.border_color = PINK
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(4)
@@ -57,7 +57,7 @@ func _ready() -> void:
 	_effect_description.name = "EffectDescription"
 	_effect_description.custom_minimum_size.x = 230.0
 	_effect_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_effect_description.add_theme_font_override("font", FONT)
+	UINarrativeFont.apply_label(_effect_description)
 	_effect_description.add_theme_font_size_override("font_size", 12)
 	_effect_description.add_theme_color_override("font_color", Color(0.91, 0.94, 0.97))
 	text_stack.add_child(_effect_description)

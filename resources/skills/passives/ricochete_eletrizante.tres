@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="PassiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="1_passive"]
+[ext_resource type="Script" path="res://scripts/resources/skills/skill_effect_data.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Resource_ricochet"]
+script = ExtResource("2_effect")
+effect_type = 55
+target = 1
+percent = 0.5
+area_radius = 3
+generated_damage_can_trigger_passives = false
+
+[resource]
+script = ExtResource("1_passive")
+id = &"ps_00031"
+display_name = "Ricochete Eletrizante"
+description = "Ao causar dano com a Espada Irada Eletrizante, ricocheteia 50% do dano causado para o inimigo mais próximo do alvo em até 3 hexes. Empates são sorteados."
+trigger = 7
+required_attack_item_id = &"aa_00014"
+requires_attack_to_deal_damage = true
+effects = Array[ExtResource("2_effect")]([SubResource("Resource_ricochet")])

@@ -48,6 +48,7 @@ effects = Array[ExtResource("3_effect")]([SubResource("Effect_taming")])
 script = ExtResource("1_event")
 id = &"ev_00020"
 display_name = "Um Artefato Mágico"
+narrative_description = "Um artefato de origem desconhecida. Coisas estranhas estão prestes a acontecer..."
 description = "Um artefato de origem incerta sorteia um efeito sobrenatural: Ataque (35%), Perseguição (35%) ou Adestramento (30%)."
 resolution_mode = 1
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome_attack"), SubResource("Outcome_persecution"), SubResource("Outcome_taming")])

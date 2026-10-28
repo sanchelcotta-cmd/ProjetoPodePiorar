@@ -24,7 +24,7 @@ metadata/_custom_type_script = "uid://bknff8de8c2u0"
 script = ExtResource("1_5qnyl")
 id = &"ev_00017_out_01"
 display_name = "Você aceita o acordo."
-narrative_description = "Garante uma Informação, mas o personagem ativo perde 5 pontos de vida máximo."
+narrative_description = "Garante uma Informação, mas você perdeu 5 pontos de vida. Se isso é uma troca justa... Fica a seu critério."
 effects = Array[ExtResource("2_fswfu")]([SubResource("Resource_grant_information"), SubResource("Resource_remove_max_hp")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
@@ -32,7 +32,7 @@ metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 script = ExtResource("1_5qnyl")
 id = &"ev_00017_out_02"
 display_name = "Você não aceita o acordo."
-narrative_description = "Ele vai embora. Nada acontece."
+narrative_description = "É melhor não aceitar...\nEle vai embora e nada acontece."
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [resource]

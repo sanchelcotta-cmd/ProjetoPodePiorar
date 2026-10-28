@@ -8,6 +8,9 @@ var data: DebuffData
 var source: EntityState
 var source_instance_id: StringName = &""
 var source_key: StringName = &""
+# Só incapacitação causada por Evento/Armadilha ativado na Exploração protege
+# contra seleção como alvo hostil. Debuffs de inimigos nunca recebem esta marca.
+var exploration_event_control: bool = false
 var resistance_chance_base: float = 0.0
 var duration_kind: int = DebuffData.DurationType.TURNS
 var remaining_turns: int = 0

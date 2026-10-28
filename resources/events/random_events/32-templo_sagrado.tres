@@ -22,13 +22,14 @@ ignore_discard_restriction = true
 script = ExtResource("2_outcome")
 id = &"ev_00032_out_01"
 display_name = "As maldições são quebradas."
+narrative_description = "As maldições são quebradas.\n\nTodas as maldições ativas são quebradas e os itens amaldiçoados são retirados do inventário de todos os personagens. O dia de hoje está abençoado."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_remove_curses"), SubResource("Effect_remove_cursed_items")])
 
 [resource]
 script = ExtResource("1_event")
 id = &"ev_00032"
 display_name = "Templo Sagrado"
-description = "Todas as maldições ativas são quebradas e os itens amaldiçoados são retirados do inventário de todos os personagens."
+description = "Todas as maldições ativas são quebradas e os itens amaldiçoados são retirados do inventário de todos os personagens. Pelo resto do Dia, novos itens amaldiçoados são anulados."
 narrative_description = "Uma capelinha simples. Daquelas que parecem esquecidas pelo tempo. A imagem da santa sorri enquanto uma luz morna percorre o corpo de todos vocês. Basta um Ave Maria e dois Pai Nossos, e tudo o que é de ruim há de ir."
 valence = 0
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

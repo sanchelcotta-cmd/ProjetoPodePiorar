@@ -22,6 +22,7 @@ script = ExtResource("2_outcome")
 id = &"ev_00055_out_01"
 id = &"ev_00055_out_01"
 display_name = "Visão ampliada."
+narrative_description = "Visão ampliada.\nA partir de agora: uma vez por turno, você pode revelar o tipo de um bloco ao alcance da Estamina. Recebe Maestria em Distância ou +1 se já a possuir, e ignora o limite de alcance em ataques à distância."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_active"), SubResource("Effect_passive")])
 
 [resource]

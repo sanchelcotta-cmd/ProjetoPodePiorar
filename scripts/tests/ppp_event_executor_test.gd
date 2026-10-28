@@ -18,6 +18,9 @@ func _run() -> void:
 	var block := scene.get_node("BlockManager") as BlockManager
 	var executor := scene.get_node("EventExecutor") as EventExecutor
 	var popup := scene.get_node("BlockActivationPopup") as BlockActivationPopup
+	var resolved_results: Array[Dictionary] = []
+	executor.result_ready.connect(func(_context: Dictionary, result: Dictionary) -> void:
+		resolved_results.append(result.duplicate(true)))
 	var data: Array[EntityData] = [
 		load("res://resources/entities/entities_playable/mae.tres"),
 		load("res://resources/entities/entities_playable/pedreiro.tres"),
@@ -71,8 +74,12 @@ func _run() -> void:
 	if raio_results.size() == 1 and (raio_results[0].get("dice_results", []) as Array).size() == 1:
 		check(hp_before_early_raio - actor.current_health == 2 * int(raio_results[0]["dice_results"][0]),
 			"O dado mostrado pelo Evento é o mesmo usado para calcular seu dano.")
+	check(block.is_busy() and popup.overlay.visible \
+		and (popup.buttons.get_child(0) as Button).text == "OK",
+		"Depois do dado, o resultado permanece legível até o OK final.")
+	(popup.buttons.get_child(0) as Button).pressed.emit()
 	check(not block.is_busy() and not popup.overlay.visible,
-		"Depois de mostrar o resultado do dado, o Evento libera o bloco.")
+		"O OK final do resultado do dado libera o bloco.")
 	var calmaria := load("res://resources/events/random_events/18-calmaria.tres") as EventData
 	coord = Vector2i(1, 0)
 	actor.position = coord
@@ -95,6 +102,10 @@ func _run() -> void:
 	var stun := scene.get_node("SkillManager").debuff_manager.get_debuff(actor, &"db_00002") as DebuffInstanceState
 	check(stun != null and stun.remaining_turns >= 1 and stun.remaining_turns <= 6,
 		"Atordoamento deve durar o valor real do dado de seis lados.")
+	check(not resolved_results.is_empty() and stun != null and
+		str(resolved_results.back().get("narrative", "")).contains(
+			"por %d turnos" % stun.remaining_turns),
+		"Bomba de Gelo mostra na narrativa a duração realmente sorteada.")
 	check(not block.is_busy(), "Armadilha deve encerrar após confirmação.")
 	var mine := load("res://resources/events/traps/77-minas_explosivas.tres") as EventData
 	coord = Vector2i(4, 0)
@@ -121,6 +132,9 @@ func _run() -> void:
 		and burn_actor.current_tick_damage == damage \
 		and burn_adjacent.current_tick_damage == damage,
 		"Queimadura começa com a mesma rolagem de dano da mina.")
+	check(not resolved_results.is_empty() and str(resolved_results.back().get(
+		"narrative", "")).contains("com %d de queimadura" % damage),
+		"Mina mostra na narrativa o mesmo dado usado para dano e Queimadura.")
 	check(not block.is_busy(), "Mina deve encerrar após confirmação.")
 	var boca := load("res://resources/events/traps/78-boca_de_lobo.tres") as EventData
 	coord = Vector2i(5, 0)
@@ -134,6 +148,10 @@ func _run() -> void:
 	check(hp_before_boca - actor.current_health in [1, 2, 3, 4, 5, 6] \
 		and root_debuff != null,
 		"Boca de Lobo causa 1d6 de dano e Enraizado.")
+	check(not resolved_results.is_empty() and str(resolved_results.back().get(
+		"narrative", "")).contains(
+			"%d de dano" % (hp_before_boca - actor.current_health)),
+		"Boca de Lobo mostra na narrativa o dano realmente sorteado.")
 	check(not block.is_busy(), "Boca de Lobo deve encerrar após confirmação.")
 	var prego := load("res://resources/events/traps/79-prego_enferrujado.tres") as EventData
 	coord = Vector2i(6, 0)
@@ -167,7 +185,8 @@ func _run() -> void:
 		&"db_00002") as DebuffInstanceState
 	check(raio_damage in [2, 4, 6, 8, 10, 12] \
 		and actor.current_health == hp_before_raio - raio_damage \
-		and raio_stun != null and raio_stun.remaining_turns == 1,
+		and raio_stun != null and raio_stun.remaining_turns == 1 \
+		and raio_stun.exploration_event_control,
 		"Raio causa exatamente 2×1d6 de dano e Atordoamento por um turno.")
 	check(not block.is_busy(), "Raio deve encerrar após confirmação.")
 	var congelado := load("res://resources/events/random_events/11-voce_foi_congelado.tres") as EventData
@@ -178,7 +197,8 @@ func _run() -> void:
 	_confirm_and_read(popup, {})
 	var frozen := scene.get_node("SkillManager").debuff_manager.get_debuff(actor,
 		&"db_00002") as DebuffInstanceState
-	check(frozen != null and frozen.expiration_round_index == campaign.get_round_index() + 1,
+	check(frozen != null and frozen.expiration_round_index == campaign.get_round_index() + 1 \
+		and frozen.exploration_event_control,
 		"Congelado deixa o Atordoamento ativo até a próxima virada de Rodada.")
 	check(not block.is_busy(), "Congelado deve encerrar após confirmação.")
 	var raizes := load("res://resources/events/random_events/34-raizes_traicoeiras.tres") as EventData
@@ -287,6 +307,9 @@ func _run() -> void:
 		print("PPP EventExecutor: Vida, Cura e armadilhas passaram")
 	else:
 		push_error("PPP EventExecutor: %d falha(s)" % failures)
+	scene.queue_free()
+	for _frame in 4:
+		await process_frame
 	quit(1 if failures > 0 else 0)
 
 

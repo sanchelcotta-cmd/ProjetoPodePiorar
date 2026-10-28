@@ -9,13 +9,125 @@ signal skill_source_removed(actor: EntityState, source_key: StringName)
 signal active_skill_used(actor: EntityState, grant: SkillGrantState, result: Dictionary)
 signal delayed_skill_effect_resolved(owner: EntityState, result: Dictionary)
 signal passive_triggered(actor: EntityState, grant: SkillGrantState, result: Dictionary)
+signal incoming_damage_applied(target: EntityState, damage: int)
 
 var effect_executor := SkillEffectExecutor.new()
 var combat_effect_executor = preload("res://scripts/combat/combat_skill_effect_executor.gd").new()
 var inventory_manager := InventoryManager.new()
 var debuff_manager := DebuffManager.new()
 @export var catastrophe_manager: CatastropheManager
+@export var gerencia: GerenciaJogo
 var _status_triggers_in_progress: Dictionary = {}
+var last_exploration_result: Dictionary = {} # Somente feedback do último uso já resolvido.
+
+
+func _ready() -> void:
+	if gerencia != null and not gerencia.information_granted.is_connected(
+			_on_information_granted):
+		gerencia.information_granted.connect(_on_information_granted)
+	if gerencia != null:
+		debuff_manager.campaign = gerencia.campaign
+		inventory_manager.campaign = gerencia.campaign
+
+
+func _on_information_granted(_information: Informacao, _result: Dictionary) -> void:
+	on_information_obtained(gerencia.campaign)
+
+
+func equipped_source_item(actor: EntityState,
+		grant: SkillGrantState) -> InventoryItemState:
+	if actor == null or grant == null or grant.source_kind != &"equipment":
+		return null
+	for slot in [actor.equipped_weapons, actor.equipped_armors,
+			actor.equipped_accessories]:
+		for entry in slot:
+			if entry != null and entry.equipment_source_id \
+					== grant.source_id:
+				return entry
+	return null
+
+
+func consume_equipment_source_item(actor: EntityState, grant: SkillGrantState,
+		campaign: CampaignState) -> bool:
+	var entry := equipped_source_item(actor, grant)
+	if entry == null or entry.data == null or campaign == null \
+			or not EquipmentManager.new().consume_equipped_item(actor, entry, self):
+		return false
+	if entry.data.cannot_craft_after_consumed:
+		campaign.consumed_uncraftable_item_ids[entry.data.id] = true
+	return true
+
+
+## A sintonização é da cópia e só pode ser feita uma vez. Equipar de novo
+## reativa a proteção do mesmo personagem sem repetir esta Ativa.
+func can_attune_divine_amulet(actor: EntityState, grant: SkillGrantState) -> bool:
+	if actor == null or grant == null or grant.skill == null \
+			or grant.skill.id != &"item_active_003" or actor.current_health <= 0 \
+			or actor.instance_id == &"" or grant not in get_active_grants(actor):
+		return false
+	var entry := equipped_source_item(actor, grant)
+	return entry != null and entry.data != null and entry.data.id == &"ac_00001" \
+		and entry.attuned_owner_instance_id == &""
+
+
+func attune_divine_amulet(actor: EntityState, grant: SkillGrantState,
+		campaign: CampaignState = null) -> Dictionary:
+	if not can_attune_divine_amulet(actor, grant):
+		return {"success": false, "reason": "Este Amuleto Divino já foi sintonizado ou não está equipado."}
+	var entry := equipped_source_item(actor, grant)
+	entry.attuned_owner_instance_id = actor.instance_id
+	entry.attuned_owner_name = actor.visible_name()
+	var protected_ids: Array[StringName] = [&"db_00003", &"db_00004",
+		&"db_00005", &"db_00009", &"db_00010"]
+	var removed := debuff_manager.remove_debuffs(actor, protected_ids)
+	actor.equipment_changed.emit()
+	if campaign != null:
+		campaign.append_journal_entry(&"attune_divine_amulet", [
+			{"text": actor.visible_name(), "tone": "actor"},
+			{"text": " sintonizou o Amuleto Divino. O vínculo é permanente.", "tone": "text"},
+		], actor.instance_id, {"item_id": str(entry.data.id)})
+	var result := {"success": true, "skill": grant.skill, "target": actor,
+		"removed_debuffs": removed, "effects": []}
+	active_skill_used.emit(actor, grant, result)
+	return result
+
+
+## A escolha e a confirmação são da UI; esta operação só altera o estado
+## depois que o jogador confirma qual morto deseja ressuscitar.
+func can_use_exploration_divine_amulet(actor: EntityState,
+		grant: SkillGrantState, campaign: CampaignState,
+		target: EntityState = null) -> bool:
+	var turn_owner := campaign.resurrection_playable_owner(actor) \
+		if campaign != null else null
+	if actor == null or grant == null or campaign == null \
+			or campaign.current_map == null or grant not in get_active_grants(actor) \
+			or grant.skill == null or grant.skill.id != &"item_active_002" \
+			or turn_owner == null or turn_owner.turn_state != EntityState.TurnState.TURNING \
+			or actor.current_health <= 0 \
+			or campaign.current_map.ppp_map_mode != HexGrid.PPPMapMode.EXPLORATION \
+			or equipped_source_item(actor, grant) == null:
+		return false
+	if catastrophe_manager != null and catastrophe_manager.skills_suppressed(
+			HexGrid.PPPMapMode.EXPLORATION, false):
+		return false
+	if target != null:
+		return campaign.can_resurrect_group_member(target, actor)
+	return not campaign.get_dead_group_members().is_empty()
+
+
+func use_exploration_divine_amulet(actor: EntityState,
+		grant: SkillGrantState, campaign: CampaignState,
+		target: EntityState) -> Dictionary:
+	if not can_use_exploration_divine_amulet(actor, grant, campaign, target) \
+			or not consume_equipment_source_item(actor, grant, campaign):
+		return {"success": false, "reason": "Sacrifício Divino indisponível."}
+	var revived := campaign.resurrect_group_member(target, actor, self)
+	if not revived.get("success", false):
+		return revived
+	var result := {"success": true, "skill": grant.skill, "target": target,
+		"effects": [{"success": true, "revived": target}]}
+	active_skill_used.emit(actor, grant, result)
+	return result
 
 
 ## Um SkillEffectData informa qual status e qual alvo. O mesmo motor serve
@@ -142,7 +254,8 @@ func is_status_immune(target: EntityState, debuff_id: StringName) -> bool:
 	if target == null:
 		return false
 	if debuff_id in target.permanent_status_immunities \
-			or debuff_id in target.temporary_status_immunities:
+			or debuff_id in target.temporary_status_immunities \
+			or target.has_divine_amulet_status_immunity(debuff_id):
 		return true
 	for grant in get_passive_grants(target):
 		var passive := grant.skill as PassiveSkillData
@@ -199,11 +312,13 @@ func ensure_innate_skills(actor: EntityState) -> void:
 
 
 func grant_skill(actor: EntityState, skill: Resource, source_kind: StringName, source_id: StringName,
-		campaign: CampaignState = null, bound_source: Resource = null) -> SkillGrantState:
+		campaign: CampaignState = null, bound_source: Resource = null,
+		bound_item_improvements: Dictionary = {}) -> SkillGrantState:
 	if actor == null or not (skill is ActiveSkillData or skill is PassiveSkillData) \
 			or source_kind == &"" or source_id == &"":
 		return null
-	var grant := _add_if_missing(actor, skill, source_kind, source_id, campaign, bound_source)
+	var grant := _add_if_missing(actor, skill, source_kind, source_id, campaign,
+		bound_source, bound_item_improvements)
 	if campaign != null:
 		refresh_information_passives(actor, campaign)
 	return grant
@@ -256,6 +371,23 @@ func can_use_combat_active(actor: EntityState, grant: SkillGrantState,
 		return false
 	if not automatic and combat.current_actor != actor:
 		return false
+	if combat.is_charm_forced_turn(actor):
+		return false
+	# Charme bloqueia imediatamente ataques, dano e ações contra hostis.
+	# Ativas de apoio sem dano continuam válidas até o turno compulsório.
+	if debuff_manager.has_control(actor, DebuffData.ControlEffect.CANT_ATTACK):
+		if selected_target in combat._opponents_of(actor) \
+				or skill.target_mode == ActiveSkillData.TargetMode.ONE_ENEMY:
+			return false
+		for effect in skill.effects:
+			if effect.effect_type in [SkillEffectData.EffectType.DEAL_FIXED_DAMAGE,
+					SkillEffectData.EffectType.PERFORM_ATTACK,
+					SkillEffectData.EffectType.COUNTERATTACK] \
+					or effect.target in [SkillEffectData.Target.ATTACK_TARGET,
+					SkillEffectData.Target.NEAREST_ENEMY,
+					SkillEffectData.Target.ALL_ENEMIES,
+					SkillEffectData.Target.DAMAGE_SOURCE]:
+				return false
 	if catastrophe_manager != null and catastrophe_manager.skills_suppressed(
 			HexGrid.PPPMapMode.COMBAT, false):
 		return false
@@ -274,10 +406,13 @@ func can_use_combat_active(actor: EntityState, grant: SkillGrantState,
 				return false
 		ActiveSkillData.TargetMode.ONE_ALLY:
 			if selected_target == null or selected_target == actor \
-					or selected_target not in combat._allies_of(actor):
+					or (selected_target not in combat._allies_of(actor, skill.allow_dead_targets) \
+					and not (skill.id == &"item_active_002" \
+					and campaign.can_resurrect_group_member(selected_target, actor))):
 				return false
 		ActiveSkillData.TargetMode.ONE_ENTITY:
-			if selected_target == null or (selected_target not in combat._allies_of(actor) \
+			if selected_target == null or (selected_target not in combat._allies_of(
+					actor, skill.allow_dead_targets) \
 					and selected_target not in combat._opponents_of(actor)):
 				return false
 		ActiveSkillData.TargetMode.SELF, ActiveSkillData.TargetMode.NONE:
@@ -326,7 +461,8 @@ func use_combat_active(actor: EntityState, grant: SkillGrantState,
 	grant.last_used_combat_id = combat._combat_id
 	grant.uses_in_last_combat += 1
 	grant.activated_combat_id = combat._combat_id
-	var result := {"success": true, "effects": results, "skill": skill}
+	var result := {"success": true, "effects": results, "skill": skill,
+		"target": selected_target}
 	active_skill_used.emit(actor, grant, result)
 	if skill.consume_skill_on_success and not results.any(func(entry: Dictionary) -> bool:
 		return entry.get("chance_failed", false)):
@@ -341,6 +477,11 @@ func get_passive_grants(actor: EntityState) -> Array[SkillGrantState]:
 	ensure_innate_skills(actor)
 	for grant in actor.skill_grants:
 		if grant.skill is PassiveSkillData:
+			if grant.skill.id == &"item_passive_004":
+				var entry := equipped_source_item(actor, grant)
+				if entry == null or entry.attuned_owner_instance_id != actor.instance_id \
+						or actor.instance_id == &"":
+					continue
 			result.append(grant)
 	return result
 
@@ -443,10 +584,14 @@ func dispatch_passive_trigger(actor: EntityState, trigger: PassiveSkillData.Trig
 				break
 		if executable:
 			eligible.append(grant)
-	for grant in _select_passive_groups(eligible, rng):
+	var selected := _select_passive_groups(eligible, rng)
+	var hostile_dodge := _preferred_hostile_dodge(actor, trigger, selected)
+	for grant in selected:
 		context["grant"] = grant
 		var passive := grant.skill as PassiveSkillData
-		if _roll_passive_chance(passive.activation_chance, rng) == false:
+		var chance := _effective_passive_chance(actor, trigger, grant, hostile_dodge,
+			campaign)
+		if _roll_passive_chance(chance, rng) == false:
 			continue
 		var effect_results: Array[Dictionary] = []
 		var success := true
@@ -459,10 +604,55 @@ func dispatch_passive_trigger(actor: EntityState, trigger: PassiveSkillData.Trig
 		if not success:
 			continue
 		_record_passive_use(actor, grant, context)
-		var result := {"grant": grant, "effects": effect_results}
+		var result := {"grant": grant, "effects": effect_results,
+			"damage_source": context.get("damage_source")}
 		results.append(result)
 		passive_triggered.emit(actor, grant, result)
 	return results
+
+
+func _preferred_hostile_dodge(actor: EntityState, trigger: PassiveSkillData.Trigger,
+		grants: Array[SkillGrantState]) -> SkillGrantState:
+	if actor.controller != EntityState.Controller.AI \
+			or trigger != PassiveSkillData.Trigger.ON_BEFORE_DAMAGE_RECEIVED:
+		return null
+	# Uma única tentativa de Esquiva por golpe, mesmo com múltiplas fontes.
+	var preferred: SkillGrantState = null
+	for grant in grants:
+		var candidate := grant.skill as PassiveSkillData
+		if not _passive_has_dodge(candidate):
+			continue
+		if preferred == null or candidate.activation_chance > \
+				(preferred.skill as PassiveSkillData).activation_chance:
+			preferred = grant
+	return preferred
+
+
+func _effective_passive_chance(actor: EntityState, trigger: PassiveSkillData.Trigger,
+		grant: SkillGrantState, preferred_hostile_dodge: SkillGrantState,
+		campaign: CampaignState = null) -> float:
+	var passive := grant.skill as PassiveSkillData
+	if actor.controller == EntityState.Controller.AI \
+			and trigger == PassiveSkillData.Trigger.ON_BEFORE_DAMAGE_RECEIVED \
+			and _passive_has_dodge(passive):
+		if grant != preferred_hostile_dodge:
+			return 0.0
+		# A limitação é aplicada à instância; o Resource de 60% dos jogáveis
+		# permanece intacto para itens e habilidades próprios.
+		var cap := 0.10 if campaign != null \
+			and campaign.difficulty == GameDifficulty.Mode.SUGAR else 0.30
+		return minf(passive.activation_chance, cap)
+	return passive.activation_chance
+
+
+func _passive_has_dodge(passive: PassiveSkillData) -> bool:
+	if passive == null:
+		return false
+	for effect in passive.effects:
+		if effect != null and effect.effect_type == \
+				SkillEffectData.EffectType.DODGE_INCOMING_ATTACK:
+			return true
+	return false
 
 
 func on_item_consumed(actor: EntityState, item: ItemData, campaign: CampaignState,
@@ -527,6 +717,12 @@ func apply_incoming_damage(target: EntityState, raw_damage: int, campaign: Campa
 		event_context: Dictionary = {}, rng: RandomNumberGenerator = null) -> Dictionary:
 	if target == null or campaign == null or raw_damage <= 0 or target.current_health <= 0:
 		return {"success": false, "damage": 0}
+	var damage_source := event_context.get("damage_source") as EntityState
+	if damage_source != null and damage_source.controller == EntityState.Controller.AI \
+			and event_context.get("mode", -1) == HexGrid.PPPMapMode.COMBAT \
+			and debuff_manager.has_exploration_event_control(target):
+		return {"success": true, "damage": 0, "protected_by_exploration_event": true,
+			"remaining_health": target.current_health}
 	var context := event_context.duplicate()
 	context["incoming_damage"] = raw_damage
 	var triggered := dispatch_passive_trigger(target,
@@ -545,11 +741,30 @@ func apply_incoming_damage(target: EntityState, raw_damage: int, campaign: Campa
 			if effect_result.has("incoming_damage_multiplier"):
 				remaining *= float(effect_result["incoming_damage_multiplier"])
 	var final_damage := maxi(1, floori(remaining))
+	if campaign.difficulty == GameDifficulty.Mode.SUGAR \
+			and target.controller == EntityState.Controller.AI:
+		# Teto da Proteção TOTAL hostil por golpe. Ceil evita que o
+		# arredondamento produza redução efetiva acima de 25%.
+		var protection_basis := maxi(raw_damage,
+			int(context.get("protection_basis", raw_damage)))
+		final_damage = maxi(final_damage, ceili(float(protection_basis) * 0.75))
 	var actual_damage := mini(target.current_health, final_damage)
+	var combat_id: StringName = context.get("combat_id", &"")
+	var survived_lethal_hit := campaign.difficulty == GameDifficulty.Mode.SUGAR \
+		and bool(context.get("direct_attack", false)) and combat_id != &"" \
+		and target.controller == EntityState.Controller.PLAYER \
+		and (target in campaign.active_entity_states or target in campaign.companion_states) \
+		and actual_damage >= target.current_health \
+		and target.sugar_lethal_guard_combat_id != combat_id
+	if survived_lethal_hit:
+		actual_damage = target.current_health - 1
+		target.sugar_lethal_guard_combat_id = combat_id
 	target.current_health -= actual_damage
+	incoming_damage_applied.emit(target, actual_damage)
 	return {"success": true, "raw_damage": raw_damage,
 		"calculated_damage": final_damage, "damage": actual_damage,
-		"remaining_health": target.current_health, "passives": triggered}
+		"remaining_health": target.current_health, "passives": triggered,
+		"survived_lethal_hit": survived_lethal_hit}
 
 
 ## Em grupos jogáveis, companheiros também são aliados. Outros grupos (como
@@ -634,7 +849,9 @@ func _roll_passive_chance(chance: float, rng: RandomNumberGenerator) -> bool:
 		return false
 	if chance >= 1.0:
 		return true
-	return (rng.randf() if rng != null else randf()) < chance
+	var source := rng if rng != null else gerencia.campaign.world_rng \
+		if gerencia != null else null
+	return (source.randf() if source != null else randf()) < chance
 
 
 func _select_passive_groups(grants: Array[SkillGrantState], rng: RandomNumberGenerator) -> Array[SkillGrantState]:
@@ -653,7 +870,10 @@ func _select_passive_groups(grants: Array[SkillGrantState], rng: RandomNumberGen
 		var total := 0
 		for grant in choices:
 			total += (grant.skill as PassiveSkillData).random_choice_weight
-		var roll := (rng.randi_range(1, total) if rng != null else randi_range(1, total))
+		var source := rng if rng != null else gerencia.campaign.world_rng \
+			if gerencia != null else null
+		var roll := source.randi_range(1, total) if source != null \
+			else randi_range(1, total)
 		for grant in choices:
 			roll -= (grant.skill as PassiveSkillData).random_choice_weight
 			if roll <= 0:
@@ -673,12 +893,23 @@ func _passive_conditions_met(actor: EntityState, passive: PassiveSkillData,
 	if passive.maximum_group_information_count >= 0:
 		checks.append(info_count <= passive.maximum_group_information_count)
 	if not passive.required_information_ids.is_empty():
+		var global_experience_rule: bool = bool(context.get(
+			"global_experience_recruitment", false)) \
+			and context.get("recruitment_encounter_id", &"") \
+			== EventCampaignDependencies.EXPERIENCE_ENCOUNTER_ID \
+			and passive.id == EventCampaignDependencies.EXPERIENCE_ONE_CLUE_PASSIVE_ID \
+			and not campaign.has_active_ending(&"orchestra") \
+			and campaign.campaign_mode in [EventCampaignEligibility.Mode.SHORT,
+				EventCampaignEligibility.Mode.MEDIUM] \
+			and info_count >= (2 if campaign.campaign_mode \
+				== EventCampaignEligibility.Mode.SHORT else 4)
 		var matching := 0
 		for info_id in passive.required_information_ids:
 			if campaign.obtained_information_ids.has(info_id):
 				matching += 1
-		checks.append(matching >= maxi(1, passive.minimum_matching_information))
-		if passive.maximum_matching_information > 0:
+		checks.append(global_experience_rule or matching >= maxi(1,
+			passive.minimum_matching_information))
+		if passive.maximum_matching_information > 0 and not global_experience_rule:
 			checks.append(matching <= passive.maximum_matching_information)
 	if passive.minimum_adjacent_enemies > 0:
 		checks.append(int(context.get("adjacent_enemies", -1)) >= passive.minimum_adjacent_enemies)
@@ -705,6 +936,8 @@ func _passive_conditions_met(actor: EntityState, passive: PassiveSkillData,
 		checks.append(context.get("damage_source_item_id", &"") in passive.required_damage_source_item_ids)
 	if passive.required_attack_item_id != &"":
 		checks.append(context.get("attack_item_id", &"") == passive.required_attack_item_id)
+	if passive.required_attack_aspect != &"":
+		checks.append(context.get("attack_aspect", &"") == passive.required_attack_aspect)
 	if passive.requires_attack_to_deal_damage:
 		checks.append(int(context.get("damage_dealt", 0)) > 0)
 	if passive.minimum_previous_encounters_same_entity_data > 0:
@@ -932,6 +1165,8 @@ func use_exploration_active(
 		if not result.get("success", false):
 			return false
 		results.append(result)
+	last_exploration_result = {"actor_id": actor.instance_id,
+		"skill_id": skill.id, "effects": results}
 	_record_use(grant, turn_owner, campaign)
 	active_skill_used.emit(actor, grant, {"effects": results})
 	if skill.consume_skill_on_success:
@@ -1063,18 +1298,21 @@ func _effect_context(
 
 
 func _add_if_missing(actor: EntityState, skill: Resource, source_kind: StringName, source_id: StringName,
-		campaign: CampaignState = null, bound_source: Resource = null) -> SkillGrantState:
+		campaign: CampaignState = null, bound_source: Resource = null,
+		bound_item_improvements: Dictionary = {}) -> SkillGrantState:
 	for existing in actor.skill_grants:
 		if existing.skill == skill and existing.source_kind == source_kind and existing.source_id == source_id:
 			return existing
 	var grant := SkillGrantState.new(skill, source_kind, source_id)
 	grant.bound_source = bound_source
+	grant.bound_item_improvements = bound_item_improvements.duplicate()
 	var planned_stats: Dictionary = {}
 	var copied_passives: Array[PassiveSkillData] = []
 	if skill is PassiveSkillData:
 		var passive := skill as PassiveSkillData
 		for effect in passive.on_granted_effects:
-			var plan := effect_executor.plan_on_granted(effect, actor, bound_source)
+			var plan := effect_executor.plan_on_granted(effect, actor, bound_source,
+				bound_item_improvements)
 			if not plan.get("success", false):
 				push_warning("SkillManager: %s não pôde ser concedida: %s" % [passive.display_name, plan.get("reason", "efeito indisponível")])
 				return null

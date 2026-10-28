@@ -1,14 +1,13 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/item_details_panel.gd" id="1_details"]
-[ext_resource type="Texture2D" path="res://sprites/ui/uielementx_00001.png" id="2_frame"]
-[ext_resource type="Shader" path="res://shaders/ui_light_pink_frame.gdshader" id="3_frame_shader"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_frame"]
-shader = ExtResource("3_frame_shader")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_details"]
-bg_color = Color(0.027, 0.044, 0.058, 0.8)
+bg_color = Color(0.027, 0.044, 0.058, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
 border_color = Color(0.996078, 0.168627, 0.592157, 1)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
@@ -25,20 +24,12 @@ offset_bottom = 542.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_details")
 script = ExtResource("1_details")
 
-[node name="Frame" type="TextureRect" parent="."]
-material = SubResource("ShaderMaterial_frame")
-layout_mode = 2
-mouse_filter = 2
-texture = ExtResource("2_frame")
-expand_mode = 1
-stretch_mode = 0
-
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 2
-theme_override_constants/margin_left = 25
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 25
-theme_override_constants/margin_bottom = 20
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
 
 [node name="Content" type="VBoxContainer" parent="Margin"]
 layout_mode = 2

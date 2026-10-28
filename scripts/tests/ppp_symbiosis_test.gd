@@ -1,7 +1,7 @@
 extends SceneTree
 
-## Regressão curta: arma comum usa a evolução vinculada no ItemData;
-## ausência total de arma apresenta erro narrativo sem conceder efeito.
+## Regressão: arma comum melhorada evolui, Épica equipada é absorvida,
+## ambas preservam os bônus da cópia e continuam serializáveis.
 var failures := 0
 
 
@@ -33,6 +33,9 @@ func _run() -> void:
 	actor.inventory_items.clear()
 	var common := load("res://resources/itens/equipments/armas/cabo_de_vassoura.tres") as ItemData
 	var entry := InventoryItemState.new(common)
+	entry.improvement_attack = 2
+	entry.improvement_life = 3
+	entry.improvement_stamina = 1
 	actor.inventory_items.append(entry)
 	var event := load("res://resources/events/permanent_effects/58-simbiose_elemental.tres") as EventData
 	var coord := Vector2i(2, 1)
@@ -54,11 +57,20 @@ func _run() -> void:
 	check(not block.is_busy() and entry not in actor.inventory_items,
 		"A arma comum é consumida ao completar o Outcome.")
 	var bound: ItemData
+	var common_grant: SkillGrantState
 	for grant in actor.skill_grants:
 		if grant.skill != null and grant.skill.id == &"permanent_passive_058":
+			common_grant = grant
 			bound = grant.bound_source as ItemData
 	check(bound != null and bound.id == &"aa_00003",
 		"O Cabo de Vassoura evolui para Bastão do Guardião.")
+	check(common_grant != null and bound.resource_path.begins_with("res://")
+		and common_grant.applied_stat_contributions.get("attack") == bound.bonus_attack + 2
+		and common_grant.applied_stat_contributions.get("max_hp") == bound.bonus_life + 3
+		and common_grant.applied_stat_contributions.get("stamina") == bound.bonus_stamina + 1,
+		"Arma comum melhorada preserva todos os bônus sem duplicar o Resource Épico.")
+	check_saved_symbiosis(gerencia.campaign, scene, actor, bound,
+		{"attack": 2, "life": 3, "stamina": 1}, "arma comum melhorada")
 	var cards := (scene.get_node("PartyStatusHUD") as PartyStatusHUD).cards
 	var card := cards[0] as PartyCharacterCard
 	card.refresh()
@@ -97,6 +109,9 @@ func _run() -> void:
 	var bow := load("res://resources/itens/equipments/armas/arma_epica_arco_da_precisao.tres") as ItemData
 	var sword := load("res://resources/itens/equipments/armas/arma_epica_espada_irada_flamejante.tres") as ItemData
 	var equipped_bow := InventoryItemState.new(bow)
+	equipped_bow.improvement_attack = 4
+	equipped_bow.improvement_life = 2
+	equipped_bow.improvement_stamina = 1
 	second_actor.inventory_items.append(equipped_bow)
 	check(equipment.equip(second_actor, equipped_bow, second_skills,
 		second_game.campaign), "Arco Épico equipado para a Simbiose.")
@@ -113,15 +128,61 @@ func _run() -> void:
 	if second_popup._outcome_reading:
 		second_popup._execute_prepared_event()
 	var chosen: ItemData
+	var epic_grant: SkillGrantState
 	for grant in second_skills.get_passive_grants(second_actor):
 		if grant.skill.id == &"permanent_passive_058":
+			epic_grant = grant
 			chosen = grant.bound_source as ItemData
 	check(not second_block.is_busy() and chosen != null and chosen.id == bow.id \
 		and carried_sword in second_actor.inventory_items \
 		and second_actor.equipped_weapons.is_empty(),
 		"Simbiose consome só a Épica equipada e mantém a outra na mochila.")
+	check(epic_grant != null and chosen.resource_path == bow.resource_path
+		and epic_grant.applied_stat_contributions.get("attack") == bow.bonus_attack + 4
+		and epic_grant.applied_stat_contributions.get("max_hp") == bow.bonus_life + 2
+		and epic_grant.applied_stat_contributions.get("stamina") == bow.bonus_stamina + 1,
+		"Épica absorvida conserva melhorias e a referência estável do catálogo.")
+	check_saved_symbiosis(second_game.campaign, second_scene, second_actor, bow,
+		{"attack": 4, "life": 2, "stamina": 1}, "arma Épica equipada")
 	print("PPP symbiosis: %d falhas" % failures)
 	quit(0 if failures == 0 else 1)
+
+
+func check_saved_symbiosis(campaign: CampaignState, scene: PPPMapView,
+		actor: EntityState, weapon: ItemData, improvements: Dictionary,
+		scenario: String) -> void:
+	var repository := CampaignSaveRepository.new("user://ppp_symbiosis_save_tests")
+	var saved := repository.save_campaign(campaign, 1, scene)
+	check(saved.get("success", false),
+		"Save após Simbiose (%s): %s" % [scenario, saved.get("reason", "")])
+	if not saved.get("success", false):
+		return
+	var loaded := repository.load_campaign(campaign.campaign_id, 1)
+	check(loaded.get("success", false),
+		"Load após Simbiose (%s): %s" % [scenario, loaded.get("reason", "")])
+	if not loaded.get("success", false):
+		return
+	var restored_campaign := loaded["campaign"] as CampaignState
+	var restored: EntityState
+	for candidate in restored_campaign.active_entity_states:
+		if candidate.instance_id == actor.instance_id:
+			restored = candidate
+			break
+	var restored_grant: SkillGrantState
+	if restored != null:
+		for grant in restored.skill_grants:
+			if grant.skill != null and grant.skill.id == &"permanent_passive_058":
+				restored_grant = grant
+				break
+	check(restored_grant != null and restored_grant.bound_source == weapon
+		and restored_grant.bound_item_improvements == improvements
+		and restored_grant.applied_stat_contributions.get("attack")
+			== weapon.bonus_attack + int(improvements["attack"])
+		and restored_grant.applied_stat_contributions.get("max_hp")
+			== weapon.bonus_life + int(improvements["life"])
+		and restored_grant.applied_stat_contributions.get("stamina")
+			== weapon.bonus_stamina + int(improvements["stamina"]),
+		"Load preserva arma absorvida e bônus (%s)." % scenario)
 
 
 func check(ok: bool, message: String) -> void:

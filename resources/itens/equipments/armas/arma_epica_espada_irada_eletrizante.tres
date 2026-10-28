@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/items/item_data.gd" id="1_item"]
+[ext_resource type="Script" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_passive"]
+[ext_resource type="Resource" path="res://resources/skills/passives/ricochete_eletrizante.tres" id="3_ricochet"]
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armas_epicas_2_transparent.png" id="4_sheet"]
+
+[sub_resource type="AtlasTexture" id="Icon_eletrizante"]
+atlas = ExtResource("4_sheet")
+region = Rect2(1008, 96, 164, 414)
+
+[resource]
+script = ExtResource("1_item")
+icon = SubResource("Icon_eletrizante")
+id = &"aa_00014"
+display_name = "Espada Irada Eletrizante"
+description = "Ricocheteia 50% do dano causado no inimigo mais próximo do alvo, em até 3 hexes. Em empate de distância, escolhe aleatoriamente."
+rarity = 4
+acquisition_sources = 4
+tags = Array[StringName]([&"arma", &"epica", &"lamina"])
+equipment_slot = 1
+mastery_granted = 1
+mastery_bonus = 3
+bonus_attack = 7
+granted_passives = Array[ExtResource("2_passive")]([ExtResource("3_ricochet")])
+consumed_on_use = false

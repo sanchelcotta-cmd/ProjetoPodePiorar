@@ -27,7 +27,7 @@ script = ExtResource("1_kbo8m")
 id = &"ev_00001_out_01"
 id = &"ev_00001_out_01"
 display_name = "Consequência Ruim"
-narrative_description = "Todos perdem metade da vida."
+narrative_description = "Vocês não sabem de nada que está acontecendo. O não-saber é uma sina.\nTodos perdem metade da vida."
 condition = SubResource("Resource_epgdd")
 effects = Array[ExtResource("2_8pfs7")]([SubResource("Resource_7j81m")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
@@ -42,7 +42,7 @@ script = ExtResource("1_kbo8m")
 id = &"ev_00001_out_02"
 id = &"ev_00001_out_02"
 display_name = "Consequência Boa"
-narrative_description = "Nada de ruim acontece. Ufa?"
+narrative_description = "Isso não é normal. Depois de alguns segundos... A esfera vai desaparece.\nNada de ruim acontece. Ufa?"
 condition = SubResource("Resource_5uxdi")
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 

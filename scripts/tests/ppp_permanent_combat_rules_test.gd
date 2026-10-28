@@ -32,6 +32,12 @@ func _run() -> void:
 		actor.inventory_items.clear()
 	var inventory := InventoryManager.new()
 	var equipment := EquipmentManager.new()
+	# Os itens iniciais são sorteados. Este caso mede especificamente o Gene
+	# desarmado, então a preparação precisa retirar qualquer arma inicial.
+	for starting_weapon in chef.equipped_weapons.duplicate():
+		_check(equipment.unequip(chef, starting_weapon, skills, campaign),
+			"Arma inicial retirada para teste desarmado.")
+	chef.inventory_items.clear()
 	var sling := load(
 		"res://resources/itens/equipments/armas/estilingue.tres") as ItemData
 	_check(inventory.add_item(journalist, sling) \

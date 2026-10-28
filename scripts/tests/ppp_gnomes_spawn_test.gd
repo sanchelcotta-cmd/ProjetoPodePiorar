@@ -42,9 +42,11 @@ func _run() -> void:
 		"res://resources/events/random_events/09-gnomos_do_caos_3.tres") as EventData
 	grid.set_ppp_block(source, HexGrid.PPPBlockType.EVENT, event)
 	_check(block.begin_activation(source, actor), "Evento 09 abre a narrativa.")
-	popup._confirm_event({})
-	if popup._outcome_reading:
-		popup._execute_prepared_event()
+	(popup.buttons.get_child(0) as Button).pressed.emit()
+	_check(popup._outcome_reading and popup.narrative_label.text \
+		== event.outcomes[0].narrative_description and gnomes._generated_paths.is_empty(),
+		"Evento 09 mostra o texto novo antes de gerar os duendes.")
+	(popup.buttons.get_child(0) as Button).pressed.emit()
 	var generated: Dictionary = {}
 	var colors: Dictionary = {}
 	for coord in grid.cells:

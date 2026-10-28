@@ -5,6 +5,7 @@ extends Control
 signal close_requested
 
 const BOLD_FONT := preload("res://fonts/UbuntuSans-Bold.ttf")
+const NARRATIVE_FONT := preload("res://scripts/ui/ui_narrative_font.gd")
 const BORDER := Color(0.996, 0.169, 0.592)
 const TEXT := Color(0.92, 0.94, 0.95)
 
@@ -68,6 +69,7 @@ func _ready() -> void:
 	effect_scroll.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	effect_label = _label("", 13, TEXT, false, effect_scroll)
 	effect_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	NARRATIVE_FONT.apply_label(effect_label)
 	_stats_caption = _label("ESTATÍSTICAS", 11, BORDER)
 	stats_scroll = ScrollContainer.new()
 	stats_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED

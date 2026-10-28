@@ -7,6 +7,7 @@ extends RefCounted
 
 const SCHEMA_VERSION := 1
 const ALL_ENDING_IDS := InformationCampaignEligibility.ENDING_IDS
+const INFORMATION_PER_ENDING := 5
 enum CampaignStatus { NOT_STARTED, ACTIVE, VICTORY, DEFEAT }
 
 # Metadados da campanha, não cópias do mapa, combate ou inventários. O ID é
@@ -14,14 +15,29 @@ enum CampaignStatus { NOT_STARTED, ACTIVE, VICTORY, DEFEAT }
 var campaign_id: String = ""
 var schema_version: int = SCHEMA_VERSION
 var campaign_status: int = CampaignStatus.NOT_STARTED
+signal campaign_terminal_changed(status: int, information_count: int)
+signal journal_entry_added(entry: Dictionary)
+## Histórico factual desta linha de campanha. Cada entrada usa apenas tipos
+## serializáveis; o Pool 4 guardará a sequência junto ao snapshot de cada slot.
+var journal_entries: Array[Dictionary] = []
+var next_journal_serial: int = 1
 var day: int = 1
+# Evento 32: o templo anula itens amaldiçoados somente no Dia da visita.
+var sacred_temple_blessing_day: int = 0
 # Valor provisório seguro até a seleção de modo/desfechos do próximo item.
 var campaign_mode: int = EventCampaignEligibility.Mode.COMPLETE
+var difficulty: int = GameDifficulty.Mode.STANDARD
+# -1: sem troca agendada. Uma seleção durante a partida vale só na próxima
+# Rodada, inclusive depois de salvar/carregar no meio do Combate.
+var pending_difficulty: int = -1
 var active_ending_ids: Array[StringName] = []
 var round_period: int = PPPMapGenerator.RoundPeriod.MORNING
 var district: StringName = &"suburbio"
 var current_map: HexGrid
 var generated_map_count: int = 0
+## A introdução do último mapa é persistida; pending permite retomá-la após carregar.
+var final_center_intro_seen: bool = false
+var final_center_intro_pending: bool = false
 # Instâncias temporárias de catástrofe; os EventData/.tres são apenas cadastro.
 # Cada entrada conserva o Dia/Rodada de início e os alvos já afetados.
 var active_catastrophes: Array[Dictionary] = []
@@ -52,6 +68,8 @@ var player_dice_luck: D6Roller = D6Roller.new()
 # Também há uma sequência única para TODOS os inimigos da campanha. Ela não
 # se mistura com a sequência do jogador.
 var enemy_dice_luck: D6Roller = D6Roller.new()
+# Sorteios gerais que continuam após carregar a campanha.
+var world_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 # Um evento ativado ou impedido por uma Skill não pode voltar nos três
 # sorteios de Rodada seguintes.
@@ -72,6 +90,7 @@ signal playable_slot_replaced(previous: EntityState, replacement: EntityState)
 # Companheiros continuam sendo entidades; apenas não ocupam uma das 3 vagas.
 var companion_states: Array[EntityState] = []
 signal companion_registered(companion: EntityState)
+var _resurrecting_companion: EntityState # Contexto transitório do sinal; não é progresso salvo.
 signal wooden_doll_changed(owner_id: StringName, present: bool)
 var wooden_dolls_by_owner: Dictionary = {} # owner_instance_id -> bonecos disponíveis
 var next_companion_serial: int = 1
@@ -113,12 +132,67 @@ func _init() -> void:
 	active_ending_ids.assign(ALL_ENDING_IDS)
 
 
+func has_sacred_temple_blessing() -> bool:
+	return sacred_temple_blessing_day > 0 and sacred_temple_blessing_day == day
+
+
+static func is_cursed_item(item: ItemData) -> bool:
+	return item != null and (item.item_type == ItemData.ItemType.CURSED \
+		or &"cursed" in item.tags)
+
+
+func request_difficulty(mode: int) -> bool:
+	if campaign_status != CampaignStatus.ACTIVE or not GameDifficulty.is_available(mode):
+		return false
+	pending_difficulty = -1 if mode == difficulty else mode
+	return true
+
+
+func difficulty_for_next_round() -> int:
+	return pending_difficulty if GameDifficulty.is_available(pending_difficulty) else difficulty
+
+
+func commit_pending_difficulty() -> void:
+	if GameDifficulty.is_available(pending_difficulty):
+		difficulty = pending_difficulty
+	pending_difficulty = -1
+
+
+func has_carried_curse() -> bool:
+	for actor in active_entity_states + companion_states:
+		if actor == null or actor.current_health <= 0:
+			continue
+		for entries in [actor.inventory_items, actor.equipped_weapons,
+				actor.equipped_armors, actor.equipped_accessories]:
+			for entry in entries:
+				if entry != null and entry.data != null \
+						and entry.data.item_type == ItemData.ItemType.CURSED:
+					return true
+	return false
+
+
+func has_catastrophe_at(target_day: int, target_round_index: int) -> bool:
+	for record in active_catastrophes:
+		var survives := true
+		for effect in record.get("effects", []):
+			if effect == null:
+				continue
+			if effect.expiration_mode == Event_EffectData.ExpirationMode.END_OF_CURRENT_DAY \
+					and target_day != int(record.get("day", -1)):
+				survives = false
+			if effect.expiration_mode == Event_EffectData.ExpirationMode.END_OF_CURRENT_ROUND \
+					and target_round_index != int(record.get("round_index", -1)):
+				survives = false
+		if survives:
+			return true
+	return false
+
+
 func has_active_ending(ending_id: StringName) -> bool:
 	return ending_id in active_ending_ids
 
 
 ## Consulta de domínio única, disponível a gerador, eventos e recompensas.
-## O Pool 2 ligará todos esses pontos a esta regra.
 func is_information_eligible(information_id: StringName = &"",
 		information_type: int = -1) -> bool:
 	return InformationCampaignEligibility.is_eligible(
@@ -132,21 +206,37 @@ func information_goal() -> int:
 		EventCampaignEligibility.Mode.MEDIUM:
 			return 10
 		EventCampaignEligibility.Mode.COMPLETE:
-			return 20
+			# A campanha completa incorpora todos os desfechos cadastrados ao
+			# começar; a meta acompanha o conjunto guardado nessa campanha.
+			return active_ending_ids.size() * INFORMATION_PER_ENDING
 	return 0
+
+
+func requires_final_center_map() -> bool:
+	return campaign_status == CampaignStatus.ACTIVE \
+		and campaign_mode == EventCampaignEligibility.Mode.COMPLETE \
+		and obtained_information_ids.size() == information_goal() - 1
+
+
+func allows_free_information_on_next_map() -> bool:
+	# O mapa que pode conceder a penúltima parte não deve antecipar a última
+	# pelo hex livre. Eventos, acessórios e outros bônus continuam válidos.
+	return campaign_mode != EventCampaignEligibility.Mode.COMPLETE \
+		or obtained_information_ids.size() < information_goal() - 2
 
 
 func is_terminal() -> bool:
 	return campaign_status in [CampaignStatus.VICTORY, CampaignStatus.DEFEAT]
 
 
-## Registra o resultado uma só vez. A integração com vitória/morte pertence
-## ao Pool 2; nenhum subsistema é encerrado apenas por chamar esta função.
+## Registra o resultado uma só vez. A UI e os controladores podem observar o
+## sinal sem duplicar a decisão de vitória/derrota.
 func mark_terminal(result: int) -> bool:
 	if campaign_status != CampaignStatus.ACTIVE or result not in [
 			CampaignStatus.VICTORY, CampaignStatus.DEFEAT]:
 		return false
 	campaign_status = result
+	campaign_terminal_changed.emit(result, obtained_information_ids.size())
 	return true
 
 
@@ -229,7 +319,10 @@ func get_unselected_playable_allies() -> Array[EntityData]:
 func start_new_game(selected: Array[EntityData], initial_inventory_capacity: int = 12,
 		rng: RandomNumberGenerator = null,
 		mode: int = EventCampaignEligibility.Mode.COMPLETE,
-		ending_ids: Array[StringName] = []) -> bool:
+		ending_ids: Array[StringName] = [],
+		chosen_difficulty: int = GameDifficulty.Mode.STANDARD) -> bool:
+	if not GameDifficulty.is_available(chosen_difficulty):
+		return false
 	if selected.size() != PLAYABLE_SLOTS.size():
 		push_warning("CampaignState: selecione exatamente três personagens jogáveis.")
 		return false
@@ -254,7 +347,7 @@ func start_new_game(selected: Array[EntityData], initial_inventory_capacity: int
 		)
 		state.base_inventory_capacity = maxi(2, initial_inventory_capacity)
 		new_states.append(state)
-	_grant_starting_items(new_states, rng)
+	_grant_starting_items(new_states, rng, mode, chosen_difficulty)
 	for state in new_states:
 		# A partida começa com a Estamina cheia, incluindo bônus do kit já
 		# vestido. Equipar no meio da partida continua usando a regra normal.
@@ -262,6 +355,8 @@ func start_new_game(selected: Array[EntityData], initial_inventory_capacity: int
 	campaign_id = _new_campaign_id()
 	schema_version = SCHEMA_VERSION
 	campaign_mode = mode
+	difficulty = chosen_difficulty
+	pending_difficulty = -1
 	active_ending_ids = chosen_endings
 	campaign_status = CampaignStatus.ACTIVE
 	day = 1
@@ -269,6 +364,8 @@ func start_new_game(selected: Array[EntityData], initial_inventory_capacity: int
 	district = &"suburbio"
 	current_map = null
 	generated_map_count = 0
+	final_center_intro_seen = false
+	final_center_intro_pending = false
 	active_catastrophes.clear()
 	visual_swap_originals.clear()
 	temporary_event_effects.clear()
@@ -280,13 +377,17 @@ func start_new_game(selected: Array[EntityData], initial_inventory_capacity: int
 	solo_map = null
 	aura_funebre_day = 0
 	nevasca_day = 0
+	sacred_temple_blessing_day = 0
 	visual_weather_event_id = &""
 	visual_weather_day = 0
 	infernal_portals_round_index = -1
 	player_dice_luck.reset()
 	enemy_dice_luck.reset()
+	world_rng.randomize()
 	obtained_information_ids.clear()
 	obtained_information_order.clear()
+	journal_entries.clear()
+	next_journal_serial = 1
 	event_effects_applied_by_actor.clear()
 	event_campaign_counts.clear()
 	event_last_handled_round.clear()
@@ -306,6 +407,43 @@ func start_new_game(selected: Array[EntityData], initial_inventory_capacity: int
 	return true
 
 
+## Registrar somente depois de uma ação resolvida. Segmentos permitem que a
+## consulta pinte nomes/itens/resultados sem tentar inferi-los de texto solto.
+func append_journal_entry(action_id: StringName, segments: Array,
+		actor_id: StringName = &"", references: Dictionary = {}) -> Dictionary:
+	if campaign_status == CampaignStatus.NOT_STARTED or segments.is_empty():
+		return {}
+	var clean_segments: Array[Dictionary] = []
+	var plain_text := ""
+	for value in segments:
+		if not value is Dictionary:
+			continue
+		var segment := value as Dictionary
+		var part := str(segment.get("text", ""))
+		if part.is_empty():
+			continue
+		clean_segments.append({"text": part, "tone": str(segment.get("tone", "text"))})
+		plain_text += part
+	if plain_text.is_empty():
+		return {}
+	var entry := {
+		"serial": next_journal_serial,
+		"day": day,
+		"period": round_period,
+		"district": str(district),
+		"round_index": get_round_index(),
+		"actor_id": str(actor_id),
+		"action_id": str(action_id),
+		"text": plain_text,
+		"segments": clean_segments,
+		"references": references.duplicate(true),
+	}
+	next_journal_serial += 1
+	journal_entries.append(entry)
+	journal_entry_added.emit(entry)
+	return entry
+
+
 ## A ausência de IDs em curta/média solicita um único sorteio uniforme, sem
 ## reposição. A UI não sorteia: o resultado fica guardado nesta campanha.
 func _resolve_active_endings(mode: int, requested: Array[StringName],
@@ -318,7 +456,7 @@ func _resolve_active_endings(mode: int, requested: Array[StringName],
 		EventCampaignEligibility.Mode.MEDIUM:
 			count = 2
 		EventCampaignEligibility.Mode.COMPLETE:
-			count = 4
+			count = ALL_ENDING_IDS.size()
 		_:
 			return result
 	if mode == EventCampaignEligibility.Mode.COMPLETE:
@@ -450,16 +588,20 @@ func _replace_solo_encounters() -> void:
 					HexGrid.PPPBlockState.REVEALED]:
 			continue
 		encounters.append(coord)
-	encounters.shuffle()
+	for index in range(encounters.size() - 1, 0, -1):
+		var other := world_rng.randi_range(0, index)
+		var chosen: Vector2i = encounters[index]
+		encounters[index] = encounters[other]
+		encounters[other] = chosen
 	var item_count := ceili(float(encounters.size()) * 0.5)
 	if encounters.size() == 1:
-		item_count = randi_range(0, 1)
+		item_count = world_rng.randi_range(0, 1)
 	for index in encounters.size():
 		var coord := encounters[index]
 		var cell := solo_map.get_cell(coord)
 		var original := solo_map.get_ppp_block_data(coord)
 		var becomes_item := index < item_count and not candidates.is_empty()
-		var item := candidates[randi_range(0, candidates.size() - 1)] \
+		var item := candidates[world_rng.randi_range(0, candidates.size() - 1)] \
 			if becomes_item else null
 		solo_saved_encounters[coord] = {"original": original,
 			"revealers": solo_map.revealed_by_skill_ids.get(coord, []).duplicate(),
@@ -636,6 +778,50 @@ func needs_replacement_ally() -> bool:
 	return has_dead_playable_slot() and not get_unselected_playable_allies().is_empty()
 
 
+## Só um personagem do catálogo jogável já recrutado pode preencher a vaga.
+## A ordem de recrutamento em companion_states desempata sem sorteio.
+func first_promotable_playable_companion() -> EntityState:
+	var playable_ids: Dictionary = {}
+	for data in get_playable_catalog():
+		playable_ids[data.id] = true
+	for companion in companion_states:
+		if companion != null and companion.current_health > 0 \
+				and companion.data != null and playable_ids.has(companion.data.id):
+			return companion
+	return null
+
+
+func _promote_playable_companion(previous: EntityState) -> EntityState:
+	var replacement := first_promotable_playable_companion()
+	if replacement == null or previous == null or previous.playable_slot_id == &"":
+		return null
+	var index := active_entity_states.find(previous)
+	if index < 0:
+		return null
+	var old_companion_id := replacement.instance_id
+	companion_states.erase(replacement)
+	replacement.instance_id = previous.playable_slot_id
+	replacement.playable_slot_id = previous.playable_slot_id
+	replacement.owner_instance_id = &""
+	replacement.base_inventory_capacity = 12
+	replacement.turn_state = EntityState.TurnState.AVAILABLE
+	active_entity_states[index] = replacement
+	# Dependentes do antigo companheiro e do personagem morto continuam com
+	# um dono válido. A instância promovida conserva Vida, Skills e equipamento.
+	for companion in companion_states:
+		if companion != null and companion.owner_instance_id in [old_companion_id,
+				previous.instance_id]:
+			companion.owner_instance_id = replacement.instance_id
+	if wooden_dolls_by_owner.has(previous.instance_id):
+		wooden_dolls_by_owner[replacement.instance_id] = int(
+			wooden_dolls_by_owner.get(replacement.instance_id, 0)) + int(
+				wooden_dolls_by_owner[previous.instance_id])
+		wooden_dolls_by_owner.erase(previous.instance_id)
+		wooden_doll_changed.emit(replacement.instance_id, true)
+	playable_slot_replaced.emit(previous, replacement)
+	return replacement
+
+
 ## Morte definitiva é concluída depois da janela de ressurreição do Combate.
 ## Equipamentos viram cópias carregadas; as demais cópias são distribuídas
 ## sem duplicação, em ordem e destinatários sorteados. Maldições permanecem
@@ -648,12 +834,13 @@ func finalize_dead_playables(skill_manager: SkillManager,
 		random.randomize()
 	var equipment := EquipmentManager.new()
 	var inventory := InventoryManager.new()
-	for actor in active_entity_states:
+	for actor in active_entity_states.duplicate():
 		if actor == null or actor.current_health > 0 or actor in dead_playable_states:
 			continue
 		dead_playable_states.append(actor)
 		finalized.append(actor)
 		actor.turn_state = EntityState.TurnState.INACTIVE
+		var promoted := _promote_playable_companion(actor)
 		for slot in [ItemData.EquipmentSlot.WEAPON, ItemData.EquipmentSlot.ARMOR,
 				ItemData.EquipmentSlot.ACCESSORY]:
 			for entry in actor.equipped_in_slot(slot).duplicate():
@@ -678,7 +865,8 @@ func finalize_dead_playables(skill_manager: SkillManager,
 				return inventory.can_receive(candidate, entry.data))
 			if eligible.is_empty():
 				continue
-			var recipient: EntityState = eligible[random.randi_range(0, eligible.size() - 1)]
+			var recipient: EntityState = promoted if promoted in eligible else \
+				eligible[random.randi_range(0, eligible.size() - 1)]
 			actor.inventory_items.erase(entry)
 			entry.inventory_slot_index = -1
 			recipient.inventory_items.append(entry)
@@ -692,6 +880,12 @@ func finalize_dead_playables(skill_manager: SkillManager,
 				skill_manager.debuff_manager.apply_by_id(survivor, &"db_00010",
 					actor, 0, day)
 		playable_death_finalized.emit(actor, leftovers)
+	# Ausência de Ninguém Além de Você/Vórtice não é morte. Só a Vida real
+	# dos jogáveis, depois da janela de ressurreição, decide derrota.
+	if not active_entity_states.is_empty() and active_entity_states.all(
+			func(member: EntityState) -> bool:
+				return member == null or member.current_health <= 0):
+		mark_terminal(CampaignStatus.DEFEAT)
 	return finalized
 
 
@@ -750,7 +944,10 @@ func revive_dead_playable(actor: EntityState, wisher: EntityState,
 	next_companion_serial += 1
 	actor.playable_slot_id = &""
 	actor.base_inventory_capacity = 0
-	if not register_companion(wisher, actor, rng, skill_manager, false):
+	_resurrecting_companion = actor
+	var registered := register_companion(wisher, actor, rng, skill_manager, false)
+	_resurrecting_companion = null
+	if not registered:
 		return {"success": false}
 	return {"success": true, "as_companion": true, "actor": actor}
 
@@ -769,6 +966,54 @@ static func resurrect_entity(actor: EntityState, health_amount: int,
 	return true
 
 
+## A escolha do Amuleto consulta identidades estáveis, não sprites nem nomes.
+## Inclui quem morreu neste combate e os jogáveis mortos já arquivados.
+func get_dead_group_members() -> Array[EntityState]:
+	var dead: Array[EntityState] = []
+	for group in [active_entity_states, dead_playable_states, companion_states]:
+		for member in group:
+			if member != null and member.current_health <= 0 and member not in dead:
+				dead.append(member)
+	return dead
+
+
+func can_resurrect_group_member(target: EntityState, owner: EntityState) -> bool:
+	var playable_owner := resurrection_playable_owner(owner)
+	return target != null and owner != null and owner.current_health > 0 \
+		and playable_owner != null and playable_owner.current_health > 0 \
+		and target in get_dead_group_members()
+
+
+func resurrection_playable_owner(actor: EntityState) -> EntityState:
+	if actor in active_entity_states:
+		return actor
+	if actor in companion_states:
+		return get_playable_slot(actor.owner_instance_id)
+	return null
+
+
+func resurrect_group_member(target: EntityState, owner: EntityState,
+		skill_manager: SkillManager) -> Dictionary:
+	if skill_manager == null or not can_resurrect_group_member(target, owner):
+		return {"success": false}
+	var playable_owner := resurrection_playable_owner(owner)
+	if target in dead_playable_states:
+		var recovered := revive_dead_playable(target, playable_owner, skill_manager)
+		if recovered.get("success", false):
+			target.position = playable_owner.position
+		return recovered
+	if not resurrect_entity(target, target.max_health, skill_manager, true):
+		return {"success": false}
+	if target in companion_states:
+		var former_owner := get_playable_slot(target.owner_instance_id)
+		if former_owner == null or former_owner.current_health <= 0:
+			target.owner_instance_id = playable_owner.instance_id
+		target.position = playable_owner.position
+	else:
+		target.turn_state = EntityState.TurnState.AVAILABLE
+	return {"success": true, "actor": target}
+
+
 ## Regra compartilhada por QUALQUER efeito de ressurreição, presente ou futuro.
 static func grant_revive_immunity(actor: EntityState,
 		skill_manager: SkillManager) -> void:
@@ -780,49 +1025,73 @@ static func grant_revive_immunity(actor: EntityState,
 		skill_manager.debuff_manager.remove_debuff(actor, status_id)
 
 
-## Um equipável e um consumível por jogável. O tipo de arma é filtrado pela
-## Maestria própria; armaduras/acessórios continuam elegíveis para todos.
-func _grant_starting_items(states: Array[EntityState], rng: RandomNumberGenerator) -> void:
+## Padrão/Fácil: quatro itens na Curta/Média e três na Completa.
+## Caótico: exatamente dois em qualquer campanha, um equipável e um consumível.
+## Equipáveis nunca repetem o tipo/slot no mesmo kit.
+func _grant_starting_items(states: Array[EntityState], rng: RandomNumberGenerator,
+		mode: int, chosen_difficulty: int) -> void:
 	var inventory := InventoryManager.new()
 	var equipment_manager := EquipmentManager.new()
 	var skill_manager := SkillManager.new()
-	var equipment := inventory.get_common_starting_items(ItemData.ItemType.EQUIPMENT)
-	var consumables := inventory.get_common_starting_items(ItemData.ItemType.CONSUMABLE)
+	var catalog := inventory.get_common_starting_catalog()
+	var equipment: Array[ItemData] = catalog["equipment"]
+	var consumables: Array[ItemData] = catalog["consumables"]
 	var source := rng
 	if source == null:
 		source = RandomNumberGenerator.new()
 		source.randomize()
+	var chaotic := chosen_difficulty == GameDifficulty.Mode.CHAOTIC
+	var item_target := 2 if chaotic else \
+		(3 if mode == EventCampaignEligibility.Mode.COMPLETE else 4)
 	for actor in states:
 		var eligible: Array[ItemData] = []
+		var available_slots: Dictionary = {}
 		for item in equipment:
 			if item.equipment_slot != ItemData.EquipmentSlot.WEAPON \
 					or actor.data == null or actor.data.maestrias.is_empty() \
 					or actor.data.maestrias == [EntityData.Mastery.NONE] \
 					or item.mastery_granted in actor.data.maestrias:
 				eligible.append(item)
-		if not eligible.is_empty():
-			# O Bloco de Notas tem peso 2 apenas no sorteio do Jornalista.
-			var weighted := eligible.duplicate()
-			if actor.data.id == &"pj_00002":
-				for item in eligible:
-					if item.display_name == "Bloco de Notas":
-						weighted.append(item)
-			# O item inicial já ocupa sua vaga equipada; só o consumível fica
-			# entre os 12 espaços carregados. Usar a operação normal aplica
-			# Vida, Ataque, Estamina e Skills da própria cópia.
-			while not weighted.is_empty():
-				var index := source.randi_range(0, weighted.size() - 1)
-				var chosen: ItemData = weighted[index]
+				available_slots[item.equipment_slot] = true
+		var consumable_target := 1 if chaotic else source.randi_range(1, 2)
+		if not chaotic and available_slots.size() < item_target - consumable_target:
+			consumable_target = 2
+		var equipment_target := item_target - consumable_target
+		var weighted := eligible.duplicate()
+		# O Bloco de Notas tem peso 2 apenas no sorteio do Jornalista.
+		# A identidade do Resource, nunca o nome exibido, controla o peso.
+		if actor.data.id == &"pj_00002":
+			for item in eligible:
+				if item.id == &"ac_00010":
+					weighted.append(item)
+		var equipped_slots: Dictionary = {}
+		while equipped_slots.size() < equipment_target and not weighted.is_empty():
+			var chosen: ItemData = weighted[source.randi_range(0, weighted.size() - 1)]
+			if not inventory.add_item(actor, chosen):
 				weighted.erase(chosen)
-				if not inventory.add_item(actor, chosen):
-					continue
-				var entry := actor.inventory_items.back() as InventoryItemState
-				if equipment_manager.equip(actor, entry, skill_manager):
-					break
+				continue
+			var entry := actor.inventory_items.back() as InventoryItemState
+			if equipment_manager.equip(actor, entry, skill_manager):
+				equipped_slots[chosen.equipment_slot] = true
+				weighted = weighted.filter(func(candidate: ItemData) -> bool:
+					return candidate.equipment_slot != chosen.equipment_slot)
+			else:
 				actor.inventory_items.erase(entry)
-		if not consumables.is_empty():
-			inventory.add_item(actor,
-				consumables[source.randi_range(0, consumables.size() - 1)])
+				weighted.erase(chosen)
+		if chaotic and equipped_slots.is_empty():
+			# Catálogos futuros podem não oferecer equipável compatível a algum
+			# jogável. Mantém os 2 itens prometidos sem criar Resource inválido.
+			consumable_target = 2
+			push_warning("CampaignState: Caótico sem equipamento inicial compatível para %s; dois consumíveis concedidos." % actor.data.display_name)
+		# Equipáveis começam vestidos, como antes; os consumíveis ficam no
+		# inventário. Itens de mesmo slot nunca entram duas vezes no kit.
+		for _index in range(consumable_target):
+			if not consumables.is_empty():
+				inventory.add_item(actor,
+					consumables[source.randi_range(0, consumables.size() - 1)])
+	# SkillManager é Node e foi criado apenas como auxiliar do kit inicial.
+	# Sem free(), fica fora da árvore e sobrevive até o encerramento do Godot.
+	skill_manager.free()
 
 
 func get_playable_slot(slot_id: StringName) -> EntityState:
@@ -892,9 +1161,24 @@ func register_companion(owner: EntityState, companion: EntityState,
 			and companion.visual_variant_index < 0:
 		var last := companion.data.animation_variants.size() - 1
 		companion.visual_variant_index = rng.randi_range(0, last) if rng != null \
-			else randi_range(0, last)
+			else world_rng.randi_range(0, last)
 	companion.owner_instance_id = owner.instance_id
+	# Um inimigo recrutado deixa de usar o redutor exclusivo dos hostis do
+	# Água com Açúcar. A bonificação/desbonificação de outras fontes permanece.
+	if companion.sugar_enemy_attack_penalty > 0:
+		companion.attack += companion.sugar_enemy_attack_penalty
+		companion.sugar_enemy_attack_penalty = 0
 	companion.controller = EntityState.Controller.PLAYER
+	if companion.data != null and companion.data.id == &"en_00019":
+		# A regra hostil encerra o encontro sem Informações; se recrutado por
+		# outra fonte, o aliado usa o primeiro patamar jogável (2 de cada).
+		var district_cap := 5 if district == &"suburbio" else 10 \
+			if district == &"baixo_centro" else 15
+		var information_power := mini(maxi(2, obtained_information_ids.size()),
+			district_cap)
+		companion.attack = information_power
+		companion.max_stamina = information_power
+		companion.stamina_remaining = information_power
 	companion_states.append(companion)
 	if companion.data != null and &"jogavel" in companion.data.tags:
 		companion.base_inventory_capacity = 0
@@ -908,8 +1192,8 @@ func _grant_recruited_human_equipment(companion: EntityState,
 		rng: RandomNumberGenerator, skill_manager: SkillManager) -> void:
 	var source := rng
 	if source == null:
-		source = RandomNumberGenerator.new()
-		source.randomize()
+		source = world_rng
+	var owns_skills := skill_manager == null
 	var skills := skill_manager if skill_manager != null else SkillManager.new()
 	var inventory := InventoryManager.new()
 	var equipment := EquipmentManager.new()
@@ -932,6 +1216,8 @@ func _grant_recruited_human_equipment(companion: EntityState,
 			if equipment.equip(companion, entry, skills, self):
 				break
 			companion.inventory_items.erase(entry)
+	if owns_skills:
+		skills.free()
 
 
 func _all_playables_have_epic(slot: ItemData.EquipmentSlot) -> bool:
@@ -947,28 +1233,61 @@ func _all_playables_have_epic(slot: ItemData.EquipmentSlot) -> bool:
 
 func filter_uncollected_information(candidates: Array[Resource]) -> Array[Resource]:
 	var eligible: Array[Resource] = []
+	if is_terminal():
+		return eligible
 	for candidate in candidates:
 		var information := candidate as Informacao
 		if information == null or information.id == &"":
 			continue
-		if not obtained_information_ids.has(information.id):
+		if is_information_eligible(information.id, information.tipo) \
+				and not obtained_information_ids.has(information.id):
 			eligible.append(information)
 	return eligible
 
 
-## Chamar somente quando o bloco de Informação for ATIVADO e obtido.
-func record_information_obtained(information: Informacao) -> bool:
+## Única operação de domínio para hex, Evento, recompensa, Skill e debug.
+## Motivos explícitos impedem que o chamador substitua uma parte inválida por
+## outra ao acaso. O contador de mapas não participa da meta de vitória.
+func grant_information(information: Informacao,
+		source_id: StringName = &"", force_debug: bool = false) -> Dictionary:
+	if force_debug and (not OS.has_feature("debug") \
+			or not bool(ProjectSettings.get_setting("ppp/debug/enabled", false))):
+		return {"success": false, "code": &"debug_unavailable",
+			"reason": "A concessão forçada não está disponível nesta versão."}
+	if campaign_status != CampaignStatus.ACTIVE:
+		return {"success": false, "code": &"campaign_not_active",
+			"reason": "A campanha não está ativa."}
 	if information == null or information.id == &"":
-		push_warning("CampaignState: Informação sem ID não pode ser registrada.")
-		return false
-	if not obtained_information_ids.has(information.id):
-		obtained_information_order.append(information.id)
+		return {"success": false, "code": &"invalid_information",
+			"reason": "Esta Informação não possui um ID válido."}
+	if not force_debug and not is_information_eligible(information.id, information.tipo):
+		return {"success": false, "code": &"inactive_ending",
+			"reason": "Esta Informação não pertence aos desfechos ativos da campanha."}
+	if obtained_information_ids.has(information.id):
+		return {"success": false, "code": &"already_obtained",
+			"reason": "Esta Informação já foi obtida."}
+	obtained_information_order.append(information.id)
 	obtained_information_ids[information.id] = true
 	information_obtained_on_current_map = true
-	return true
+	var won := obtained_information_ids.size() == information_goal() \
+		and mark_terminal(CampaignStatus.VICTORY)
+	# Chefes de finalização poderão entrar nesta condição futuramente, sem
+	# transformar a quantidade de mapas em requisito.
+	return {"success": true, "code": &"forced_debug" if force_debug else &"granted", "information_id": information.id,
+		"source_id": source_id, "information_count": obtained_information_ids.size(),
+		"goal": information_goal(), "victory": won,
+		"impossible_in_normal_campaign": force_debug and not is_information_eligible(
+			information.id, information.tipo)}
+
+
+## Compatibilidade para chamadas antigas e testes; usa a mesma decisão.
+func record_information_obtained(information: Informacao) -> bool:
+	return grant_information(information).get("success", false)
 
 
 func forget_last_information() -> StringName:
+	if is_terminal():
+		return &""
 	while not obtained_information_order.is_empty():
 		var information_id: StringName = obtained_information_order.pop_back()
 		if obtained_information_ids.erase(information_id):
@@ -1077,4 +1396,5 @@ func record_generated_map(new_map: HexGrid) -> void:
 ## Isto indica apenas que a Informação liberou o botão. A futura máquina de
 ## Exploração ainda deverá impedir avanço durante bloco/combate pendente.
 func information_allows_round_advance() -> bool:
-	return information_obtained_on_current_map
+	return campaign_status == CampaignStatus.ACTIVE \
+		and information_obtained_on_current_map

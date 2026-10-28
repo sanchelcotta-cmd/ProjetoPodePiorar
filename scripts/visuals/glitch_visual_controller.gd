@@ -29,6 +29,7 @@ var _ui_text_material: ShaderMaterial
 var _pixel_material: ShaderMaterial
 var _sky_pixel_material: ShaderMaterial
 var _actor_pixel_material: ShaderMaterial
+var _actor_reduced_pixel_material: ShaderMaterial
 var _original_scene_materials: Dictionary = {}
 var _original_ui_materials: Dictionary = {}
 var _original_buttons: Dictionary = {}
@@ -60,6 +61,9 @@ func _ready() -> void:
 	_actor_pixel_material = ShaderMaterial.new()
 	_actor_pixel_material.shader = ACTOR_PIXEL_SHADER
 	_actor_pixel_material.set_shader_parameter("amount", 2.0)
+	_actor_reduced_pixel_material = ShaderMaterial.new()
+	_actor_reduced_pixel_material.shader = PIXEL_SHADER # Sem TIME, franjas ou wobble.
+	_actor_reduced_pixel_material.set_shader_parameter("amount", 2.0)
 	_world_layer = CanvasLayer.new()
 	_world_layer.layer = 5 # Depois do mapa, antes de toda a UI.
 	add_child(_world_layer)
@@ -82,7 +86,24 @@ func _ready() -> void:
 	var exploration := get_parent().get_node_or_null("ExplorationManager") as ExplorationManager
 	if exploration != null:
 		exploration.turn_finished.connect(_on_turn_finished)
+	var comfort := get_node_or_null("/root/VisualComfort")
+	if comfort != null:
+		comfort.changed.connect(_on_comfort_changed)
 	set_process(false)
+
+
+func _reduced() -> bool:
+	var comfort := get_node_or_null("/root/VisualComfort")
+	return comfort != null and bool(comfort.get("enabled"))
+
+
+func _on_comfort_changed(_enabled: bool) -> void:
+	if not active:
+		return
+	var remaining := _turns_until_clear
+	stop_effect()
+	start_effect()
+	_turns_until_clear = remaining
 
 
 func _screen_rect(material: ShaderMaterial) -> ColorRect:
@@ -150,8 +171,16 @@ func start_effect() -> void:
 	_distortion_remaining = 0.0
 	_gameboy_remaining = 0.0
 	_scan_elapsed = 0.0
-	_world_layer.show()
-	_terminal_layer.show()
+	_pixel_material.set_shader_parameter("amount", 4.0 if _reduced() else 8.0)
+	_sky_pixel_material.set_shader_parameter("amount", 2.0 if _reduced() else 4.0)
+	if _reduced():
+		# Variante acessível: apenas pixelização estática na cena; nenhum
+		# shader, banner, flash ou substituição de botão da interface.
+		_world_layer.hide()
+		_terminal_layer.hide()
+	else:
+		_world_layer.show()
+		_terminal_layer.show()
 	_resize_rects()
 	_set_mode(0)
 	_scan_visuals()
@@ -188,6 +217,9 @@ func stop_effect() -> void:
 				(button as Button).add_theme_color_override(name, saved[key])
 	_original_buttons.clear()
 	set_process(false)
+	var palette := get_node_or_null("/root/UIColorManager")
+	if palette != null:
+		palette.call("set_palette", str(palette.get("palette_id")), false)
 
 
 func _on_turn_finished(_actor: EntityState) -> void:
@@ -205,6 +237,8 @@ func _process(delta: float) -> void:
 	if _scan_elapsed >= 0.3:
 		_scan_elapsed = 0.0
 		_scan_visuals()
+	if _reduced():
+		return
 	if _gameboy_remaining > 0.0:
 		_gameboy_remaining -= delta
 		if _gameboy_remaining <= 0.0:
@@ -233,6 +267,8 @@ func _process(delta: float) -> void:
 func show_preview_mode(mode: int) -> void:
 	if not active:
 		start_effect()
+	if _reduced():
+		return
 	if mode == 2:
 		_set_mode(0)
 		_show_gameboy(0)
@@ -243,6 +279,11 @@ func show_preview_mode(mode: int) -> void:
 
 
 func _set_mode(mode: int) -> void:
+	if _reduced():
+		_world_layer.hide()
+		_flash_layer.hide()
+		_terminal_layer.hide()
+		return
 	_world_material.set_shader_parameter("mode", mode)
 	_world_material.set_shader_parameter("distortion_strength", 1.0 if mode == 1 else 0.0)
 	_ui_material.set_shader_parameter("aberration", 0.006 if mode == 1 else 0.001)
@@ -252,6 +293,8 @@ func _set_mode(mode: int) -> void:
 
 
 func _show_gameboy(color_index: int) -> void:
+	if _reduced():
+		return
 	var lights := [Color("b6e75a"), Color("ff9ad5"), Color("7be5ed")]
 	var darks := [Color("102816"), Color("2c1026"), Color("092c35")]
 	_flash_material.set_shader_parameter("mode", 2)
@@ -275,6 +318,8 @@ func _scan_visuals() -> void:
 					_pixelate_actor_tree(group)
 	if sky != null:
 		_pixelate_tree(sky, _sky_pixel_material)
+	if _reduced():
+		return
 	for child in scene.get_children():
 		if child is CanvasLayer and (child as CanvasLayer).layer >= 10 \
 				and child != _flash_layer:
@@ -298,7 +343,8 @@ func _pixelate_actor_tree(node: Node) -> void:
 		var item := node as CanvasItem
 		if not _original_scene_materials.has(item):
 			_original_scene_materials[item] = item.material
-			item.material = _actor_pixel_material
+			item.material = _actor_reduced_pixel_material if _reduced() \
+				else _actor_pixel_material
 	for child in node.get_children():
 		_pixelate_actor_tree(child)
 

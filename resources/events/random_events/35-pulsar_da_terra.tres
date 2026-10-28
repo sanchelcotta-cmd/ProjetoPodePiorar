@@ -23,6 +23,7 @@ math_operation = 1
 script = ExtResource("2_outcome")
 id = &"ev_00035_out_01"
 display_name = "A terra revela seus segredos."
+narrative_description = "A terra revela seus segredos. Vocês sentiram o impacto do tremor, mas pelo menos, agora conseguem enxergar alguns caminhos com mais clareza."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_reveal"), SubResource("Effect_damage")])
 
 [resource]

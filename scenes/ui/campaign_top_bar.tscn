@@ -97,7 +97,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_combat_border")
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -924.0
+offset_left = -1052.0
 offset_top = 7.0
 offset_right = -8.0
 offset_bottom = 51.0
@@ -129,6 +129,17 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_information")
 theme_override_styles/hover = SubResource("StyleBoxFlat_information_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_information_hover")
 text = "▣ INVENTÁRIO"
+
+[node name="JournalButton" type="Button" parent="Bar/Items"]
+custom_minimum_size = Vector2(126, 0)
+layout_mode = 2
+tooltip_text = "Abrir o livro completo de registros da campanha"
+theme_override_colors/font_color = Color(0.28, 0.88, 0.95, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_information")
+theme_override_styles/hover = SubResource("StyleBoxFlat_information_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_information_hover")
+text = "▤ REGISTROS"
 
 [node name="InformationDaySpace" type="Control" parent="Bar/Items"]
 custom_minimum_size = Vector2(52, 0)
@@ -188,14 +199,14 @@ text = "MODO:\nEXPLORAÇÃO"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MenuButton" type="MenuButton" parent="Bar/Items"]
+[node name="PauseButton" type="Button" parent="Bar/Items"]
 custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
-tooltip_text = "Menu"
+tooltip_text = "Pausar jogo"
 text = "☰"
 
 [node name="SoundButton" type="Button" parent="Bar/Items"]
 custom_minimum_size = Vector2(46, 0)
 layout_mode = 2
-tooltip_text = "Silenciar som"
+tooltip_text = "Abrir controles de áudio"
 text = "♪"

@@ -6,11 +6,11 @@
 [ext_resource type="Resource" uid="uid://8ta6ag3ik530" path="res://resources/skills/passives/causa_queimaduras_50.tres" id="4_nvakf"]
 [ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="5_jxciv"]
 
-[ext_resource type="Texture2D" path="res://sprites/itens_icons/armas_epicas_1.png" id="ppp_icon_sheet"]
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armas_epicas_2_transparent.png" id="ppp_icon_sheet"]
 
 [sub_resource type="AtlasTexture" id="ppp_item_icon"]
 atlas = ExtResource("ppp_icon_sheet")
-region = Rect2(28, 22, 47, 101)
+region = Rect2(772, 94, 158, 416)
 
 [resource]
 script = ExtResource("1_nvakf")

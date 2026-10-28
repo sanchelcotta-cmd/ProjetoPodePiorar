@@ -107,6 +107,8 @@ enum ConditionCombination {
 @export var required_damage_source_item_ids: Array[StringName] = []
 # Filtra a arma usada pelo portador no ataque que está começando.
 @export var required_attack_item_id: StringName
+# Para armas com ciclos visuais/funcionais (ex.: Luz e Sombra).
+@export var required_attack_aspect: StringName
 # Em ON_AFTER_ATTACK, não dispara em um ataque que errou ou causou zero dano.
 @export var requires_attack_to_deal_damage: bool = false
 # Uma criatura do mesmo EntityData já enfrentada ao menos N vezes antes deste encontro.

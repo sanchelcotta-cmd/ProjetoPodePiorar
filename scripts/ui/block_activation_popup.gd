@@ -10,6 +10,8 @@ extends CanvasLayer
 @export var player_skill_manager: PlayerSkillManager
 @export var event_executor: Node
 @export var combat_manager: Node
+@export var exploration: ExplorationManager
+@export var playable_party_view: PlayablePartyView
 
 @onready var overlay: Control = $Overlay
 @onready var frame_area: Control = $Overlay/Center/FrameArea
@@ -23,7 +25,7 @@ extends CanvasLayer
 @onready var item_icon: TextureRect = $Overlay/Center/FrameArea/Content/Body/ItemPreview/PreviewRow/ItemIcon
 @onready var missing_item_icon: Label = $Overlay/Center/FrameArea/Content/Body/ItemPreview/PreviewRow/MissingIcon
 @onready var item_info_button: Button = $Overlay/Center/FrameArea/Content/Body/ItemPreview/PreviewRow/InfoButton
-@onready var narrative_label: Label = $Overlay/Center/FrameArea/Content/Body/NarrativeScroll/Narrative
+@onready var narrative_label: Label = $Overlay/Center/FrameArea/Content/Body/NarrativeScroll/NarrativeInset/Narrative
 @onready var narrative_scroll: ScrollContainer = $Overlay/Center/FrameArea/Content/Body/NarrativeScroll
 @onready var feedback_label: Label = $Overlay/Center/FrameArea/Content/Body/Feedback
 @onready var buttons: HFlowContainer = $Overlay/Center/FrameArea/Content/Body/Buttons
@@ -35,16 +37,21 @@ const ACTION_GOLD := Color(0.52, 0.36, 0.055)
 const INVENTORY_BLUE := Color(0.075, 0.27, 0.53)
 const COMBAT_BLACK := Color(0.025, 0.025, 0.035)
 const BOLD_FONT := preload("res://fonts/UbuntuSans-Bold.ttf")
+const NARRATIVE_FONT := preload("res://scripts/ui/ui_narrative_font.gd")
 const WHITE_FRAME_SHADER := preload("res://shaders/ui_cyan_to_white_80.gdshader")
 const ITEM_PICKER_SCRIPT := preload("res://scripts/ui/event_item_picker.gd")
 const REWARD_DETAILS_SCRIPT := preload("res://scripts/ui/event_reward_details_panel.gd")
-const GENIE_SHEET_SCENE := preload("res://scenes/ui/character_sheet_panel.tscn")
+const GENIE_SHEET_PATH := "res://scenes/ui/character_sheet_panel.tscn"
+const HEX_ARRIVAL_PAUSE_SECONDS := 0.5
 
 var _context: Dictionary = {}
 var _pre_activation_pending := false
 var _result_shown := false
 var _outcome_reading := false
+var _theft_outcome_pages: Array[String] = []
 var _combat_conclusion_open := false
+var _pending_loot_decline_confirmation := false
+var _combat_loot_labels: Array[Label] = []
 var _combat_trap_open := false
 var _event_die_pending := false
 var _event_die_animating := false
@@ -67,6 +74,9 @@ var _genie_info_panel: PanelContainer
 var _genie_info_title: Label
 var _genie_info_description: Label
 var _genie_sheet: CharacterSheetPanel
+var _hex_arrival_token := 0
+var _hex_walk_pending := false
+var _hex_popup_prepared := false
 
 
 func _carreta_visual() -> Node:
@@ -89,6 +99,8 @@ func _stop_carreta_visual() -> void:
 func _ready() -> void:
 	title_label.add_theme_font_override("font", BOLD_FONT)
 	conclusion_title.add_theme_font_override("font", BOLD_FONT)
+	NARRATIVE_FONT.apply_label(narrative_label)
+	NARRATIVE_FONT.apply_label(skill_info_description)
 	_normal_frame_material = frame_rect.material
 	if block_manager != null:
 		block_manager.item_decision_requested.connect(show_block)
@@ -99,6 +111,10 @@ func _ready() -> void:
 		block_manager.block_finished.connect(_on_block_finished)
 	if player_skill_manager != null:
 		player_skill_manager.pre_activation_choice_requested.connect(_show_pre_activation)
+	if exploration != null:
+		exploration.actor_moved.connect(_on_exploration_actor_moved)
+		exploration.actor_teleported.connect(_on_exploration_actor_teleported)
+		exploration.map_entered.connect(_on_exploration_map_entered)
 	if event_executor != null:
 		event_executor.connect("outcome_prepared", _on_event_outcome_prepared)
 		event_executor.connect("result_ready", _on_event_result_ready)
@@ -144,6 +160,49 @@ func _ready() -> void:
 	_build_genie_info_panel()
 	_hide_reward_item_details()
 	overlay.hide()
+
+
+func _on_exploration_actor_moved(actor: EntityState,
+		_path: Array[Vector2i], _stamina_spent: int) -> void:
+	if actor == null or playable_party_view == null:
+		return
+	var visual := playable_party_view.visuals_by_slot.get(
+		actor.playable_slot_id) as PlayableActorVisual
+	if visual == null or not visual.is_inside_tree():
+		return
+	_hex_arrival_token += 1
+	_hex_walk_pending = true
+	_hex_popup_prepared = false
+	visual.walk_finished.connect(_on_hex_walk_finished.bind(_hex_arrival_token),
+		CONNECT_ONE_SHOT)
+
+
+func _on_hex_walk_finished(token: int) -> void:
+	await get_tree().create_timer(HEX_ARRIVAL_PAUSE_SECONDS).timeout
+	if not is_inside_tree() or token != _hex_arrival_token:
+		return
+	_hex_walk_pending = false
+	if _hex_popup_prepared and not _context.is_empty():
+		_present_block_overlay()
+	_hex_popup_prepared = false
+
+
+func _on_exploration_actor_teleported(_actor: EntityState,
+		_destination: Vector2i) -> void:
+	_hex_arrival_token += 1
+	_hex_walk_pending = true
+	_hex_popup_prepared = false
+	_on_hex_walk_finished(_hex_arrival_token)
+
+
+func _on_exploration_map_entered(_map: HexGrid) -> void:
+	_cancel_hex_arrival_wait()
+
+
+func _cancel_hex_arrival_wait() -> void:
+	_hex_arrival_token += 1
+	_hex_walk_pending = false
+	_hex_popup_prepared = false
 
 
 func _style_item_info_button(button: Button) -> void:
@@ -212,7 +271,20 @@ func show_block(context: Dictionary) -> void:
 		_show_event_buttons(content as EventData)
 	else:
 		return
+	if _hex_walk_pending:
+		_hex_popup_prepared = true
+		return
+	_present_block_overlay()
+
+
+func _present_block_overlay() -> void:
+	var content := _context.get("resource") as Resource
+	if content == null:
+		return
 	overlay.show()
+	get_node("/root/UISFX").call("play", &"hex_open")
+	if content is ItemData:
+		get_node("/root/UISFX").call("play", &"item_reward")
 	overlay.modulate.a = 0.0
 	create_tween().tween_property(overlay, "modulate:a", 1.0, 0.16)
 
@@ -305,6 +377,7 @@ func _build_genie_info_panel() -> void:
 	_genie_info_description = Label.new()
 	_genie_info_description.custom_minimum_size = Vector2(430, 90)
 	_genie_info_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	NARRATIVE_FONT.apply_label(_genie_info_description)
 	_genie_info_description.add_theme_font_size_override("font_size", 15)
 	_genie_info_description.add_theme_color_override("font_color", Color(0.94, 0.95, 0.96))
 	body.add_child(_genie_info_description)
@@ -322,7 +395,7 @@ func _show_genie_actor_sheet(actor: EntityState) -> void:
 	if actor == null:
 		return
 	if _genie_sheet == null:
-		_genie_sheet = GENIE_SHEET_SCENE.instantiate() as CharacterSheetPanel
+		_genie_sheet = (load(GENIE_SHEET_PATH) as PackedScene).instantiate() as CharacterSheetPanel
 		_genie_sheet.z_index = 310
 		overlay.add_child(_genie_sheet)
 		_genie_sheet.close_requested.connect(_hide_reward_item_details)
@@ -465,8 +538,18 @@ func _narrative(content: Resource) -> String:
 
 func _show_item_buttons(item: ItemData) -> void:
 	var owner := _context.get("actor") as EntityState
-	if item.item_type == ItemData.ItemType.CURSED and owner != null \
-			and owner.permanent_curse_immunity:
+	var campaign := block_manager.gerencia.campaign if block_manager != null \
+		and block_manager.gerencia != null else null
+	if CampaignState.is_cursed_item(item) and campaign != null \
+			and campaign.has_sacred_temple_blessing():
+		title_label.text = "MALDIÇÃO ANULADA"
+		_fit_title_inside_banner()
+		narrative_label.text = "O dia de hoje está abençoado."
+		item_preview.hide()
+		_add_button("OK", INVENTORY_BLUE, _acknowledge_curse_immunity, true)
+		return
+	if CampaignState.is_cursed_item(item) and owner != null \
+			and owner.is_curse_immune():
 		_add_button("OK", INVENTORY_BLUE, _acknowledge_curse_immunity, true)
 		_show_feedback("A proteção milagrosa impediu esta maldição.")
 		return
@@ -695,10 +778,28 @@ func _show_event_buttons(event: EventData) -> void:
 					func() -> void: _confirm_event({"refused": true}), true)
 		_:
 			_add_button("OK", ACTION_GOLD,
-				func() -> void: _confirm_event({}), true)
+				_preview_gnome_spawn.bind(event) if event.custom_rule == &"spawn_gnomes_3" \
+					and not event.outcomes.is_empty() \
+					and event.outcomes[0] != null \
+					and not event.outcomes[0].narrative_description.is_empty() \
+					else func() -> void: _confirm_event({}), true)
 	if buttons.get_child_count() == 0:
 		_add_button("PROSSEGUIR", ACTION_GOLD,
 			func() -> void: _confirm_event({}), true)
+
+
+func _preview_gnome_spawn(event: EventData) -> void:
+	var outcome := event.outcomes[0]
+	_outcome_reading = true
+	title_label.text = outcome.display_name.to_upper()
+	_fit_title_inside_banner()
+	narrative_label.text = outcome.narrative_description
+	_clear_buttons()
+	_add_button("OK", ACTION_GOLD, func() -> void:
+		_outcome_reading = false
+		_confirm_event({}), true)
+	feedback_label.hide()
+	get_node("/root/UISFX").call("play", &"hex_open")
 
 
 func _show_genie_wishes(event: EventData) -> void:
@@ -913,8 +1014,10 @@ func _show_symbiosis_choices(actor: EntityState,
 				and entry.data.rarity == ItemData.Rarity.EPIC:
 			epics.append(entry)
 	if not epics.is_empty():
+		var choice_rng := block_manager.gerencia.campaign.world_rng
+		var chosen_epic := epics[choice_rng.randi_range(0, epics.size() - 1)]
 		_add_button("ACEITAR SIMBIOSE", ACTION_GOLD,
-			_confirm_event.bind({"selected_item": epics.pick_random()}), true)
+			_confirm_event.bind({"selected_item": chosen_epic}), true)
 		return
 	# Sem Épica: a equipada prevalece. Sem equipada, a mochila sorteia
 	# uma arma comum. A evolução vem do craft_result do próprio Resource.
@@ -928,7 +1031,8 @@ func _show_symbiosis_choices(actor: EntityState,
 		if _can_evolve_symbiosis_weapon(entry):
 			carried.append(entry)
 	if not carried.is_empty():
-		var chosen := carried[randi_range(0, carried.size() - 1)]
+		var choice_rng := block_manager.gerencia.campaign.world_rng
+		var chosen := carried[choice_rng.randi_range(0, carried.size() - 1)]
 		_add_button("ACEITAR SIMBIOSE", ACTION_GOLD,
 			_confirm_event.bind({"selected_item": chosen}), true)
 		return
@@ -941,7 +1045,8 @@ func _can_evolve_symbiosis_weapon(entry: InventoryItemState) -> bool:
 	if entry == null or entry.data == null \
 			or entry.data.equipment_slot != ItemData.EquipmentSlot.WEAPON:
 		return false
-	for result in entry.data.craft_result:
+	for raw_result in entry.data.craft_result:
+		var result := raw_result as ItemData
 		if result != null and result.rarity == ItemData.Rarity.EPIC:
 			return true
 	return false
@@ -989,6 +1094,8 @@ func _on_event_outcome_prepared(event_context: Dictionary, preview: Dictionary) 
 		_execute_prepared_event()
 		return
 	var story := str(preview.get("narrative", "")).strip_edges()
+	if _event_die_pending:
+		story = story.replace("[resultado_dado]", "?")
 	if story.is_empty():
 		story = str(preview.get("outcome_name", "")).strip_edges()
 	if preview.get("coin_result", &"") != &"":
@@ -1014,6 +1121,9 @@ func _on_event_outcome_prepared(event_context: Dictionary, preview: Dictionary) 
 	# A consequência aparece como uma segunda leitura, separada da caixa
 	# inicial do Evento. Só fechar esta leitura aplica os efeitos.
 	overlay.show()
+	get_node("/root/UISFX").call("play", &"hex_open")
+	if reward_item != null:
+		get_node("/root/UISFX").call("play", &"item_reward")
 
 
 func _execute_prepared_event() -> void:
@@ -1046,6 +1156,20 @@ func _on_event_result_ready(_event_context: Dictionary, result: Dictionary) -> v
 	if _event_die_pending:
 		_finish_event_die_result(result)
 		return
+	for effect_result in result.get("effects", []):
+		if effect_result is Dictionary \
+				and effect_result.get("temple_blessing_nullified", false):
+			_show_event_effect_summary("MALDIÇÃO ANULADA",
+				"O dia de hoje está abençoado.")
+			return
+	if result.get("event_id") in [&"ev_00012", &"ev_00013"]:
+		_theft_outcome_pages.clear()
+		for detail in result.get("effects", []):
+			if detail is Dictionary and detail.has("theft_narrative"):
+				_theft_outcome_pages.append(str(detail["theft_narrative"]))
+		if not _theft_outcome_pages.is_empty():
+			_show_next_theft_outcome()
+			return
 	if result.get("event_id") == &"ev_00045":
 		for effect_result in result.get("effects", []):
 			if not effect_result is Dictionary:
@@ -1065,6 +1189,7 @@ func _on_event_result_ready(_event_context: Dictionary, result: Dictionary) -> v
 	var forgotten_information := ""
 	var forgot_result := false
 	var no_eligible_information := false
+	var information_not_granted := ""
 	var map_presence: Dictionary = {}
 	for effect_result in result.get("effects", []):
 		if not effect_result is Dictionary:
@@ -1076,6 +1201,8 @@ func _on_event_result_ready(_event_context: Dictionary, result: Dictionary) -> v
 			forgotten_information = str(effect_result["forgotten_information_title"])
 		if effect_result.get("no_eligible_information", false):
 			no_eligible_information = true
+		if effect_result.get("information_not_granted", false):
+			information_not_granted = str(effect_result.get("reason", ""))
 		if effect_result.has("presence"):
 			map_presence = effect_result["presence"]
 	if discovered_information != null:
@@ -1086,6 +1213,7 @@ func _on_event_result_ready(_event_context: Dictionary, result: Dictionary) -> v
 		_add_button("OK", ACTION_GOLD, _acknowledge_event_result, true)
 		feedback_label.hide()
 		overlay.show()
+		get_node("/root/UISFX").call("play", &"hex_open")
 		return
 	if forgot_result or no_eligible_information:
 		title_label.text = "RESULTADO DA MOEDA"
@@ -1100,6 +1228,20 @@ func _on_event_result_ready(_event_context: Dictionary, result: Dictionary) -> v
 		_add_button("OK", ACTION_GOLD, _acknowledge_event_result, true)
 		feedback_label.hide()
 		overlay.show()
+		get_node("/root/UISFX").call("play", &"hex_open")
+		return
+	if not information_not_granted.is_empty():
+		title_label.text = "INFORMAÇÃO NÃO CONCEDIDA"
+		_fit_title_inside_banner()
+		var other_effects := (result.get("effects", []) as Array).size() > 1
+		narrative_label.text = str(result.get("narrative", "")) + "\n\n" \
+			+ information_not_granted \
+			+ (" Os demais efeitos foram aplicados." if other_effects else "")
+		_clear_buttons()
+		_add_button("OK", ACTION_GOLD, _acknowledge_event_result, true)
+		feedback_label.hide()
+		overlay.show()
+		get_node("/root/UISFX").call("play", &"hex_open")
 		return
 	if not map_presence.is_empty():
 		var lines: Array[String] = []
@@ -1114,6 +1256,7 @@ func _on_event_result_ready(_event_context: Dictionary, result: Dictionary) -> v
 		_add_button("OK", ACTION_GOLD, _acknowledge_event_result, true)
 		feedback_label.hide()
 		overlay.show()
+		get_node("/root/UISFX").call("play", &"hex_open")
 		return
 	if result.get("event_id") == &"ev_00014":
 		for effect_result in result.get("effects", []):
@@ -1126,8 +1269,24 @@ func _on_event_result_ready(_event_context: Dictionary, result: Dictionary) -> v
 				_add_button("OK", ACTION_GOLD, _acknowledge_event_result, true)
 				feedback_label.hide()
 				overlay.show()
+				get_node("/root/UISFX").call("play", &"hex_open")
 				return
 	_acknowledge_event_result()
+
+
+func _show_next_theft_outcome() -> void:
+	if _theft_outcome_pages.is_empty():
+		_acknowledge_event_result()
+		return
+	title_label.text = "PERDEU, PERDEU!"
+	_fit_title_inside_banner()
+	narrative_label.text = _theft_outcome_pages.pop_front()
+	_clear_buttons()
+	_add_button("PRÓXIMO" if not _theft_outcome_pages.is_empty() else "OK",
+		ACTION_GOLD, _show_next_theft_outcome, true)
+	feedback_label.hide()
+	overlay.show()
+	get_node("/root/UISFX").call("play", &"hex_open")
 
 
 func _show_event_effect_summary(title: String, description: String) -> void:
@@ -1138,6 +1297,7 @@ func _show_event_effect_summary(title: String, description: String) -> void:
 	_add_button("OK", ACTION_GOLD, _acknowledge_event_result, true)
 	feedback_label.hide()
 	overlay.show()
+	get_node("/root/UISFX").call("play", &"hex_open")
 
 
 func _acknowledge_event_result() -> void:
@@ -1150,13 +1310,14 @@ func _acknowledge_event_result() -> void:
 func _finish_event_die_result(result: Dictionary) -> void:
 	if is_instance_valid(_roll_button):
 		_roll_button.text = _dice_result_text(result)
-	await get_tree().create_timer(0.8).timeout
-	if not is_inside_tree():
-		return
 	_event_die_pending = false
 	_event_die_animating = false
-	if event_executor == null or not event_executor.call("acknowledge_result"):
-		_show_feedback("O resultado foi aplicado, mas o bloco não pôde ser encerrado.")
+	var story := str(result.get("narrative", "")).strip_edges()
+	if not story.is_empty():
+		narrative_label.text = story
+	_clear_buttons()
+	_add_button("OK", ACTION_GOLD, _acknowledge_event_result, true)
+	overlay.show()
 
 
 func _animate_roll_preview() -> void:
@@ -1184,6 +1345,7 @@ func _on_event_resolution_blocked(_event_context: Dictionary, reason: String) ->
 	_result_shown = true
 	_event_die_animating = false
 	overlay.show()
+	get_node("/root/UISFX").call("play", &"hex_open")
 	_clear_buttons()
 	_show_feedback("Este resultado ainda não pode ser aplicado: " + reason)
 	if reason.contains("Libere espaço no inventário"):
@@ -1246,6 +1408,7 @@ func _confirm_encounter() -> void:
 func _on_combat_conclusion_requested(title: String, narrative: String,
 		rewards: Array[Resource]) -> void:
 	_combat_conclusion_open = true
+	_pending_loot_decline_confirmation = false
 	_context.clear()
 	skill_info.hide()
 	item_preview.hide()
@@ -1268,7 +1431,11 @@ func _on_combat_conclusion_requested(title: String, narrative: String,
 	($Overlay/Center/FrameArea/Content/Body/NarrativeScroll as ScrollContainer).visible = not narrative.is_empty()
 	feedback_label.hide()
 	_clear_rewards()
-	for reward in rewards:
+	_combat_loot_labels.clear()
+	var loot_count := (combat_manager.get("_loot_items") as Array).size() \
+		if combat_manager != null else 0
+	for reward_index in rewards.size():
+		var reward := rewards[reward_index]
 		if reward == null:
 			continue
 		var line := HBoxContainer.new()
@@ -1289,9 +1456,13 @@ func _on_combat_conclusion_requested(title: String, narrative: String,
 			image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			line.add_child(image)
 		var label := Label.new()
-		label.text = name
+		var is_loot := reward_index >= rewards.size() - loot_count
+		label.text = "%d/%d · %s" % [reward_index - (rewards.size() - loot_count) + 1,
+			loot_count, name] if is_loot else name
 		label.add_theme_color_override("font_color", Color(0.95, 0.84, 0.94))
 		line.add_child(label)
+		if is_loot:
+			_combat_loot_labels.append(label)
 		if reward is ItemData:
 			var info := Button.new()
 			info.text = "ⓘ"
@@ -1302,10 +1473,113 @@ func _on_combat_conclusion_requested(title: String, narrative: String,
 			line.add_child(info)
 		rewards_container.add_child(line)
 	rewards_container.visible = rewards_container.get_child_count() > 0
-	_clear_buttons()
-	_add_button("PROSSEGUIR", ACTION_GOLD, _confirm_combat_conclusion, true)
+	_refresh_combat_loot_controls()
 	overlay.modulate.a = 1.0
 	overlay.show()
+	if rewards.any(func(reward: Resource) -> bool: return reward is ItemData):
+		get_node("/root/UISFX").call("play", &"item_reward")
+
+
+func _refresh_combat_loot_controls() -> void:
+	_clear_buttons()
+	_update_combat_loot_labels()
+	var pending: Dictionary = combat_manager.call("get_pending_loot_item") \
+		if combat_manager != null else {}
+	if pending.is_empty():
+		feedback_label.hide()
+		_add_button("PROSSEGUIR", ACTION_GOLD, _confirm_combat_conclusion, true)
+		return
+	var item := pending["item"] as ItemData
+	_show_feedback("SAQUE %d/%d · %s — escolha quem vai guardar." % [
+		int(pending["index"]), int(pending["count"]), item.display_name])
+	var campaign := block_manager.gerencia.campaign if block_manager != null \
+		and block_manager.gerencia != null else null
+	var inventory := _inventory()
+	if campaign != null and inventory != null:
+		for recipient in campaign.active_entity_states:
+			if recipient == null or recipient.current_health <= 0:
+				continue
+			if inventory.can_receive(recipient, item):
+				_add_button("GUARDAR: %s" % recipient.visible_name().to_upper(),
+					INVENTORY_BLUE, _claim_combat_loot.bind(recipient), true)
+			else:
+				_add_button("TROCAR ITENS: %s" % recipient.visible_name().to_upper(),
+					INVENTORY_BLUE, _open_combat_loot_exchange.bind(recipient), true)
+	_add_button("RECUSAR ITEM", Color(0.38, 0.13, 0.16),
+		_confirm_combat_loot_decline, true)
+
+
+func _update_combat_loot_labels() -> void:
+	if combat_manager == null:
+		return
+	var items := combat_manager.get("_loot_items") as Array
+	var resolutions := combat_manager.get("_loot_resolutions") as Array
+	for index in mini(_combat_loot_labels.size(), items.size()):
+		var label := _combat_loot_labels[index]
+		var status := "PENDENTE"
+		if index < resolutions.size():
+			var resolution := resolutions[index] as Dictionary
+			status = "COM %s" % str(resolution.get("recipient", "")) \
+				if resolution.get("kind") == &"claimed" else "RECUSADO"
+		elif index == int(combat_manager.get("_loot_resolved_count")):
+			status = "ESCOLHENDO"
+		label.text = "%d/%d · %s · %s" % [index + 1, items.size(),
+			(items[index] as ItemData).display_name, status]
+		label.add_theme_color_override("font_color", Color(0.40, 0.93, 0.69) \
+			if status.begins_with("COM ") else Color(0.96, 0.40, 0.46) \
+			if status == "RECUSADO" else Color(0.93, 0.95, 0.97))
+
+
+func _claim_combat_loot(recipient: EntityState) -> void:
+	if combat_manager == null or not combat_manager.call("claim_pending_loot", recipient):
+		_show_feedback("Não foi possível guardar este item. Escolha outro destino.")
+		return
+	_refresh_combat_loot_controls()
+
+
+func _confirm_combat_loot_decline() -> void:
+	_pending_loot_decline_confirmation = true
+	_clear_buttons()
+	_show_feedback("Recusar este item? Ele não será colocado em nenhum inventário.")
+	_add_button("SIM, RECUSAR", Color(0.45, 0.11, 0.14),
+		_decline_combat_loot, true)
+	_add_button("VOLTAR", INVENTORY_BLUE, _cancel_combat_loot_decline, true)
+
+
+func _cancel_combat_loot_decline() -> void:
+	_pending_loot_decline_confirmation = false
+	_refresh_combat_loot_controls()
+
+
+func _decline_combat_loot() -> void:
+	if combat_manager == null or not combat_manager.call("decline_pending_loot"):
+		_show_feedback("A recusa não pôde ser concluída.")
+		return
+	_pending_loot_decline_confirmation = false
+	_refresh_combat_loot_controls()
+
+
+func _open_combat_loot_exchange(recipient: EntityState) -> void:
+	var pending: Dictionary = combat_manager.call("get_pending_loot_item") \
+		if combat_manager != null else {}
+	var item := pending.get("item") as ItemData
+	var top_bar := get_parent().get_node_or_null("CampaignTopBar") as CampaignTopBar
+	if item == null or top_bar == null or top_bar.group_inventory == null \
+			or not top_bar.group_inventory.begin_exchange(recipient, item,
+			_complete_combat_loot_exchange.bind(recipient), Callable(), false):
+		_show_feedback("Não foi possível abrir a troca de inventário.")
+		return
+	_waiting_inventory_close = true
+	overlay.hide()
+
+
+func _complete_combat_loot_exchange(outgoing: Array[InventoryItemState],
+		recipient: EntityState) -> bool:
+	if combat_manager == null or not combat_manager.call("exchange_pending_loot",
+			recipient, outgoing):
+		return false
+	_refresh_combat_loot_controls()
+	return true
 
 
 func _restore_normal_frame() -> void:
@@ -1393,6 +1667,7 @@ func _on_combat_trap_requested(event: EventData, _actor: EntityState,
 		_add_button("PROSSEGUIR", ACTION_GOLD, _confirm_combat_trap, true)
 	overlay.modulate.a = 1.0
 	overlay.show()
+	get_node("/root/UISFX").call("play", &"hex_open")
 
 
 func _confirm_combat_trap() -> void:
@@ -1441,7 +1716,9 @@ func _confirm_information() -> void:
 	if block_manager != null and block_manager.confirm_information():
 		overlay.hide()
 	else:
-		_show_feedback("Não foi possível registrar esta Informação.")
+		_show_feedback(str(block_manager.last_information_grant_result.get(
+			"reason", "Não foi possível registrar esta Informação.")) \
+			if block_manager != null else "Não foi possível registrar esta Informação.")
 
 
 func _input(event: InputEvent) -> void:
@@ -1494,7 +1771,13 @@ func _input(event: InputEvent) -> void:
 		return
 	if _combat_conclusion_open and event is InputEventKey and event.pressed \
 			and not event.echo and event.keycode == KEY_ESCAPE:
-		_confirm_combat_conclusion()
+		if _pending_loot_decline_confirmation:
+			_cancel_combat_loot_decline()
+		elif combat_manager != null and not combat_manager.call(
+				"get_pending_loot_item").is_empty():
+			_show_feedback("Escolha o destino ou recuse o saque antes de prosseguir.")
+		else:
+			_confirm_combat_conclusion()
 		get_viewport().set_input_as_handled()
 		return
 	if _outcome_reading:
@@ -1543,6 +1826,8 @@ func _add_button(label: String, color: Color, action: Callable,
 		enabled: bool, parent: Container = null) -> Button:
 	var button := Button.new()
 	button.text = label
+	if _context.get("resource") is EventData:
+		button.set_meta("ui_sfx_kind", &"outcome_click")
 	button.custom_minimum_size = Vector2(165, 42)
 	button.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	button.tooltip_text = label
@@ -1576,6 +1861,8 @@ func _add_button(label: String, color: Color, action: Callable,
 
 
 func _on_block_finished(_result: Dictionary) -> void:
+	_cancel_hex_arrival_wait()
+	_theft_outcome_pages.clear()
 	_context.clear()
 	_post_reveal_warning = false
 	_wooden_doll_prompt = false

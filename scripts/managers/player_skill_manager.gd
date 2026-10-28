@@ -12,6 +12,8 @@ signal pre_activation_choice_requested(
 	options: Array[SkillGrantState],
 )
 signal normal_activation_requested(actor: EntityState, coord: Vector2i)
+signal exploration_active_resolved(actor: EntityState, skill: ActiveSkillData,
+	coord: Vector2i)
 signal item_recipient_choice_requested(item: ItemData, options: Array[EntityState])
 
 @export var block_manager: BlockManager
@@ -93,6 +95,8 @@ func answer_pre_activation_choice(selected_grant: SkillGrantState = null) -> boo
 		actor, actor, selected_grant, block_manager.gerencia.campaign, coord,
 		block_manager, block_manager.gerencia.map_view, true
 	):
+		exploration_active_resolved.emit(actor,
+			selected_grant.skill as ActiveSkillData, coord)
 		return true
 	# Se o mapa mudou antes da resposta, a Skill não foi gasta. Mantemos a
 	# escolha pendente para que o controlador trate a situação explicitamente.
@@ -116,7 +120,7 @@ func use_exploration_active(actor: EntityState, grant: SkillGrantState, coord: V
 	var owner := gerencia.campaign.get_playable_slot(actor.owner_instance_id) \
 		if actor != null and actor in gerencia.campaign.companion_states else null
 	var off_turn_pet: bool = skill != null and skill.usable_while_owner_inactive \
-		and owner != null and exploration.current_actor != owner
+		and owner != null
 	var turn_owner: EntityState = owner if off_turn_pet else exploration.current_actor
 	if turn_owner == null or (not off_turn_pet \
 			and not skill_manager.debuff_manager.can_take_action(turn_owner)):
@@ -131,9 +135,13 @@ func use_exploration_active(actor: EntityState, grant: SkillGrantState, coord: V
 		if not exploration.arrive_from_event(coord, actor):
 			return false
 		exploration.refresh_map_feedback()
+		exploration_active_resolved.emit(actor, skill, coord)
 		return true
 	exploration.refresh_map_feedback()
-	return true if off_turn_pet else exploration.commit_current_turn_action()
+	var committed: bool = true if off_turn_pet else exploration.commit_current_turn_action()
+	if committed:
+		exploration_active_resolved.emit(actor, skill, coord)
+	return committed
 
 
 ## Mantém a chamada já usada pela tela/testes para Skills que escolhem hex.

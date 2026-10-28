@@ -20,6 +20,7 @@ metadata/_custom_type_script = "uid://bknff8de8c2u0"
 script = ExtResource("1_5sqxd")
 id = &"ev_00018_out_01"
 display_name = "Recupera vida"
+narrative_description = "Recupera vida\n\nUm alívio: você recupera toda a sua vida e remove todos os efeitos ruins que te aflingem."
 weight = 2
 effects = Array[ExtResource("2_lkn1g")]([SubResource("Resource_jyqi8"), SubResource("Resource_ng1ii")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"

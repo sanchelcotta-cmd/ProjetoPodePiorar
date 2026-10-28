@@ -8,6 +8,7 @@ signal details_requested(entry: InventoryItemState)
 signal inventory_changed
 signal equip_slot_requested(owner: EntityState, slot_type: int)
 signal chance_result_requested(message: String)
+signal craft_requested(owner: EntityState, item: ItemData)
 
 const PINK := Color(0.996, 0.169, 0.592)
 const GREEN := Color(0.11, 0.49, 0.20)
@@ -22,6 +23,7 @@ var entry: InventoryItemState
 var campaign: CampaignState
 var skill_manager: SkillManager
 var combat_manager: CombatManager
+var craft_exploration: ExplorationManager
 var equipped := false
 var companion_mode := false
 var companion_owner: EntityState
@@ -169,6 +171,7 @@ func _equip_companion_choice(donor: EntityState,
 		candidate: InventoryItemState) -> void:
 	if _equipment.equip_companion_from_playable(donor, actor, candidate,
 			skill_manager, campaign):
+		get_node("/root/UISFX").call("play", &"equip")
 		inventory_changed.emit()
 		close()
 	else:
@@ -282,7 +285,7 @@ func _build() -> void:
 	menu.custom_minimum_size = Vector2(166, 0)
 	menu.z_index = 11
 	menu.mouse_filter = Control.MOUSE_FILTER_STOP
-	menu.add_theme_stylebox_override("panel", _style(Color(0.10, 0.12, 0.15, 0.75), PINK, 1))
+	menu.add_theme_stylebox_override("panel", _style(Color(0.055, 0.075, 0.095, 0.96), PINK, 1))
 	add_child(menu)
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 12)
@@ -377,12 +380,21 @@ func _show_main_buttons() -> void:
 			ItemData.ItemType.CURSED:
 				# Maldições não são transferíveis nem descartáveis por ação comum.
 				pass
+	if campaign != null and skill_manager != null and CraftAvailability.status_for(
+			actor, item, campaign, skill_manager.inventory_manager,
+			craft_exploration) != CraftAvailability.Status.NONE:
+		rows.add_child(_button("Criar Épico", YELLOW, _request_craft))
 	rows.add_child(_button("Informações" if equipped else "Detalhes", YELLOW, _details))
 	if not equipped and item.item_type != ItemData.ItemType.CURSED:
 		var discard := _button("Descartar", BLACK, _ask_discard)
 		discard.disabled = not item.can_be_discarded
 		rows.add_child(discard)
 	menu.reset_size()
+
+
+func _request_craft() -> void:
+	if actor != null and entry != null and entry.data != null:
+		craft_requested.emit(actor, entry.data)
 
 
 func _show_companion_equipped_buttons() -> void:
@@ -444,6 +456,7 @@ func _show_companion_recipients() -> void:
 func _transfer_companion_to(recipient: EntityState) -> void:
 	if _equipment.unequip_companion_to_playable(actor, recipient, entry,
 			skill_manager, campaign):
+		get_node("/root/UISFX").call("play", &"unequip")
 		inventory_changed.emit()
 		close()
 	else:
@@ -453,6 +466,7 @@ func _transfer_companion_to(recipient: EntityState) -> void:
 func _unequip_companion_to_owner() -> void:
 	if companion_owner != null and _equipment.unequip_companion_to_playable(
 			actor, companion_owner, entry, skill_manager, campaign):
+		get_node("/root/UISFX").call("play", &"unequip")
 		inventory_changed.emit()
 		close()
 	else:
@@ -531,6 +545,7 @@ func _equip() -> void:
 func _equip_with_replacement(replacement: InventoryItemState) -> void:
 	if skill_manager != null and _equipment.equip(actor, entry, skill_manager, campaign,
 			replacement):
+		get_node("/root/UISFX").call("play", &"equip")
 		inventory_changed.emit()
 		close()
 	else:
@@ -546,7 +561,8 @@ func _slot_key(slot: ItemData.EquipmentSlot) -> StringName:
 
 
 func _unequip() -> void:
-	if skill_manager != null and _equipment.unequip(actor, entry, skill_manager):
+	if skill_manager != null and _equipment.unequip(actor, entry, skill_manager, campaign):
+		get_node("/root/UISFX").call("play", &"unequip")
 		inventory_changed.emit()
 		close()
 	else:
@@ -561,6 +577,8 @@ func _transfer(recipient: EntityState) -> void:
 	else:
 		completed = _inventory.transfer_item(actor, recipient, entry, campaign)
 	if completed:
+		if recipient != null and campaign != null and recipient in campaign.companion_states:
+			get_node("/root/UISFX").call("play", &"equip")
 		inventory_changed.emit()
 		close()
 	else:
@@ -683,7 +701,7 @@ func _cancel_discard() -> void:
 
 
 func _confirm_discard() -> void:
-	if _inventory.discard_item(actor, entry):
+	if _inventory.discard_item(actor, entry, campaign):
 		inventory_changed.emit()
 		close()
 	else:
@@ -691,6 +709,7 @@ func _confirm_discard() -> void:
 
 
 func _show_feedback(message: String) -> void:
+	get_node("/root/UISFX").call("play", &"blocked_button")
 	feedback.text = message
 	_question.text = "AÇÃO INDISPONÍVEL"
 	_cancel_button.text = "FECHAR"

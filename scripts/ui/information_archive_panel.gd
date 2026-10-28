@@ -8,7 +8,6 @@ const COLOR_BLUE := Color(0.16, 0.66, 0.86)
 const COLOR_GREEN := Color(0.35, 0.93, 0.61)
 const COLOR_GRAY := Color(0.44, 0.48, 0.51)
 const COLOR_TEXT := Color(0.88, 0.91, 0.91)
-const TRACE_CORNER := preload("res://sprites/ui/uielementx_00008.png")
 const VIEWPORT_MARGIN := 15.0
 
 var gerencia: GerenciaJogo
@@ -19,7 +18,6 @@ var selected_document_id: StringName = &""
 var _last_obtained_signature := ""
 
 var window: PanelContainer
-var free_space_trace: TextureRect
 var total_label: Label
 var folder_list: VBoxContainer
 var folder_buttons: Array[Button] = []
@@ -69,7 +67,6 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		_window_user_positioned = true
 		window.position = _clamp_window_position(window.position + event.relative)
-		_position_free_space_trace()
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT \
 			and not event.pressed:
@@ -91,12 +88,6 @@ func _clamp_window_position(candidate: Vector2) -> Vector2:
 		clampf(candidate.y, VIEWPORT_MARGIN,
 			maxf(VIEWPORT_MARGIN, viewport_size.y - window.size.y - VIEWPORT_MARGIN))
 	)
-
-
-func _position_free_space_trace() -> void:
-	if free_space_trace != null:
-		free_space_trace.position = window.position + Vector2(24.0,
-			window.size.y - free_space_trace.size.y - 20.0)
 
 
 func _process(_delta: float) -> void:
@@ -123,11 +114,6 @@ func _layout_window() -> void:
 		minf(viewport_size.y * 0.77, 570.0))
 	window.position = _clamp_window_position(window.position if _window_user_positioned
 		else (viewport_size - window.size) * 0.5)
-	if free_space_trace != null:
-		# Só cabe quando a coluna de pastas é curta; nunca por cima dos docs.
-		free_space_trace.visible = visible and folder_keys.size() <= 4 \
-			and window.size.y >= 480.0
-		_position_free_space_trace()
 
 
 func _build_interface() -> void:
@@ -137,15 +123,6 @@ func _build_interface() -> void:
 	window.focus_mode = Control.FOCUS_ALL
 	window.add_theme_stylebox_override("panel", _box(Color(0.025, 0.041, 0.045, 0.97), COLOR_BLUE, 2))
 	add_child(window)
-	free_space_trace = TextureRect.new()
-	free_space_trace.name = "FreeSpaceTrace"
-	free_space_trace.texture = TRACE_CORNER
-	free_space_trace.modulate.a = 0.18
-	free_space_trace.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	free_space_trace.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	free_space_trace.stretch_mode = TextureRect.STRETCH_SCALE
-	free_space_trace.size = Vector2(110.0, 85.0)
-	add_child(free_space_trace)
 	var outer := MarginContainer.new()
 	for side in ["left", "right", "top", "bottom"]:
 		outer.add_theme_constant_override("margin_%s" % side, 12)
@@ -246,9 +223,6 @@ func _collect_folders() -> void:
 		if folder != "" and folder not in folder_keys:
 			folder_keys.append(folder)
 	folder_keys.sort()
-	if free_space_trace != null:
-		free_space_trace.visible = visible and folder_keys.size() <= 4 \
-			and window.size.y >= 480.0
 
 
 func _rebuild_folder_list() -> void:

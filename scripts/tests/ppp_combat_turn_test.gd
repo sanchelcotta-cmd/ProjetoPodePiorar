@@ -89,7 +89,7 @@ func _run_test() -> void:
 		or companion.current_health < companion_health_before_ai \
 		or &"attack" in enemy_actions,
 		"A IA se aproxima ou tenta atacar; dano zero também conta como ação.")
-	check(enemy.max_stamina == 1,
+	check(enemy.max_stamina == 2,
 		"O Homem de Preto conserva a Stamina definida pela quantidade de Informações.")
 	check(combat.current_actor == actor and combat.is_player_turn(),
 		"Após o turno automático do inimigo, a iniciativa retorna ao jogável.")
@@ -188,9 +188,27 @@ func _run_test() -> void:
 	await create_timer(0.44).timeout
 	check(popup.overlay.visible and popup.conclusion_title.text == "Vocês venceram",
 		"O desfecho aparece antes de retornar à Exploração.")
+	var fallen_data := load(
+		"res://resources/entities/entities_general/cultista_encapuzado.tres") as EntityData
+	var fallen_companion := EntityState.from_encounter_member(fallen_data,
+		&"fallen_companion_test", 1, Vector2i(1, 1))
+	var surviving_companion := EntityState.from_encounter_member(fallen_data,
+		&"surviving_companion_test", 2, Vector2i(2, 1))
+	check(gerencia.campaign.register_companion(actor, fallen_companion)
+		and gerencia.campaign.register_companion(actor, surviving_companion),
+		"Aliados de teste integram o grupo no encerramento do encontro.")
+	fallen_companion.current_health = 0
+	surviving_companion.current_health = 1
+	while not combat.get_pending_loot_item().is_empty():
+		check(combat.claim_pending_loot(actor),
+			"O jogador confirma o destino de cada saque antes de prosseguir.")
+	popup._refresh_combat_loot_controls()
 	(popup.buttons.get_child(0) as Button).pressed.emit()
 	check(grid.ppp_map_mode == HexGrid.PPPMapMode.EXPLORATION and not block.is_busy(),
 		"Confirmar o desfecho restaura a Exploração.")
+	check(fallen_companion.current_health == 0
+		and surviving_companion.current_health == surviving_companion.max_health,
+		"Vida 0 persiste como morte; companheiro sobrevivente recupera Vida cheia.")
 	print("PPP combat turn: %d falhas" % failures)
 	quit(0 if failures == 0 else 1)
 

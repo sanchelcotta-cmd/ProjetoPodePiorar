@@ -47,6 +47,7 @@ func _ready() -> void:
 ## Não chamar enquanto um Evento/Combate ainda estiver sendo resolvido.
 func enter_map(reset_turn_cycle: bool, preferred_actor: EntityState = null) -> bool:
 	if gerencia == null or gerencia.campaign.current_map == null \
+			or gerencia.campaign.is_terminal() \
 			or block_manager == null or player_skill_manager == null:
 		return false
 	if block_manager.is_busy() or player_skill_manager.has_pending_choice():
@@ -145,7 +146,7 @@ func select_next_available_actor() -> bool:
 ## Outras ações de Exploração podem avisar que o turno já começou. Isso
 ## impede trocar de personagem depois de usar um item/Skill e antes de andar.
 func commit_current_turn_action() -> bool:
-	if current_actor == null or _awaiting_block:
+	if current_actor == null or _awaiting_block or gerencia.campaign.is_terminal():
 		return false
 	_turn_committed = true
 	return true
@@ -198,7 +199,9 @@ func get_emergency_destination() -> Vector2i:
 
 
 func _find_emergency_destination(actor: EntityState) -> Vector2i:
-	if actor == null or _any_playable_can_reach_block():
+	# A saída de emergência é individual: outro jogável alcançar um bloco não
+	# resolve o personagem ilhado (especialmente se ele for o último vivo).
+	if actor == null or _actor_can_reach_block(actor):
 		return EntityState.UNPLACED
 	var grid := gerencia.campaign.current_map
 	var nearest := 999
@@ -224,48 +227,33 @@ func _find_emergency_destination(actor: EntityState) -> Vector2i:
 	return chosen
 
 
-func _any_playable_can_reach_block() -> bool:
+func _actor_can_reach_block(actor: EntityState) -> bool:
 	var grid := gerencia.campaign.current_map
 	var debuffs := player_skill_manager.skill_manager.debuff_manager
-	for member in gerencia.campaign.active_entity_states:
-		if member == null or member.current_health <= 0 \
-				or member.temporarily_absent_from_map \
-				or member.turn_state not in [EntityState.TurnState.AVAILABLE,
-					EntityState.TurnState.TURNING] \
-				or not debuffs.can_take_action(member):
-			continue
-		var occupied: Dictionary = {}
-		for other in gerencia.campaign.active_entity_states:
-			if other != member and other != null and other.current_health > 0 \
-					and not other.temporarily_absent_from_map:
-				occupied[other.position] = true
-		for companion in gerencia.campaign.companion_states:
-			if companion != null and companion.current_health > 0 \
-					and grid.is_valid(companion.position):
-				occupied[companion.position] = true
-		if member.unlimited_exploration_movement:
-			for coord in grid.cells:
-				if grid.can_choose_ppp_destination(coord, member.position, occupied) \
-						and grid.get_ppp_block_resource(coord) != null:
-					return true
-			continue
-		var range_limit := member.stamina_remaining
-		if catastrophe_manager != null:
-			range_limit = catastrophe_manager.allowed_movement_distance(member, range_limit)
-		if _can_fly(member):
-			for coord in grid.cells:
-				if HexGrid.distance(member.position, coord) <= range_limit \
-						and grid.can_choose_ppp_destination(coord, member.position, occupied) \
-						and grid.get_ppp_block_resource(coord) != null:
-					return true
-			continue
-		var reachable := grid.get_ppp_reachable_hexes(member.position, range_limit)
-		for coord in grid.get_ppp_available_destinations(reachable, member.position, occupied):
-			if grid.get_ppp_block_resource(coord) == null:
-				continue
-			var path := grid.get_ppp_movement_path(member.position, coord, range_limit)
-			if debuffs.can_follow_path(member, path):
+	var occupied := _occupied_coords()
+	if actor.unlimited_exploration_movement:
+		for coord in grid.cells:
+			if grid.can_choose_ppp_destination(coord, actor.position, occupied) \
+					and grid.get_ppp_block_resource(coord) != null:
 				return true
+		return false
+	var range_limit := actor.stamina_remaining
+	if catastrophe_manager != null:
+		range_limit = catastrophe_manager.allowed_movement_distance(actor, range_limit)
+	if _can_fly(actor):
+		for coord in grid.cells:
+			if HexGrid.distance(actor.position, coord) <= range_limit \
+					and grid.can_choose_ppp_destination(coord, actor.position, occupied) \
+					and grid.get_ppp_block_resource(coord) != null:
+				return true
+		return false
+	var reachable := grid.get_ppp_reachable_hexes(actor.position, range_limit)
+	for coord in grid.get_ppp_available_destinations(reachable, actor.position, occupied):
+		if grid.get_ppp_block_resource(coord) == null:
+			continue
+		var path := grid.get_ppp_movement_path(actor.position, coord, range_limit)
+		if debuffs.can_follow_path(actor, path):
+			return true
 	return false
 
 
@@ -384,7 +372,7 @@ func _on_normal_activation_requested(actor: EntityState, coord: Vector2i) -> voi
 ## Passar sem mover é explícito; zerar Stamina sozinho não encerra o turno,
 ## pois o personagem pode ter outras ações antes de passar.
 func pass_turn() -> bool:
-	if current_actor == null or _awaiting_block:
+	if current_actor == null or _awaiting_block or gerencia.campaign.is_terminal():
 		return false
 	_finish_current_turn()
 	return true
@@ -447,6 +435,8 @@ func reactivate_extra_movement(actor: EntityState, grant: SkillGrantState) -> bo
 	_has_moved_this_turn = true
 	_turn_committed = true
 	_sync_view()
+	player_skill_manager.exploration_active_resolved.emit(actor,
+		grant.skill as ActiveSkillData, EntityState.UNPLACED)
 	turn_started.emit(actor)
 	return true
 
@@ -459,8 +449,9 @@ func _on_block_finished(result: Dictionary) -> void:
 		# EventExecutor terminará o teleporte/troca de mapa após o jogador ler
 		# e confirmar o Outcome. Não selecionar outro turno neste mapa antigo.
 		return
-	if result.get("completion_kind") == BlockManager.CompletionKind.INFORMATION_OBTAINED:
-		player_skill_manager.on_information_obtained(gerencia.campaign)
+	# GerenciaJogo já notificou as passivas pela concessão central; não duplicar.
+	if gerencia.campaign.is_terminal():
+		return
 	if current_actor.current_health > 0 and not current_actor.extra_movement_sources.is_empty():
 		_sync_view()
 		return
@@ -468,6 +459,8 @@ func _on_block_finished(result: Dictionary) -> void:
 
 
 func _finish_current_turn() -> void:
+	if gerencia != null and gerencia.campaign.is_terminal():
+		return
 	var finished := current_actor
 	if gerencia != null and gerencia.map_view != null:
 		gerencia.map_view.clear_temporary_inspection(finished)
@@ -486,7 +479,14 @@ func _finish_current_turn() -> void:
 			and player_skill_manager != null:
 		gerencia.campaign.finalize_dead_playables(
 			player_skill_manager.skill_manager)
+		if gerencia.campaign.is_terminal():
+			gerencia.request_terminal_record()
 	turn_finished.emit(finished)
+	# Um efeito no fim do turno pode ter matado o último jogável. Não iniciar
+	# outro ciclo nem escolher personagem depois da derrota definitiva.
+	if gerencia.campaign.is_terminal():
+		_sync_view()
+		return
 	if gerencia.campaign.solo_turns_remaining > 0:
 		# Só o dono recebe as três próximas vezes. Cada vez precisa de um
 		# ciclo novo para avançar turn_serial e disparar os gatilhos novamente.
@@ -590,6 +590,7 @@ func _sync_view() -> void:
 
 func _can_choose_turn() -> bool:
 	return gerencia != null and gerencia.campaign.current_map != null \
+		and not gerencia.campaign.is_terminal() \
 		and gerencia.campaign.current_map.ppp_map_mode == HexGrid.PPPMapMode.EXPLORATION \
 		and block_manager != null and not block_manager.is_busy() \
 		and player_skill_manager != null \

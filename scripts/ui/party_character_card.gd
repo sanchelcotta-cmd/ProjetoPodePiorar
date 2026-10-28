@@ -67,6 +67,7 @@ func _ready() -> void:
 	_dead_style = _empty_style.duplicate()
 	_dead_style.border_color = Color(0.12, 0.13, 0.14, 0.95)
 	_dead_style.bg_color = Color(0.008, 0.009, 0.012, 0.98)
+	_bind_palette()
 	_inactive_material = ShaderMaterial.new()
 	_inactive_material.shader = INACTIVE_SHADER
 	var disabled_button := StyleBoxFlat.new()
@@ -211,9 +212,17 @@ func set_current_turn(is_current: bool) -> void:
 	add_theme_stylebox_override("panel", _dead_style if _is_dead_slot else \
 		(_inactive_style if inactive else \
 		(_active_style if is_current else _empty_style)))
-	name_label.add_theme_color_override("font_color",
-		Color(0.55, 0.57, 0.59) if inactive else \
-		(ACTIVE_BORDER if is_current else EMPTY_BORDER))
+	var palette := get_node_or_null("/root/UIColorManager")
+	if palette != null:
+		palette.call("bind_control_style", self, "panel", "surface",
+			"card_dead" if _is_dead_slot else "card_inactive" if inactive else \
+			"card_active" if is_current else "card_empty")
+	var name_color := Color(0.55, 0.57, 0.59) if inactive else \
+		(ACTIVE_BORDER if is_current else EMPTY_BORDER)
+	if palette != null and str(palette.get("palette_id")) != "padrao":
+		name_color = palette.call("color", "card_inactive" if inactive else \
+			"card_active" if is_current else "card_empty")
+	name_label.add_theme_color_override("font_color", name_color)
 	if is_current and not inactive:
 		name_label.add_theme_font_override("font", BOLD_FONT)
 	else:
@@ -226,6 +235,33 @@ func set_current_turn(is_current: bool) -> void:
 	info_button.disabled = state == null
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if state != null \
 		else Control.CURSOR_ARROW
+
+
+func _bind_palette() -> void:
+	var palette := get_node_or_null("/root/UIColorManager")
+	if palette == null:
+		return
+	for pair in [[_empty_style, "card_empty"], [_active_style, "card_active"],
+			[_inactive_style, "card_inactive"], [_dead_style, "card_dead"]]:
+		palette.call("bind_style", pair[0], "surface", pair[1])
+	for pair in [[health_label, "danger"], [attack_label, "warning"],
+			[stamina_label, "progress"], [mastery_label, "structure"]]:
+		palette.call("bind_color", pair[0], "font_color", pair[1])
+	for slot in [$Margin/Content/TopRow/PortraitFrame,
+			$Margin/Content/Equipment/Weapon, $Margin/Content/Equipment/Armor,
+			$Margin/Content/Equipment/Accessory]:
+		var local_style := (slot as Control).get_theme_stylebox("panel") as StyleBoxFlat
+		if local_style != null:
+			var unique_style := local_style.duplicate() as StyleBoxFlat
+			(slot as Control).add_theme_stylebox_override("panel", unique_style)
+			palette.call("bind_style", unique_style, "surface", "neutral")
+			palette.call("bind_control_style", slot, "panel", "surface", "neutral")
+	for caption in [$Margin/Content/Equipment/Weapon/SlotContent/Caption,
+			$Margin/Content/Equipment/Armor/SlotContent/Caption,
+			$Margin/Content/Equipment/Accessory/SlotContent/Caption]:
+		palette.call("bind_color", caption, "font_color", "secondary")
+	palette.connect("palette_changed", func(_new_id: String) -> void:
+		set_current_turn(_current_turn))
 
 
 func set_actions_open(is_open: bool) -> void:

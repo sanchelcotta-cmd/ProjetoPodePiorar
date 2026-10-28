@@ -21,6 +21,7 @@ debuff = ExtResource("4_debuff")
 script = ExtResource("2_outcome")
 id = &"ev_00078_out_01"
 display_name = "A armadilha fecha sobre sua perna."
+narrative_description = "A armadilha fecha sobre sua perna.\nVocê sofre [resultado_dado] de dano e fica preso por um turno."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_damage"), SubResource("Effect_root")])
 
 [resource]

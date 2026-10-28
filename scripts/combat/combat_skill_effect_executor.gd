@@ -35,7 +35,9 @@ func can_execute(effect: SkillEffectData, context: Dictionary) -> bool:
 			var manager := context.get("skill_manager") as SkillManager
 			return manager != null and manager.can_apply_debuff_effect(effect, context)
 		SkillEffectData.EffectType.SUMMON_ENTITY:
-			if actor.controller != EntityState.Controller.AI:
+			if actor.controller != EntityState.Controller.AI \
+					or (actor.summoned_by_instance_id != &"" \
+					and not actor.summoned_can_summon):
 				return false
 			for id in _summon_ids(effect):
 				if _find_entity(id) != null:
@@ -52,8 +54,13 @@ func can_execute(effect: SkillEffectData, context: Dictionary) -> bool:
 			return target != null and target.data != null \
 				and not effect.passives_granted_on_success.is_empty()
 		SkillEffectData.EffectType.REVIVE_ENTITY:
+			var campaign := context.get("campaign") as CampaignState
 			return target != null and target.current_health <= 0 \
-				and target in combat._allies_of(actor)
+				and campaign != null \
+				and campaign.can_resurrect_group_member(target, actor) \
+				and (not effect.consume_source_item_on_success \
+				or combat.can_consume_skill_source_item(actor,
+					context.get("grant") as SkillGrantState))
 	return false
 
 
@@ -87,6 +94,11 @@ func execute(effect: SkillEffectData, context: Dictionary) -> Dictionary:
 			var count := effect.amount
 			if effect.maximum_amount > 0:
 				count = combat._rng.randi_range(effect.minimum_amount, effect.maximum_amount)
+			# As invocações elementais de abertura são UMA entidade, não um
+			# EncounterData inteiro nem uma instância de cada ID sorteável.
+			var skill := context.get("skill") as ActiveSkillData
+			if skill != null and &"invocacao_inicio" in skill.tags:
+				count = mini(count, 1)
 			var summoned: Array[EntityState] = []
 			for index in count:
 				if effect.maximum_active_instances > 0 and \
@@ -116,12 +128,16 @@ func execute(effect: SkillEffectData, context: Dictionary) -> Dictionary:
 			return {"success": not granted.is_empty(), "granted": granted,
 				"enemy_type": target.data.id}
 		SkillEffectData.EffectType.REVIVE_ENTITY:
-			if not CampaignState.resurrect_entity(target,
-				target.max_health if effect.revive_with_full_hp else 1, manager,
-				effect.revive_with_full_hp):
+			# O item precisa ser consumido antes da ressurreição: não permitir
+			# devolver um aliado à vida mantendo o Amuleto por falha de remoção.
+			if effect.consume_source_item_on_success and not combat.consume_skill_source_item(
+					actor, context["grant"] as SkillGrantState):
+				return {"success": false, "reason": "O item de sacrifício não está equipado."}
+			if not campaign.resurrect_group_member(target, actor, manager).get(
+					"success", false):
 				return {"success": false, "reason": "O alvo não está morto."}
-			if effect.consume_source_item_on_success:
-				combat.consume_skill_source_item(actor, context["grant"] as SkillGrantState)
+			combat.place_revived_ally(target, actor)
+			combat._sync_combat_view()
 			return {"success": true, "revived": target}
 	return {"success": false, "reason": "Tipo de efeito de Combate sem executor."}
 

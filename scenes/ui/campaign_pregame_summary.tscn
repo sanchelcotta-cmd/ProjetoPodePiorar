@@ -1,0 +1,123 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/campaign_pregame_summary.gd" id="1_summary"]
+[ext_resource type="Texture2D" path="res://sprites/ui/uielementx_00003.png" id="2_loading_bar"]
+
+[node name="CampaignPreGameSummary" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_summary")
+
+[node name="BlackBackground" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0, 0, 0, 1)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Summary" type="VBoxContainer" parent="Center"]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="Mode" type="Label" parent="Center/Summary"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.33, 0.88, 0.96, 1)
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+
+[node name="Endings" type="Label" parent="Center/Summary"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.96, 0.98, 1)
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Artwork" type="TextureRect" parent="Center/Summary"]
+custom_minimum_size = Vector2(520, 210)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Divider" type="ColorRect" parent="Center/Summary"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.25, 0.70, 0.79, 0.8)
+
+[node name="CharactersTitle" type="Label" parent="Center/Summary"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.75, 0.80, 1)
+theme_override_font_sizes/font_size = 13
+text = "PERSONAGENS INICIAIS"
+horizontal_alignment = 1
+
+[node name="Characters" type="Label" parent="Center/Summary"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94, 0.97, 0.99, 1)
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Status" type="Label" parent="Center/Summary"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.58, 0.58, 1)
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Start" type="Button" parent="Center/Summary"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "OK"
+
+[node name="Loading" type="CenterContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -90.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="Content" type="VBoxContainer" parent="Loading"]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+theme_override_constants/separation = 9
+
+[node name="Caption" type="Label" parent="Loading/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.83, 0.88, 1)
+theme_override_font_sizes/font_size = 15
+text = "Carregando…"
+horizontal_alignment = 1
+
+[node name="Progress" type="TextureProgressBar" parent="Loading/Content"]
+custom_minimum_size = Vector2(420, 9)
+layout_mode = 2
+max_value = 5.0
+step = 1.0
+texture_progress = ExtResource("2_loading_bar")

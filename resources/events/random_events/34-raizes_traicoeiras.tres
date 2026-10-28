@@ -15,6 +15,7 @@ debuff = ExtResource("4_enraizado")
 script = ExtResource("2_outcome")
 id = &"ev_00034_out_01"
 display_name = "As raízes o prendem."
+narrative_description = "As raízes o prendem.\n\nVocê está enraizado... Não poderá se mover por um turno."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

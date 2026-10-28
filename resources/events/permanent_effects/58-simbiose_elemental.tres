@@ -21,6 +21,7 @@ script = ExtResource("2_outcome")
 id = &"ev_00058_out_01"
 id = &"ev_00058_out_01"
 display_name = "A arma foi absorvida."
+narrative_description = "A arma foi absorvida.\nA partir de agora: A arma absorvida ocupa o espaço equipado permanentemente e não pode ser trocada. Preserva passivas, Maestria e bônus da sua versão Épica."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_absorb_weapon_and_grant_passive")])
 
 [resource]

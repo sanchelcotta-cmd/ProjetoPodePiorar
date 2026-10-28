@@ -26,6 +26,15 @@
 [ext_resource type="Script" uid="uid://cs7qdwj48070j" path="res://scripts/visuals/solo_event_visual_controller.gd" id="25_solo"]
 [ext_resource type="Script" uid="uid://e6eudg3txh14" path="res://scripts/managers/gnomes_2_manager.gd" id="26_gnomes2"]
 [ext_resource type="Script" uid="uid://bo6ahkklld5gs" path="res://scripts/visuals/gnome_hover_hint.gd" id="27_gnome_hover"]
+[ext_resource type="Script" uid="uid://cwi8qovl6cyml" path="res://scripts/campaign/campaign_journal_recorder.gd" id="28_journal"]
+[ext_resource type="Script" uid="uid://be5vlycvk0eqs" path="res://scripts/campaign/campaign_autosave_controller.gd" id="29_autosave"]
+[ext_resource type="Script" path="res://scripts/visuals/world_ambient_lighting.gd" id="30_ambient"]
+[ext_resource type="Script" path="res://scripts/visuals/grey_sky_rain.gd" id="31_rain"]
+[ext_resource type="Script" path="res://scripts/visuals/actor_ground_shadows.gd" id="32_shadows"]
+[ext_resource type="Script" path="res://scripts/visuals/grey_weather_grade.gd" id="33_grey_grade"]
+[ext_resource type="Script" path="res://scripts/ui/game_ambient_audio.gd" id="34_ambient_audio"]
+[ext_resource type="Script" path="res://scripts/ui/game_music_controller.gd" id="35_music_controller"]
+[ext_resource type="Script" path="res://scripts/ui/game_action_sfx.gd" id="36_action_sfx"]
 
 [node name="Node2D" type="Node2D" unique_id=577434666]
 script = ExtResource("1_map")
@@ -37,13 +46,31 @@ position = Vector2(395, 363)
 layer = -100
 script = ExtResource("9_parallax")
 
+[node name="WorldAmbientLighting" type="CanvasModulate" parent="." node_paths=PackedStringArray("gerencia", "sky", "sky_light")]
+script = ExtResource("30_ambient")
+gerencia = NodePath("../GerenciaJogo")
+sky = NodePath("../ParallaxBackground")
+sky_light = NodePath("../SkyFillLight")
+
+[node name="SkyFillLight" type="DirectionalLight2D" parent="."]
+energy = 0.0
+
 [node name="MapRoot" type="Node2D" parent="." unique_id=214109439]
 
 [node name="Background" type="Sprite2D" parent="MapRoot" unique_id=1010442680]
 z_index = -30
 
+[node name="BackgroundCopies" type="Node2D" parent="MapRoot"]
+z_index = -31
+
 [node name="Ground" type="Node2D" parent="MapRoot" unique_id=1965463702]
 z_index = -20
+
+[node name="ActorGroundShadows" type="Node2D" parent="MapRoot" node_paths=PackedStringArray("gerencia", "sky")]
+z_index = -11
+script = ExtResource("32_shadows")
+gerencia = NodePath("../../GerenciaJogo")
+sky = NodePath("../../ParallaxBackground")
 
 [node name="StartZone" type="Node2D" parent="MapRoot" unique_id=1555494476]
 z_index = -10
@@ -56,12 +83,13 @@ z_index = -8
 y_sort_enabled = true
 script = ExtResource("11_depth")
 
-[node name="PlayableActors" type="Node2D" parent="MapRoot/DepthSorted" unique_id=820761731 node_paths=PackedStringArray("gerencia", "exploration", "combat_manager")]
+[node name="PlayableActors" type="Node2D" parent="MapRoot/DepthSorted" unique_id=820761731 node_paths=PackedStringArray("gerencia", "exploration", "combat_manager", "skill_manager")]
 y_sort_enabled = true
 script = ExtResource("10_party")
 gerencia = NodePath("../../../GerenciaJogo")
 exploration = NodePath("../../../ExplorationManager")
 combat_manager = NodePath("../../../CombatManager")
+skill_manager = NodePath("../../../SkillManager")
 
 [node name="CompanionActors" type="Node2D" parent="MapRoot/DepthSorted" unique_id=1866738934 node_paths=PackedStringArray("gerencia", "exploration", "skill_manager", "combat_manager")]
 y_sort_enabled = true
@@ -87,6 +115,41 @@ y_sort_enabled = true
 script = ExtResource("20_catastrophe_visual")
 catastrophe_manager = NodePath("../../CatastropheManager")
 visual_root = NodePath("../DepthSorted/CatastropheVisuals")
+
+[node name="GreySkyRain" type="Node2D" parent="." node_paths=PackedStringArray("sky")]
+script = ExtResource("31_rain")
+sky = NodePath("../ParallaxBackground")
+
+[node name="GameAmbientAudio" type="Node" parent="." node_paths=PackedStringArray("gerencia", "sky")]
+script = ExtResource("34_ambient_audio")
+gerencia = NodePath("../GerenciaJogo")
+sky = NodePath("../ParallaxBackground")
+
+[node name="GameMusicController" type="Node" parent="." node_paths=PackedStringArray("gerencia")]
+script = ExtResource("35_music_controller")
+gerencia = NodePath("../GerenciaJogo")
+
+[node name="GameActionSFX" type="Node" parent="." node_paths=PackedStringArray("gerencia", "exploration", "combat_manager", "skill_manager", "companion_view", "playable_view")]
+script = ExtResource("36_action_sfx")
+gerencia = NodePath("../GerenciaJogo")
+exploration = NodePath("../ExplorationManager")
+combat_manager = NodePath("../CombatManager")
+skill_manager = NodePath("../SkillManager")
+companion_view = NodePath("../MapRoot/DepthSorted/CompanionActors")
+playable_view = NodePath("../MapRoot/DepthSorted/PlayableActors")
+
+[node name="GreyWeatherGrade" type="CanvasLayer" parent="." node_paths=PackedStringArray("sky")]
+layer = 10
+script = ExtResource("33_grey_grade")
+sky = NodePath("../ParallaxBackground")
+
+[node name="ColorRect" type="ColorRect" parent="GreyWeatherGrade"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
 [node name="GerenciaJogo" type="Node" parent="." unique_id=1592334703 node_paths=PackedStringArray("map_view")]
 script = ExtResource("2_campaign")
@@ -129,9 +192,10 @@ script = ExtResource("19_catastrophe")
 gerencia = NodePath("../GerenciaJogo")
 skill_manager = NodePath("../SkillManager")
 
-[node name="SkillManager" type="Node" parent="." unique_id=617302417 node_paths=PackedStringArray("catastrophe_manager")]
+[node name="SkillManager" type="Node" parent="." unique_id=617302417 node_paths=PackedStringArray("catastrophe_manager", "gerencia")]
 script = ExtResource("4_skill")
 catastrophe_manager = NodePath("../CatastropheManager")
+gerencia = NodePath("../GerenciaJogo")
 
 [node name="CombatManager" type="Node" parent="." unique_id=353317532 node_paths=PackedStringArray("gerencia", "block_manager", "skill_manager", "map_view", "enemy_visual_root", "event_executor")]
 script = ExtResource("21_combat")
@@ -184,17 +248,7 @@ disabled = true
 text = "Próxima fase"
 script = ExtResource("17_next_phase")
 
-[node name="DestinationDialog" type="ConfirmationDialog" parent="RoundUI" unique_id=282901623]
-title = "Próxima fase"
-dialog_text = "Escolha para onde o grupo irá:"
-
-[node name="DistrictOptions" type="OptionButton" parent="RoundUI/DestinationDialog" unique_id=469584896]
-offset_left = 20.0
-offset_top = 70.0
-offset_right = 380.0
-offset_bottom = 102.0
-
-[node name="RoundManager" type="Node" parent="." unique_id=446084339 node_paths=PackedStringArray("gerencia", "exploration", "block_manager", "player_skill_manager", "skill_manager", "catastrophe_manager", "advance_button", "destination_dialog", "district_options")]
+[node name="RoundManager" type="Node" parent="." unique_id=446084339 node_paths=PackedStringArray("gerencia", "exploration", "block_manager", "player_skill_manager", "skill_manager", "catastrophe_manager", "advance_button")]
 script = ExtResource("7_round")
 gerencia = NodePath("../GerenciaJogo")
 exploration = NodePath("../ExplorationManager")
@@ -203,8 +257,16 @@ player_skill_manager = NodePath("../PlayerSkillManager")
 skill_manager = NodePath("../SkillManager")
 catastrophe_manager = NodePath("../CatastropheManager")
 advance_button = NodePath("../RoundUI/NextPhaseButton")
-destination_dialog = NodePath("../RoundUI/DestinationDialog")
-district_options = NodePath("../RoundUI/DestinationDialog/DistrictOptions")
+
+[node name="CampaignJournalRecorder" type="Node" parent="." unique_id=564130922 node_paths=PackedStringArray("gerencia", "exploration", "player_skill_manager", "block_manager", "combat", "event_executor", "round_manager")]
+script = ExtResource("28_journal")
+gerencia = NodePath("../GerenciaJogo")
+exploration = NodePath("../ExplorationManager")
+player_skill_manager = NodePath("../PlayerSkillManager")
+block_manager = NodePath("../BlockManager")
+combat = NodePath("../CombatManager")
+event_executor = NodePath("../EventExecutor")
+round_manager = NodePath("../RoundManager")
 
 [node name="PartyStatusHUD" parent="." unique_id=1267966876 node_paths=PackedStringArray("gerencia", "exploration", "skill_manager", "combat_manager") instance=ExtResource("14_party_hud")]
 gerencia = NodePath("../GerenciaJogo")
@@ -221,11 +283,16 @@ party_hud = NodePath("../PartyStatusHUD")
 gerencia = NodePath("../GerenciaJogo")
 round_manager = NodePath("../RoundManager")
 
-[node name="BlockActivationPopup" parent="." unique_id=1380542902 node_paths=PackedStringArray("block_manager", "skill_manager", "player_skill_manager", "event_executor", "combat_manager") instance=ExtResource("16_block_popup")]
+[node name="BlockActivationPopup" parent="." unique_id=1380542902 node_paths=PackedStringArray("block_manager", "skill_manager", "player_skill_manager", "event_executor", "combat_manager", "exploration", "playable_party_view") instance=ExtResource("16_block_popup")]
 block_manager = NodePath("../BlockManager")
 skill_manager = NodePath("../SkillManager")
 player_skill_manager = NodePath("../PlayerSkillManager")
 event_executor = NodePath("../EventExecutor")
 combat_manager = NodePath("../CombatManager")
+exploration = NodePath("../ExplorationManager")
+playable_party_view = NodePath("../MapRoot/DepthSorted/PlayableActors")
+
+[node name="CampaignAutosaveController" type="Node" parent="." unique_id=1763315149]
+script = ExtResource("29_autosave")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2100316477]

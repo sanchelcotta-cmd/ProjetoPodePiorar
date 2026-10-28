@@ -1,6 +1,9 @@
 class_name PartyStatusHUD
 extends CanvasLayer
 
+const DIALOG_STYLE := preload("res://scripts/ui/game_dialog_style.gd")
+const NARRATIVE_FONT := preload("res://scripts/ui/ui_narrative_font.gd")
+
 ## Três quadros idênticos, sempre nas vagas Playable_1/2/3. A posição é de
 ## tela (CanvasLayer), então o painel não anda junto com o mapa.
 
@@ -32,10 +35,10 @@ extends CanvasLayer
 @onready var ally_scroll_arrows: HBoxContainer = $AllyDrawer/Margin/Content/ScrollArrows
 @onready var ally_scroll_up_button: Button = $AllyDrawer/Margin/Content/ScrollArrows/Up
 @onready var ally_scroll_down_button: Button = $AllyDrawer/Margin/Content/ScrollArrows/Down
-@onready var hex_choice: PanelContainer = $HexChoice
-@onready var hex_choice_title: Label = $HexChoice/Margin/Content/Header/Title
-@onready var hex_choice_close: Button = $HexChoice/Margin/Content/Header/Close
-@onready var hex_choice_buttons: VBoxContainer = $HexChoice/Margin/Content/Buttons
+@onready var hex_choice: PanelContainer = $HexChoiceLayer/HexChoice
+@onready var hex_choice_title: Label = $HexChoiceLayer/HexChoice/Margin/Content/Header/Title
+@onready var hex_choice_close: Button = $HexChoiceLayer/HexChoice/Margin/Content/Header/Close
+@onready var hex_choice_buttons: VBoxContainer = $HexChoiceLayer/HexChoice/Margin/Content/Buttons
 @onready var skill_info: PanelContainer = $SkillInfo
 @onready var skill_info_description: Label = $SkillInfo/Margin/Content/Description
 @onready var inventory_panel: CharacterInventoryPanel = $InventoryPanel
@@ -66,6 +69,7 @@ var _hex_choice_detail_scroll: ScrollContainer
 var _hex_choice_separator: HSeparator
 var _hex_choice_anchor := Vector2.ZERO
 var _companion_map_hit_buttons: Dictionary = {}
+var _companion_frame_bounds: Dictionary = {}
 var _map_debuff_hit_buttons: Dictionary = {}
 var _stat_hover_actor: EntityState
 var _stat_hover_key := ""
@@ -89,6 +93,9 @@ var _targeting_grant: SkillGrantState
 var _ally_target_choice_open := false
 var _ground_choice_open := false
 var _drag_pet_visual: CompanionActorVisual
+var _pending_cat_visual: CompanionActorVisual
+var _pending_cat_actor: EntityState
+var _pending_cat_press := Vector2.ZERO
 var _drop_preview_visual: CompanionActorVisual
 var _drop_actor: EntityState
 var _drop_grant: SkillGrantState
@@ -101,6 +108,9 @@ var _ally_scroll_first_index := 0
 var _ally_selected_index := 0
 var _ally_select: OptionButton
 var _ally_info: VBoxContainer
+var _ally_roster: VBoxContainer
+var _ally_owner_badge: PanelContainer
+var _ally_owner_badge_text: Label
 var _ally_portrait: TextureRect
 var _ally_summary: Label
 var _ally_stats: Label
@@ -109,16 +119,25 @@ var _ally_equipment: HBoxContainer
 var _ally_position_queued := false
 var _companion_action_choice_open := false
 var _companion_action_target: EntityState
+var _companion_actions_from_initiative := false
+var _initiative_action_anchor := Rect2()
+var _initiative_action_link: Line2D
 var _combat_pass_button: Button
 var _combat_ally_roll_button: Button
 var _combat_roll_animating := false
 var _revive_dialog: ConfirmationDialog
+var _attune_dialog: ConfirmationDialog
+var _attune_owner: EntityState
+var _attune_grant: SkillGrantState
+var _amulet_owner: EntityState
+var _amulet_grant: SkillGrantState
+var _amulet_target: EntityState
 var _tame_dialog: ConfirmationDialog
 var _tame_result_dialog: AcceptDialog
 var _archenemy_dialog: ConfirmationDialog
 var _recruitment_dialog: ConfirmationDialog
 var _recruitment_result_dialog: AcceptDialog
-var _chance_result_dialog: AcceptDialog
+var _chance_result_dialog: Control
 var _pending_tame_target: EntityState
 var _pending_tame_grant: SkillGrantState
 var _pending_archenemy_target: EntityState
@@ -128,6 +147,7 @@ var _craft_hint_from_item := false
 
 
 func _ready() -> void:
+	NARRATIVE_FONT.apply_label(skill_info_description)
 	for card in cards:
 		card.action_toggle_requested.connect(_on_action_toggle_requested)
 		card.inspect_requested.connect(_on_card_inspect_requested)
@@ -157,6 +177,13 @@ func _ready() -> void:
 	ally_scroll_up_button.pressed.connect(_on_ally_scroll_up)
 	ally_scroll_down_button.pressed.connect(_on_ally_scroll_down)
 	_build_ally_info()
+	_build_ally_owner_badge()
+	_initiative_action_link = Line2D.new()
+	_initiative_action_link.name = "InitiativeAllyActionLink"
+	_initiative_action_link.width = 2.0
+	_initiative_action_link.default_color = Color(0.22, 0.79, 0.91, 0.92)
+	add_child(_initiative_action_link)
+	_initiative_action_link.hide()
 	inventory_panel.close_requested.connect(_close_inventory)
 	inventory_panel.expansion_changed.connect(_on_inventory_expansion_changed)
 	inventory_panel.inventory_reordered.connect(func() -> void:
@@ -176,14 +203,14 @@ func _ready() -> void:
 	item_menu.name = "ItemMenu"
 	add_child(item_menu)
 	item_menu.combat_manager = combat_manager
+	item_menu.craft_exploration = exploration
 	item_menu.linked_details_panel = item_details_panel
 	item_menu.details_requested.connect(_show_item_details)
 	item_menu.inventory_changed.connect(_on_item_inventory_changed)
 	item_menu.equip_slot_requested.connect(_on_equip_slot_requested)
 	item_menu.chance_result_requested.connect(_show_chance_result)
-	_chance_result_dialog = AcceptDialog.new()
-	_chance_result_dialog.title = "Resultado da tentativa"
-	_chance_result_dialog.ok_button_text = "PROSSEGUIR"
+	item_menu.craft_requested.connect(_on_craft_requested)
+	_chance_result_dialog = preload("res://scripts/ui/item_chance_result_popup.gd").new()
 	add_child(_chance_result_dialog)
 	debuff_popup = DEBUFF_POPUP_SCRIPT.new() as Control
 	debuff_popup.name = "DebuffInfoPopup"
@@ -220,6 +247,7 @@ func _ready() -> void:
 	var info_style := (action_drawer.get_theme_stylebox("panel") as StyleBoxFlat).duplicate()
 	info_style.bg_color.a = 0.94
 	skill_info.add_theme_stylebox_override("panel", info_style)
+	_bind_palette()
 	_set_mouse_ignore_recursive(skill_info)
 	if gerencia != null:
 		gerencia.map_generated.connect(_on_map_generated)
@@ -251,6 +279,7 @@ func _ready() -> void:
 		_tame_dialog.confirmed.connect(_confirm_taming)
 		_tame_dialog.canceled.connect(_cancel_taming)
 		add_child(_tame_dialog)
+		DIALOG_STYLE.apply(_tame_dialog, "warning", 470.0, 78.0)
 		_tame_result_dialog = AcceptDialog.new()
 		_tame_result_dialog.title = "Adestramento Bestial"
 		_tame_result_dialog.ok_button_text = "OK"
@@ -258,6 +287,7 @@ func _ready() -> void:
 		_tame_result_dialog.exclusive = false
 		_tame_result_dialog.window_input.connect(_on_tame_result_window_input)
 		add_child(_tame_result_dialog)
+		DIALOG_STYLE.apply(_tame_result_dialog, "structure", 470.0, 70.0)
 		_archenemy_dialog = ConfirmationDialog.new()
 		_archenemy_dialog.title = "Arqui-inimigo"
 		_archenemy_dialog.ok_button_text = "SIM"
@@ -266,6 +296,7 @@ func _ready() -> void:
 		_archenemy_dialog.confirmed.connect(_confirm_archenemy)
 		_archenemy_dialog.canceled.connect(_cancel_archenemy)
 		add_child(_archenemy_dialog)
+		DIALOG_STYLE.apply(_archenemy_dialog, "warning", 470.0, 70.0)
 		_recruitment_dialog = ConfirmationDialog.new()
 		_recruitment_dialog.title = "A Experiência"
 		_recruitment_dialog.ok_button_text = "RECRUTAR"
@@ -274,6 +305,7 @@ func _ready() -> void:
 		_recruitment_dialog.confirmed.connect(_on_recruitment_confirmed)
 		_recruitment_dialog.canceled.connect(_on_recruitment_declined)
 		add_child(_recruitment_dialog)
+		DIALOG_STYLE.apply(_recruitment_dialog, "warning", 500.0, 82.0)
 		_recruitment_result_dialog = AcceptDialog.new()
 		_recruitment_result_dialog.title = "A Experiência"
 		_recruitment_result_dialog.ok_button_text = "PROSSEGUIR"
@@ -283,16 +315,28 @@ func _ready() -> void:
 		_recruitment_result_dialog.window_input.connect(
 			_on_recruitment_result_window_input)
 		add_child(_recruitment_result_dialog)
+		DIALOG_STYLE.apply(_recruitment_result_dialog, "structure", 470.0, 70.0)
 		_revive_dialog = ConfirmationDialog.new()
 		_revive_dialog.title = "Sacrifício Divino"
-		_revive_dialog.ok_button_text = "SACRIFICAR AMULETO"
-		_revive_dialog.cancel_button_text = "NÃO USAR"
-		_revive_dialog.confirmed.connect(func() -> void:
-			combat_manager.confirm_revive_choice(true))
-		_revive_dialog.canceled.connect(func() -> void:
-			combat_manager.confirm_revive_choice(false))
+		_revive_dialog.ok_button_text = "CONFIRMAR SACRIFÍCIO"
+		_revive_dialog.cancel_button_text = "VOLTAR"
+		_revive_dialog.confirmed.connect(_confirm_amulet_revive)
+		_revive_dialog.canceled.connect(_cancel_amulet_revive)
 		add_child(_revive_dialog)
-		combat_manager.revive_choice_requested.connect(_on_revive_choice_requested)
+		DIALOG_STYLE.apply(_revive_dialog, "danger", 560.0, 82.0)
+		_attune_dialog = ConfirmationDialog.new()
+		_attune_dialog.title = "Sintonizar Amuleto Divino"
+		_attune_dialog.ok_button_text = "SIM, SINTONIZAR"
+		_attune_dialog.cancel_button_text = "CANCELAR"
+		_attune_dialog.confirmed.connect(_confirm_amulet_attunement)
+		_attune_dialog.canceled.connect(_cancel_amulet_attunement)
+		add_child(_attune_dialog)
+		DIALOG_STYLE.apply(_attune_dialog, "warning", 590.0, 100.0)
+		DIALOG_STYLE.make_layer_backdrop(self, [
+			_tame_dialog, _tame_result_dialog, _archenemy_dialog,
+			_recruitment_dialog, _recruitment_result_dialog, _revive_dialog,
+			_attune_dialog,
+		])
 		combat_manager.turn_started.connect(_on_combat_turn_started)
 		combat_manager.turn_finished.connect(_on_combat_turn_finished)
 		combat_manager.die_rolled.connect(_on_combat_die_rolled)
@@ -317,8 +361,11 @@ func _input(event: InputEvent) -> void:
 	if hex_choice.visible and event is InputEventKey and event.pressed \
 			and event.keycode == KEY_ESCAPE:
 		_hide_hex_choice()
+		_hide_ally_owner_badge()
 		get_viewport().set_input_as_handled()
 		return
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		_hide_ally_owner_badge()
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE \
 			and _future_vision_targeting_actor != null:
 		_end_future_vision_targeting()
@@ -330,7 +377,11 @@ func _input(event: InputEvent) -> void:
 		_clear_companion_click_suppression.call_deferred()
 		return
 	if not event.pressed:
+		_pending_cat_visual = null
+		_pending_cat_actor = null
 		return
+	if _ally_owner_badge != null and _ally_owner_badge.visible:
+		_hide_ally_owner_badge()
 	if hex_choice.visible \
 			and not hex_choice.get_global_rect().has_point(event.position):
 		_hide_hex_choice()
@@ -350,6 +401,17 @@ func _input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
+	if _pending_cat_visual != null and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) \
+			and get_viewport().get_mouse_position().distance_to(_pending_cat_press) > 12.0:
+		var grant := _pet_skill(_pending_cat_actor, &"companion_active_001")
+		if grant != null and _skill_is_available(_pending_cat_actor, grant) \
+				and _pending_cat_visual.begin_mouse_carry():
+			_drag_pet_visual = _pending_cat_visual
+			_drop_actor = _pending_cat_actor
+			_drop_grant = grant
+			_suppress_companion_click = true
+		_pending_cat_visual = null
+		_pending_cat_actor = null
 	if _drag_pet_visual != null:
 		_drag_pet_visual.update_mouse_carry(get_viewport().get_mouse_position())
 	_update_map_hit_targets()
@@ -438,23 +500,16 @@ func _on_combat_turn_started(actor: EntityState, _cycle: int) -> void:
 	if not combat_manager.is_player_turn():
 		_close_actions()
 		return
-	var owner := actor
 	if actor in gerencia.campaign.companion_states:
-		owner = gerencia.campaign.get_playable_slot(actor.owner_instance_id)
+		# A ordem de iniciativa apresenta automaticamente as ações do aliado.
+		# Não duplicar esse painel dentro da caixa do dono.
+		_close_actions()
+		return
+	var owner := actor
 	var index := gerencia.campaign.active_entity_states.find(owner)
 	if index >= 0 and index < cards.size() and _open_card != cards[index]:
 		_on_action_toggle_requested(cards[index])
-	if actor in gerencia.campaign.companion_states and _open_card != null:
-		for companion_index in gerencia.campaign.get_companions_for_owner(owner.instance_id).size():
-			var companion := gerencia.campaign.get_companions_for_owner(owner.instance_id)[companion_index]
-			if companion == actor:
-				_ally_selected_index = companion_index
-				break
-		_rebuild_action_buttons()
-		ally_drawer.show()
-		ally_button.text = "ALIADO ◀"
-		_queue_ally_drawer_position()
-	elif _open_card != null:
+	if _open_card != null:
 		_rebuild_action_buttons()
 		_position_action_drawer(false)
 
@@ -554,8 +609,7 @@ func _on_active_skill_used(_actor: EntityState, grant: SkillGrantState,
 func _show_chance_result(message: String) -> void:
 	if _chance_result_dialog == null or message.is_empty():
 		return
-	_chance_result_dialog.dialog_text = message
-	_chance_result_dialog.popup_centered(Vector2i(480, 170))
+	_chance_result_dialog.call("show_message", message)
 
 
 func _on_delayed_created_item(_owner: EntityState, result: Dictionary) -> void:
@@ -608,6 +662,7 @@ func _build_hex_choice_details() -> void:
 	_hex_choice_detail.name = "RevealedDescription"
 	_hex_choice_detail.custom_minimum_size.x = 270.0
 	_hex_choice_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	NARRATIVE_FONT.apply_label(_hex_choice_detail)
 	_hex_choice_detail.add_theme_font_size_override("font_size", 13)
 	_hex_choice_detail.add_theme_color_override("font_color",
 		Color(0.92, 0.96, 0.98))
@@ -712,10 +767,11 @@ func _on_hex_overlay_pressed(coord: Vector2i, screen_position: Vector2,
 				if not _is_ally_target_skill(skill):
 					continue
 				var skill_button := _make_choice_button(skill.display_name,
-					Color(0.52, 0.36, 0.055))
+					Color(0.52, 0.36, 0.055), "skill")
 				skill_button.disabled = not skill_manager.can_use_combat_active(
 					combat_manager.current_actor, grant, gerencia.campaign,
 					combat_manager, entity)
+				_add_combat_use_count(skill_button, grant)
 				skill_button.pressed.connect(_on_combat_ally_skill_pressed.bind(
 					combat_manager.current_actor, grant, entity))
 				hex_choice_buttons.add_child(skill_button)
@@ -778,6 +834,10 @@ func _update_map_hit_targets() -> void:
 		for hit in _map_debuff_hit_buttons.values():
 			if hit is Button and hit.visible:
 				_hex_click_overlay.excluded_rects.append(hit.get_global_rect())
+		if not _in_combat():
+			for hit in _companion_map_hit_buttons.values():
+				if hit is Button and hit.visible:
+					_hex_click_overlay.excluded_rects.append(hit.get_global_rect())
 		map_hit_targets.move_child(_hex_click_overlay,
 			map_hit_targets.get_child_count() - 1)
 
@@ -861,17 +921,36 @@ func _companion_body_rect(companion: EntityState) -> Rect2:
 	var view := get_parent().get_node_or_null("MapRoot/DepthSorted/CompanionActors") \
 		as CompanionPartyView
 	if view != null:
+		var ground := view.ground_silhouettes_by_id.get(companion.instance_id) \
+			as EnemySilhouetteVisual
+		if ground != null and ground.visible:
+			var ground_transform := ground.get_global_transform_with_canvas()
+			var ground_size := Vector2(60.0 * absf(ground_transform.x.x),
+				145.0 * absf(ground_transform.y.y))
+			return Rect2(ground_transform.origin - Vector2(
+				ground_size.x * 0.5, ground_size.y), ground_size)
 		var visual := view.visuals_by_id.get(companion.instance_id) as CompanionActorVisual
 		if visual != null and visual.visible and visual.sprite != null:
 			var sprite := visual.sprite
 			var transform := sprite.get_global_transform_with_canvas()
-			var animation := visual.state.get_animation_variant() as SpriteSheetAnimationData
-			if animation == null:
+			var texture := sprite.sprite_frames.get_frame_texture(sprite.animation,
+				sprite.frame) if sprite.sprite_frames != null else null
+			if texture == null:
 				return Rect2()
-			var frame := animation.canvas_size
-			var size := Vector2(float(frame.x) * absf(transform.x.x) * 0.72,
-				float(frame.y) * absf(transform.y.y) * 0.88)
-			return Rect2(transform.origin - size * 0.5, size)
+			var texture_id := texture.get_instance_id()
+			if not _companion_frame_bounds.has(texture_id):
+				_companion_frame_bounds[texture_id] = texture.get_image().get_used_rect()
+			var used: Rect2i = _companion_frame_bounds[texture_id]
+			if not used.has_area():
+				return Rect2()
+			var local_center := Vector2(used.position) + Vector2(used.size) * 0.5 \
+				- texture.get_size() * 0.5
+			if sprite.flip_h:
+				local_center.x = -local_center.x
+			var center := transform * local_center
+			var size := Vector2(maxf(28.0, used.size.x * absf(transform.x.x) * 1.08),
+				maxf(28.0, used.size.y * absf(transform.y.y) * 1.08))
+			return Rect2(center - size * 0.5, size)
 	if combat_manager != null and combat_manager.enemy_visual_root != null:
 		for child in combat_manager.enemy_visual_root.get_children():
 			var silhouette := child as EnemySilhouetteVisual
@@ -912,16 +991,97 @@ func _on_map_companion_pressed(companion: EntityState) -> void:
 	if _in_combat():
 		_show_companion_combat_actions(companion, rect)
 		return
-	if not _in_combat() and companion.data != null \
-			and companion.data.tags.has(&"doguinho_caramelo"):
-		_show_dog_skill_choice(companion, rect.end + Vector2(8.0, -8.0))
-		return
-	if _show_combat_ally_target_choices(companion, rect.end + Vector2(8.0, -8.0)):
-		return
-	_show_inspect_bubble(companion, Vector2(rect.end.x - 4.0, rect.position.y - 4.0))
+	_show_ally_owner_badge(companion, rect)
+	if _companion_exploration_actives(companion).is_empty():
+		_open_character_sheet(companion, rect.get_center())
+	else:
+		_show_companion_exploration_actions(companion, rect)
 
 
-func _show_companion_combat_actions(companion: EntityState, body_rect: Rect2) -> void:
+func _companion_exploration_actives(companion: EntityState) -> Array[SkillGrantState]:
+	var result: Array[SkillGrantState] = []
+	if companion == null or skill_manager == null:
+		return result
+	for grant in skill_manager.get_active_grants(companion):
+		var skill := grant.skill as ActiveSkillData
+		if _is_displayed_skill(grant) and skill != null \
+				and skill.use_context != ActiveSkillData.UseContext.COMBAT \
+				and skill.automatic_triggers.is_empty():
+			result.append(grant)
+	return result
+
+
+func _show_companion_exploration_actions(companion: EntityState,
+		body_rect: Rect2) -> void:
+	_hide_hex_choice()
+	_clear_buttons(hex_choice_buttons)
+	var sheet := _make_choice_button("ABRIR FICHA", Color(0.075, 0.27, 0.53))
+	sheet.pressed.connect(func() -> void:
+		_hide_hex_choice()
+		_open_character_sheet(companion, body_rect.get_center()))
+	hex_choice_buttons.add_child(sheet)
+	for grant in _companion_exploration_actives(companion):
+		var skill := grant.skill as ActiveSkillData
+		var button := _make_choice_button(skill.display_name,
+			Color(0.52, 0.36, 0.055))
+		button.disabled = not _skill_is_available(companion, grant)
+		button.tooltip_text = ""
+		button.set_meta("skill_info_text", skill.description)
+		button.pressed.connect(_on_companion_exploration_skill_pressed.bind(
+			companion, grant, body_rect))
+		button.mouse_entered.connect(_show_skill_info.bind(button, skill))
+		button.mouse_exited.connect(_hide_skill_info)
+		hex_choice_buttons.add_child(button)
+	hex_choice_title.text = companion.visible_name().to_upper()
+	hex_choice.show()
+	hex_choice.reset_size()
+	var x := body_rect.get_center().x - hex_choice.size.x * 0.5
+	var y := body_rect.position.y - hex_choice.size.y - 68.0
+	_position_hex_choice(Vector2(x, y))
+
+
+func _on_companion_exploration_skill_pressed(companion: EntityState,
+		grant: SkillGrantState, body_rect: Rect2) -> void:
+	if not _skill_is_available(companion, grant):
+		return
+	var skill := grant.skill as ActiveSkillData
+	if skill == null:
+		return
+	_hide_hex_choice()
+	if skill.id == &"companion_active_001":
+		_targeting_actor = companion
+		_targeting_grant = grant
+		_show_ally_owner_badge(companion, body_rect,
+			"Escolha um hex para revelar; arrastar o Gatinho também funciona.")
+		return
+	if skill.target_mode == ActiveSkillData.TargetMode.TILE:
+		_targeting_actor = companion
+		_targeting_grant = grant
+		_show_ally_owner_badge(companion, body_rect,
+			"Escolha um hex para %s." % skill.display_name)
+		return
+	if exploration != null and exploration.player_skill_manager != null \
+			and exploration.player_skill_manager.use_exploration_active(
+				companion, grant, EntityState.UNPLACED, exploration):
+		return
+	_show_companion_exploration_actions(companion, body_rect)
+
+
+func show_initiative_companion_actions(companion: EntityState, anchor: Rect2) -> void:
+	if companion == null or combat_manager == null \
+			or companion not in gerencia.campaign.companion_states \
+			or combat_manager.current_actor != companion \
+			or not combat_manager.is_player_turn():
+		return
+	if hex_choice.visible and _companion_actions_from_initiative \
+			and _companion_action_target == companion:
+		_hide_hex_choice()
+		return
+	_show_companion_combat_actions(companion, anchor, true)
+
+
+func _show_companion_combat_actions(companion: EntityState, body_rect: Rect2,
+		from_initiative: bool = false) -> void:
 	if companion == null or companion.current_health <= 0 or combat_manager == null:
 		return
 	# A ficha lateral e a caixa contextual são alternativas, não camadas sobrepostas.
@@ -931,6 +1091,8 @@ func _show_companion_combat_actions(companion: EntityState, body_rect: Rect2) ->
 	_clear_buttons(hex_choice_buttons)
 	var acting := combat_manager.is_player_turn() \
 		and combat_manager.current_actor == companion
+	var forced_charm := acting and combat_manager.is_charm_forced_turn(companion)
+	var charmed := skill_manager != null and not skill_manager.debuff_manager.can_attack(companion)
 	var waiting := combat_manager._attack_animation_pending
 	var rolled := combat_manager.has_rolled_turn_die() if acting else false
 	var roll := _make_choice_button("JOGAR DADO" if not rolled else \
@@ -940,12 +1102,12 @@ func _show_companion_combat_actions(companion: EntityState, body_rect: Rect2) ->
 	roll.pressed.connect(_on_combat_roll_pressed)
 	hex_choice_buttons.add_child(roll)
 	var reposition := _make_choice_button("REPOSICIONAR", Color(0.11, 0.43, 0.17))
-	reposition.disabled = not acting or waiting or not rolled \
+	reposition.disabled = not acting or waiting or forced_charm or not rolled \
 		or companion.stamina_remaining <= 0 or combat_manager._turn_moved
 	reposition.pressed.connect(_on_combat_move_pressed)
 	hex_choice_buttons.add_child(reposition)
 	var attack := _make_choice_button("ATACAR", Color(0.55, 0.10, 0.12))
-	attack.disabled = not acting or waiting or not rolled \
+	attack.disabled = not acting or waiting or forced_charm or charmed or not rolled \
 		or combat_manager._attacks_used >= 1 + companion.extra_attacks_this_turn
 	attack.pressed.connect(_on_combat_attack_pressed)
 	hex_choice_buttons.add_child(attack)
@@ -974,9 +1136,10 @@ func _show_companion_combat_actions(companion: EntityState, body_rect: Rect2) ->
 					if not _is_ally_target_skill(skill):
 						continue
 					var target_button := _make_choice_button(skill.display_name,
-						Color(0.52, 0.36, 0.055))
+						Color(0.52, 0.36, 0.055), "skill")
 					target_button.disabled = not skill_manager.can_use_combat_active(
 						actor, grant, gerencia.campaign, combat_manager, companion)
+					_add_combat_use_count(target_button, grant)
 					target_button.tooltip_text = ""
 					target_button.set_meta("skill_info_text", skill.description)
 					target_button.pressed.connect(_on_combat_ally_skill_pressed.bind(
@@ -985,8 +1148,9 @@ func _show_companion_combat_actions(companion: EntityState, body_rect: Rect2) ->
 						target_button, skill))
 					target_button.mouse_exited.connect(_hide_skill_info)
 					hex_choice_buttons.add_child(target_button)
-	var pass_button := _make_choice_button("ENCERRAR TURNO", Color(0.24, 0.25, 0.27))
-	pass_button.disabled = not acting or waiting
+	var pass_button := _make_choice_button("PASSAR O TURNO", Color(0.24, 0.25, 0.27))
+	pass_button.disabled = not acting or waiting or forced_charm
+	_style_combat_pass_button(pass_button, companion)
 	pass_button.pressed.connect(_on_combat_end_pressed)
 	hex_choice_buttons.add_child(pass_button)
 	hex_choice_title.text = companion.visible_name().to_upper() \
@@ -994,9 +1158,17 @@ func _show_companion_combat_actions(companion: EntityState, body_rect: Rect2) ->
 	hex_choice_title.tooltip_text = ""
 	_companion_action_target = companion
 	_companion_action_choice_open = true
+	_companion_actions_from_initiative = from_initiative
+	_initiative_action_anchor = body_rect if from_initiative else Rect2()
 	hex_choice.show()
 	hex_choice.reset_size()
 	var screen := get_viewport().get_visible_rect().size
+	if from_initiative:
+		var under_card := Vector2(body_rect.get_center().x - hex_choice.size.x * 0.5,
+			body_rect.end.y + 9.0)
+		_position_hex_choice(under_card)
+		call_deferred("_refresh_initiative_action_link")
+		return
 	var x := clampf(body_rect.get_center().x - hex_choice.size.x * 0.5,
 		6.0, maxf(6.0, screen.x - hex_choice.size.x - 6.0))
 	# Prioriza a faixa livre das casas: o painel fica acima da cabeça e do
@@ -1005,6 +1177,68 @@ func _show_companion_combat_actions(companion: EntityState, body_rect: Rect2) ->
 	var y := maxf(56.0, minf(body_rect.position.y - 12.0,
 		safe_ground_y - 8.0) - hex_choice.size.y)
 	hex_choice.position = Vector2(x, y)
+
+
+func _refresh_initiative_action_link() -> void:
+	if not _companion_actions_from_initiative or not hex_choice.visible \
+			or _initiative_action_link == null:
+		return
+	_initiative_action_link.points = PackedVector2Array([
+		_initiative_action_anchor.get_center() + Vector2(0.0,
+			_initiative_action_anchor.size.y * 0.5),
+		Vector2(_initiative_action_anchor.get_center().x,
+			hex_choice.position.y - 3.0),
+		Vector2(hex_choice.get_global_rect().get_center().x,
+			hex_choice.position.y - 3.0),
+		Vector2(hex_choice.get_global_rect().get_center().x,
+			hex_choice.position.y)])
+	_initiative_action_link.show()
+
+
+func _combat_core_actions_exhausted(actor: EntityState) -> bool:
+	if actor == null or combat_manager == null or gerencia == null \
+			or not combat_manager.is_player_turn() \
+			or combat_manager.current_actor != actor:
+		return false
+	if combat_manager.can_roll_player_turn_die():
+		return false
+	var grid := gerencia.campaign.current_map
+	if grid == null:
+		return true
+	for coord in grid.cells:
+		if combat_manager.can_player_move(coord):
+			return false
+	for enemy in combat_manager._opponents_of(actor):
+		if enemy != null and enemy.current_health > 0 \
+				and combat_manager.can_player_attack(enemy.position):
+			return false
+	return true
+
+
+func _style_combat_pass_button(button: Button, actor: EntityState) -> void:
+	if button == null:
+		return
+	var exhausted := _combat_core_actions_exhausted(actor)
+	_paint_action_button(button, Color(0.68, 0.10, 0.16) \
+		if exhausted else Color(0.24, 0.25, 0.27), exhausted,
+		"pass" if exhausted else "")
+
+
+func _show_combat_pass_only(screen_position: Vector2) -> void:
+	if combat_manager == null or not combat_manager.is_player_turn():
+		return
+	_hide_hex_choice()
+	_clear_buttons(hex_choice_buttons)
+	var pass_button := _make_choice_button("PASSAR O TURNO", Color(0.68, 0.10, 0.16),
+		"pass_only")
+	pass_button.disabled = combat_manager._attack_animation_pending \
+		or combat_manager.is_charm_forced_turn(combat_manager.current_actor)
+	pass_button.pressed.connect(_on_combat_end_pressed)
+	hex_choice_buttons.add_child(pass_button)
+	hex_choice_title.text = "TURNO CONCLUÍDO"
+	hex_choice_title.tooltip_text = ""
+	hex_choice.show()
+	_position_hex_choice(screen_position + Vector2(16.0, -10.0))
 
 
 func _on_companion_map_skill_pressed(companion: EntityState,
@@ -1018,6 +1252,9 @@ func _refresh_companion_action_choice() -> void:
 			or _companion_action_target == null:
 		return
 	var target := _companion_action_target
+	if _companion_actions_from_initiative:
+		_show_companion_combat_actions(target, _initiative_action_anchor, true)
+		return
 	var hit := _companion_map_hit_buttons.get(target.instance_id) as Button
 	if hit == null or not hit.visible:
 		_hide_hex_choice()
@@ -1051,13 +1288,13 @@ func _on_companion_map_input(event: InputEvent, companion: EntityState) -> void:
 	var grant := _pet_skill(companion, &"companion_active_001")
 	if visual == null or grant == null or not _skill_is_available(companion, grant):
 		return
-	_hide_hex_choice()
-	if visual.begin_mouse_carry():
-		_drag_pet_visual = visual
-		_drop_actor = companion
-		_drop_grant = grant
-		_suppress_companion_click = true
-		get_viewport().set_input_as_handled()
+	# Clique curto abre ações; arrastar começa só após deslocar o mouse.
+	_pending_cat_visual = visual
+	_pending_cat_actor = companion
+	# gui_input usa coordenadas locais do botão; o limiar de arrasto usa viewport.
+	var hit := _companion_map_hit_buttons.get(companion.instance_id) as Button
+	_pending_cat_press = hit.get_global_transform_with_canvas() * event.position \
+		if hit != null else get_viewport().get_mouse_position()
 
 
 func _finish_cat_drag(screen_position: Vector2) -> void:
@@ -1187,6 +1424,29 @@ func _open_character_sheet(actor: EntityState, anchor: Vector2) -> void:
 
 func show_entity_sheet(actor: EntityState, anchor: Vector2) -> void:
 	_open_character_sheet(actor, anchor)
+
+
+func show_combat_actions_for(actor: EntityState, anchor: Rect2) -> void:
+	# Atalho da ordem de iniciativa: só o ator jogável do turno atual pode
+	# abrir ações. A ficha dos demais continua disponível separadamente.
+	if actor == null or combat_manager == null \
+			or not combat_manager.is_player_turn() \
+			or combat_manager.current_actor != actor:
+		return
+	if actor in gerencia.campaign.companion_states:
+		var body_rect := _companion_body_rect(actor)
+		_show_companion_combat_actions(actor,
+			body_rect if body_rect.size != Vector2.ZERO else anchor)
+		return
+	for card in cards:
+		if card.state != actor:
+			continue
+		if _open_card != card or not action_drawer.visible:
+			_on_action_toggle_requested(card)
+		else:
+			_rebuild_action_buttons()
+			_position_action_drawer(false)
+		return
 
 
 func _close_character_sheet() -> void:
@@ -1496,32 +1756,38 @@ func _rebuild_action_buttons() -> void:
 	_clear_buttons(ally_skill_buttons)
 	_clear_buttons(passive_buttons)
 	if _in_combat():
+		_set_ally_drawer_exploration_mode(false)
 		var acting := combat_manager != null and combat_manager.current_actor == actor \
 			and combat_manager.is_player_turn()
+		var forced_charm := acting and combat_manager.is_charm_forced_turn(actor)
+		var charmed := skill_manager != null and not skill_manager.debuff_manager.can_attack(actor)
 		var waiting_for_move := combat_manager != null \
 			and combat_manager._attack_animation_pending
 		var rolled := combat_manager != null and combat_manager.has_rolled_turn_die()
 		var can_roll := combat_manager != null and combat_manager.can_roll_player_turn_die()
-		walk_button.text = ("JOGAR DADO" if can_roll else "DADOS ESGOTADOS") if not rolled \
+		walk_button.text = "CHARME: CAMINHANDO" if forced_charm else \
+			("JOGAR DADO" if can_roll else "DADOS ESGOTADOS") if not rolled \
 			else "DADO %d · SOMA %d" % [
 			combat_manager._turn_die, actor.attack + combat_manager._turn_die]
 		walk_button.disabled = not acting or not can_roll or waiting_for_move
+		_paint_action_button(walk_button, Color(0.11, 0.43, 0.17), false, "core")
 		var reposition := _make_choice_button("REPOSICIONAR", Color(0.11, 0.43, 0.17))
-		reposition.disabled = not acting or waiting_for_move or not rolled or actor.stamina_remaining <= 0 \
+		reposition.disabled = not acting or waiting_for_move or forced_charm or not rolled or actor.stamina_remaining <= 0 \
 			or combat_manager._turn_moved
 		if not rolled:
 			reposition.tooltip_text = "Jogue o dado antes de se mover."
 		reposition.pressed.connect(_on_combat_move_pressed)
 		skill_buttons.add_child(reposition)
 		var attack_button := _make_choice_button("ATACAR", Color(0.55, 0.10, 0.12))
-		attack_button.disabled = not acting or waiting_for_move or not rolled or combat_manager._attacks_used >= \
+		attack_button.disabled = not acting or waiting_for_move or forced_charm or charmed or not rolled or combat_manager._attacks_used >= \
 			1 + actor.extra_attacks_this_turn
 		if not rolled:
 			attack_button.tooltip_text = "Jogue o dado antes de atacar."
 		attack_button.pressed.connect(_on_combat_attack_pressed)
 		skill_buttons.add_child(attack_button)
 		_combat_pass_button.show()
-		_combat_pass_button.disabled = not acting or waiting_for_move
+		_combat_pass_button.disabled = not acting or waiting_for_move or forced_charm
+		_style_combat_pass_button(_combat_pass_button, actor)
 		if skill_manager != null:
 			for grant in skill_manager.get_active_grants(actor):
 				if _is_displayed_skill(grant):
@@ -1552,6 +1818,7 @@ func _rebuild_action_buttons() -> void:
 		_update_ally_scroll()
 		return
 	_combat_pass_button.hide()
+	_paint_action_button(walk_button, Color(0.11, 0.43, 0.17))
 	walk_button.text = "ANDAR ATÉ"
 	var listed := 0
 	if skill_manager != null:
@@ -1563,7 +1830,7 @@ func _rebuild_action_buttons() -> void:
 	if actor.future_vision_uses > 0:
 		var vision_button := _make_choice_button(
 			"VISÃO DO FUTURO (%d)" % actor.future_vision_uses,
-			Color(0.52, 0.36, 0.055))
+			Color(0.52, 0.36, 0.055), "skill")
 		vision_button.disabled = not _open_card.is_available() \
 			or exploration == null or exploration.current_actor != actor
 		vision_button.tooltip_text = "Escolha qualquer bloco oculto do mapa para revelar seu tipo e efeito. Não há limite de alcance."
@@ -1572,7 +1839,8 @@ func _rebuild_action_buttons() -> void:
 		listed += 1
 	if gerencia != null and gerencia.campaign != null \
 			and actor.premonition_round_index == gerencia.campaign.get_round_index():
-		var premonition_button := _make_choice_button("PREMONIÇÃO", Color(0.52, 0.36, 0.055))
+		var premonition_button := _make_choice_button("PREMONIÇÃO",
+			Color(0.52, 0.36, 0.055), "skill")
 		premonition_button.disabled = not _open_card.is_available() \
 			or exploration == null or exploration.current_actor != actor \
 			or actor.premonition_used_turn_serial == actor.turn_serial
@@ -1582,26 +1850,13 @@ func _rebuild_action_buttons() -> void:
 		listed += 1
 	var companions: Array[EntityState] = []
 	if gerencia != null and gerencia.campaign != null:
-		for companion in gerencia.campaign.get_companions_for_owner(actor.instance_id):
-			if companion.current_health > 0:
+		for companion in gerencia.campaign.companion_states:
+			if companion != null and companion.current_health > 0:
 				companions.append(companion)
-	# Sem um companheiro vinculado, não existe botão de Aliado nem caixa-filha.
+	_set_ally_drawer_exploration_mode(true)
 	ally_button.visible = not companions.is_empty()
-	var has_off_turn_companion := false
-	for companion in companions:
-		for grant in skill_manager.get_active_grants(companion):
-			var companion_skill := grant.skill as ActiveSkillData
-			if companion_skill != null and companion_skill.usable_while_owner_inactive:
-				has_off_turn_companion = true
-				break
-	ally_button.disabled = not _open_card.is_available() and not has_off_turn_companion
-	_ally_selected_index = clampi(_ally_selected_index, 0, maxi(0, companions.size() - 1))
-	_refresh_ally_info(companions)
-	if not companions.is_empty() and skill_manager != null:
-		var selected_companion := companions[_ally_selected_index]
-		for grant in skill_manager.get_active_grants(selected_companion):
-			if _is_displayed_skill(grant):
-				_add_skill_button(ally_skill_buttons, selected_companion, grant)
+	ally_button.disabled = false
+	_refresh_ally_roster(companions)
 	if companions.is_empty():
 		ally_drawer.hide()
 		ally_button.text = "ALIADO ▶"
@@ -1626,6 +1881,12 @@ func _build_ally_info() -> void:
 	_ally_info.add_theme_constant_override("separation", 7)
 	content.add_child(_ally_info)
 	content.move_child(_ally_info, 1)
+	_ally_roster = VBoxContainer.new()
+	_ally_roster.name = "AllyRoster"
+	_ally_roster.add_theme_constant_override("separation", 5)
+	content.add_child(_ally_roster)
+	content.move_child(_ally_roster, 1)
+	_ally_roster.hide()
 	_ally_select = OptionButton.new()
 	_ally_select.item_selected.connect(_on_ally_selected)
 	_ally_info.add_child(_ally_select)
@@ -1697,6 +1958,84 @@ func _build_ally_info() -> void:
 	_ally_equipment = HBoxContainer.new()
 	_ally_equipment.add_theme_constant_override("separation", 6)
 	equipment_section.add_child(_ally_equipment)
+
+
+func _set_ally_drawer_exploration_mode(exploration_mode: bool) -> void:
+	if _ally_roster == null:
+		return
+	var content := ally_drawer.get_node("Margin/Content") as VBoxContainer
+	(content.get_node("Title") as Label).text = "ALIADOS" if exploration_mode else "ALIADO"
+	ally_drawer.custom_minimum_size.x = 270.0 if exploration_mode else 326.0
+	_ally_roster.visible = exploration_mode
+	_ally_info.visible = not exploration_mode
+	(content.get_node("SkillsHeading") as Label).visible = not exploration_mode
+	(content.get_node("AllyEquipmentSection") as VBoxContainer).visible = not exploration_mode
+	ally_scroll.visible = not exploration_mode
+	ally_scroll_arrows.visible = false if exploration_mode else ally_scroll_arrows.visible
+
+
+func _refresh_ally_roster(companions: Array[EntityState]) -> void:
+	if _ally_roster == null:
+		return
+	_clear_buttons(_ally_roster)
+	for companion in companions:
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 5)
+		_ally_roster.add_child(row)
+		var name_button := _make_choice_button(companion.visible_name(),
+			Color(0.075, 0.27, 0.53))
+		name_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		name_button.pressed.connect(_open_character_sheet.bind(companion,
+			ally_drawer.position + Vector2(ally_drawer.size.x, 18.0)))
+		row.add_child(name_button)
+		var info_button := _make_choice_button("ⓘ", Color(0.075, 0.27, 0.53))
+		info_button.custom_minimum_size = Vector2(34.0, 35.0)
+		info_button.tooltip_text = "Abrir ficha de %s" % companion.visible_name()
+		info_button.pressed.connect(_open_character_sheet.bind(companion,
+			ally_drawer.position + Vector2(ally_drawer.size.x, 18.0)))
+		row.add_child(info_button)
+
+
+func _build_ally_owner_badge() -> void:
+	_ally_owner_badge = PanelContainer.new()
+	_ally_owner_badge.name = "AllyOwnerBadge"
+	_ally_owner_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.025, 0.045, 0.06, 0.93)
+	style.border_color = Color(0.21, 0.78, 0.90)
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(3)
+	style.set_content_margin_all(6)
+	_ally_owner_badge.add_theme_stylebox_override("panel", style)
+	_ally_owner_badge_text = Label.new()
+	_ally_owner_badge_text.add_theme_font_size_override("font_size", 11)
+	_ally_owner_badge_text.add_theme_color_override("font_color", Color(0.91, 0.97, 0.98))
+	_ally_owner_badge.add_child(_ally_owner_badge_text)
+	add_child(_ally_owner_badge)
+	_ally_owner_badge.hide()
+
+
+func _show_ally_owner_badge(companion: EntityState, body_rect: Rect2,
+		instruction: String = "") -> void:
+	if _ally_owner_badge == null or gerencia == null:
+		return
+	var owner := gerencia.campaign.get_playable_slot(companion.owner_instance_id)
+	_ally_owner_badge_text.text = "Aliado de %s" % owner.visible_name() \
+		if owner != null else "Aliado do grupo"
+	if not instruction.is_empty():
+		_ally_owner_badge_text.text += "\n%s" % instruction
+	_ally_owner_badge.show()
+	_ally_owner_badge.reset_size()
+	var screen := get_viewport().get_visible_rect().size
+	_ally_owner_badge.position = Vector2(clampf(body_rect.end.x + 8.0,
+		6.0, maxf(6.0, screen.x - _ally_owner_badge.size.x - 6.0)),
+		clampf(body_rect.position.y, 56.0,
+			maxf(56.0, screen.y - _ally_owner_badge.size.y - 6.0)))
+
+
+func _hide_ally_owner_badge() -> void:
+	if _ally_owner_badge != null:
+		_ally_owner_badge.hide()
 
 
 func _current_ally() -> EntityState:
@@ -2053,6 +2392,9 @@ func _skill_list_signature(actor: EntityState) -> String:
 	for grant in skill_manager.get_active_grants(actor):
 		if _is_displayed_skill(grant):
 			ids.append(str(grant.get_instance_id()))
+			if _in_combat() and _shows_combat_use_count(grant.skill as ActiveSkillData):
+				ids.append("uses:%s:%d" % [grant.last_used_combat_id,
+					grant.uses_in_last_combat])
 	for grant in skill_manager.get_passive_grants(actor):
 		ids.append("passive:%s" % grant.get_instance_id())
 	for companion in gerencia.campaign.get_companions_for_owner(actor.instance_id):
@@ -2073,6 +2415,10 @@ func _add_skill_button(container: VBoxContainer, actor: EntityState,
 	button.custom_minimum_size.y = 46.0 if "\n" in button.text else 35.0
 	button.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 	button.disabled = not _skill_is_available(actor, grant)
+	_paint_action_button(button, Color(0.52, 0.36, 0.055), false,
+		"skill" if gerencia != null and gerencia.campaign != null \
+		and actor in gerencia.campaign.active_entity_states else "")
+	_add_combat_use_count(button, grant)
 	button.set_meta("skill_info_text",
 		skill.description + _reveal_unavailability_note(actor, grant))
 	button.tooltip_text = ""
@@ -2080,7 +2426,6 @@ func _add_skill_button(container: VBoxContainer, actor: EntityState,
 	button.pressed.connect(_on_skill_pressed.bind(actor, grant))
 	button.mouse_entered.connect(_show_skill_info.bind(button, skill))
 	button.mouse_exited.connect(_hide_skill_info)
-	_paint_action_button(button, Color(0.52, 0.36, 0.055))
 	# Toda Ativa adquirida (evento, efeito ou equipamento) conserva a origem
 	# dinâmica no SkillGrantState e recebe um contorno discreto, sem criar
 	# uma lista fixa de habilidades por personagem.
@@ -2093,6 +2438,58 @@ func _add_skill_button(container: VBoxContainer, actor: EntityState,
 				button.add_theme_stylebox_override(state, gold)
 	button.add_theme_font_size_override("font_size", 10)
 	container.add_child(button)
+
+
+func _shows_combat_use_count(skill: ActiveSkillData) -> bool:
+	return skill != null and skill.id in [&"playable_active_004", &"playable_active_006"]
+
+
+func _add_combat_use_count(button: Button, grant: SkillGrantState) -> void:
+	var skill := grant.skill as ActiveSkillData if grant != null else null
+	if button == null or not _in_combat() or not _shows_combat_use_count(skill) \
+			or combat_manager == null:
+		return
+	var spent := grant.uses_in_last_combat \
+		if grant.last_used_combat_id == combat_manager._combat_id else 0
+	var title := button.text
+	button.text = ""
+	button.custom_minimum_size.y = 49.0
+	var inset := MarginContainer.new()
+	inset.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	inset.offset_left = 5
+	inset.offset_right = -5
+	inset.offset_top = 3
+	inset.offset_bottom = -3
+	inset.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(inset)
+	var lines := VBoxContainer.new()
+	lines.alignment = BoxContainer.ALIGNMENT_CENTER
+	lines.add_theme_constant_override("separation", 1)
+	lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inset.add_child(lines)
+	var name_label := Label.new()
+	name_label.text = title
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.add_theme_font_size_override("font_size", 10)
+	name_label.add_theme_color_override("font_color",
+		Color(0.63, 0.68, 0.72) if button.disabled else Color(0.95, 0.97, 0.99))
+	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lines.add_child(name_label)
+	var count_label := Label.new()
+	count_label.name = "CombatUses"
+	count_label.text = "%d de %d gastos" % [spent, skill.max_uses_per_combat]
+	count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	count_label.add_theme_font_size_override("font_size", 9)
+	count_label.add_theme_color_override("font_color",
+		Color(0.59, 0.64, 0.68) if button.disabled else Color(0.87, 0.91, 0.94))
+	count_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lines.add_child(count_label)
+	button.set_meta("combat_uses_text", count_label.text)
+	if not button.disabled and str(button.get_meta("action_color_intent", "")) == "skill":
+		var palette := get_node_or_null("/root/UIColorManager")
+		if palette != null:
+			palette.call("bind_color", name_label, "font_color", "action_skill_text")
+			palette.call("bind_color", count_label, "font_color", "action_skill_subtext")
 
 
 func _reveal_unavailability_note(actor: EntityState, grant: SkillGrantState) -> String:
@@ -2143,7 +2540,7 @@ func _build_passive_info_popup() -> void:
 	passive_info_popup.custom_minimum_size.x = 305.0
 	passive_info_popup.z_index = 105
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.10, 0.12, 0.15, 0.82)
+	style.bg_color = Color(0.055, 0.075, 0.095, 0.96)
 	style.border_color = Color(0.60, 0.66, 0.70, 0.95)
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(3)
@@ -2174,6 +2571,7 @@ func _build_passive_info_popup() -> void:
 	description.name = "Description"
 	description.custom_minimum_size.x = 280.0
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	NARRATIVE_FONT.apply_label(description)
 	description.add_theme_font_size_override("font_size", 13)
 	description.add_theme_color_override("font_color", Color(0.96, 0.97, 0.98))
 	content.add_child(description)
@@ -2244,6 +2642,13 @@ func _skill_is_available(actor: EntityState, grant: SkillGrantState) -> bool:
 		var combat_skill := grant.skill as ActiveSkillData
 		if combat_skill == null or combat_skill.use_context == ActiveSkillData.UseContext.EXPLORATION:
 			return false
+		if combat_skill.id == &"item_active_003":
+			return not combat_manager._attack_animation_pending \
+				and not combat_manager.is_charm_forced_turn(actor) \
+				and (skill_manager.catastrophe_manager == null \
+				or not skill_manager.catastrophe_manager.skills_suppressed(
+					HexGrid.PPPMapMode.COMBAT, false)) \
+				and skill_manager.can_attune_divine_amulet(actor, grant)
 		if combat_skill.target_mode in [ActiveSkillData.TargetMode.SELF,
 				ActiveSkillData.TargetMode.NONE]:
 			return skill_manager.can_use_combat_active(actor, grant,
@@ -2251,6 +2656,8 @@ func _skill_is_available(actor: EntityState, grant: SkillGrantState) -> bool:
 		var targets: Array[EntityState] = combat_manager._opponents_of(actor) \
 			if combat_skill.target_mode == ActiveSkillData.TargetMode.ONE_ENEMY \
 			else combat_manager._allies_of(actor)
+		if combat_skill.id == &"item_active_002":
+			targets = gerencia.campaign.get_dead_group_members()
 		if combat_skill.target_mode == ActiveSkillData.TargetMode.ONE_ENTITY:
 			targets.append_array(combat_manager._opponents_of(actor))
 		for target in targets:
@@ -2259,6 +2666,13 @@ func _skill_is_available(actor: EntityState, grant: SkillGrantState) -> bool:
 				return true
 		return false
 	var skill := grant.skill as ActiveSkillData if grant != null else null
+	if actor != null and skill != null and skill.id == &"item_active_002" \
+			and gerencia != null and exploration != null \
+			and actor in gerencia.campaign.companion_states \
+			and exploration.current_actor == gerencia.campaign.resurrection_playable_owner(actor) \
+			and not exploration.block_manager.is_busy():
+		return skill_manager.can_use_exploration_divine_amulet(
+			actor, grant, gerencia.campaign)
 	if actor != null and skill != null and skill.usable_while_owner_inactive \
 			and gerencia != null and gerencia.campaign != null \
 			and actor in gerencia.campaign.companion_states \
@@ -2289,9 +2703,18 @@ func _skill_is_available(actor: EntityState, grant: SkillGrantState) -> bool:
 	if actor != owner and actor.owner_instance_id != owner.instance_id:
 		return false
 	skill = grant.skill as ActiveSkillData
+	if skill.id == &"item_active_003":
+		return actor == owner and actor.turn_state == EntityState.TurnState.TURNING \
+			and (skill_manager.catastrophe_manager == null \
+			or not skill_manager.catastrophe_manager.skills_suppressed(
+				HexGrid.PPPMapMode.EXPLORATION, false)) \
+			and skill_manager.can_attune_divine_amulet(actor, grant)
 	if skill.use_context == ActiveSkillData.UseContext.COMBAT \
-			or skill.requires_player_confirmation:
+			or (skill.requires_player_confirmation and skill.id != &"item_active_002"):
 		return false
+	if skill.id == &"item_active_002":
+		return actor == owner and skill_manager.can_use_exploration_divine_amulet(
+			actor, grant, gerencia.campaign)
 	if skill.target_mode == ActiveSkillData.TargetMode.TILE:
 		for coord in gerencia.campaign.current_map.cells:
 			if skill_manager.can_use_exploration_active(actor, owner, grant,
@@ -2426,7 +2849,8 @@ func _on_hex_choice_requested(coord: Vector2i) -> void:
 			label = "REVELAR"
 		if option["is_companion"]:
 			label = "%s · %s" % [owner.visible_name(), skill.display_name]
-		var button := _make_choice_button(label, Color(0.52, 0.36, 0.055))
+		var button := _make_choice_button(label, Color(0.52, 0.36, 0.055),
+			"skill" if not option["is_companion"] else "")
 		button.pressed.connect(_on_context_skill_pressed.bind(owner, grant, coord))
 		button.mouse_entered.connect(_show_skill_info.bind(button, skill))
 		button.mouse_exited.connect(_hide_skill_info)
@@ -2444,7 +2868,15 @@ func _on_hex_choice_requested(coord: Vector2i) -> void:
 
 
 func _on_ground_pressed(screen_position: Vector2) -> void:
-	if _in_combat() or exploration == null or exploration.current_actor == null \
+	if _in_combat():
+		if combat_manager != null and combat_manager.is_player_turn():
+			if _combat_core_actions_exhausted(combat_manager.current_actor):
+				_show_combat_pass_only(screen_position)
+			else:
+				show_combat_actions_for(combat_manager.current_actor,
+					Rect2(screen_position, Vector2.ZERO))
+		return
+	if exploration == null or exploration.current_actor == null \
 			or exploration.block_manager.is_busy() \
 			or exploration.player_skill_manager.has_pending_choice() \
 			or _walk_target_actor != null or _targeting_grant != null:
@@ -2464,7 +2896,7 @@ func _on_ground_pressed(screen_position: Vector2) -> void:
 					or not _skill_is_available(actor, grant):
 				continue
 			var button := _make_choice_button(_fit_skill_label(skill.display_name),
-				Color(0.52, 0.36, 0.055))
+				Color(0.52, 0.36, 0.055), "skill")
 			button.pressed.connect(_on_ground_skill_pressed.bind(actor, grant))
 			button.mouse_entered.connect(_show_skill_info.bind(button, skill))
 			button.mouse_exited.connect(_hide_skill_info)
@@ -2607,7 +3039,8 @@ func _show_combat_target_choices(coord: Vector2i) -> void:
 						grant, gerencia.campaign, combat_manager, target):
 				continue
 			var skill_button := _make_choice_button(_fit_skill_label(skill.display_name),
-				Color(0.52, 0.36, 0.055))
+				Color(0.52, 0.36, 0.055), "skill")
+			_add_combat_use_count(skill_button, grant)
 			skill_button.pressed.connect(_on_combat_context_skill.bind(grant, coord))
 			skill_button.mouse_entered.connect(_show_skill_info.bind(skill_button, skill))
 			skill_button.mouse_exited.connect(_hide_skill_info)
@@ -2767,7 +3200,7 @@ func _on_recruitment_choice_requested(enemy: EntityState, chance: float,
 	if _recruitment_dialog == null or enemy == null:
 		return
 	_recruitment_dialog.dialog_text = \
-		"Tentar recrutar %s? %d%% de chance.\nBônus por carregar %s." % [
+		"Tentar recrutar %s? %d%% de chance.\nOrigem: %s." % [
 			enemy.visible_name(), roundi(chance * 100.0), information_names]
 	_recruitment_dialog.call_deferred("popup_centered", Vector2i(510, 180))
 
@@ -2829,9 +3262,10 @@ func _show_combat_ally_target_choices(target: EntityState,
 		if not _is_ally_target_skill(skill):
 			continue
 		var button := _make_choice_button(skill.display_name,
-			Color(0.52, 0.36, 0.055))
+			Color(0.52, 0.36, 0.055), "skill")
 		button.disabled = not skill_manager.can_use_combat_active(actor, grant,
 			gerencia.campaign, combat_manager, target)
+		_add_combat_use_count(button, grant)
 		button.set_meta("skill_info_text",
 			"Indisponível neste turno." if button.disabled else skill.description)
 		button.tooltip_text = ""
@@ -2895,13 +3329,105 @@ func _on_combat_ally_skill_pressed(actor: EntityState,
 		_rebuild_action_buttons()
 
 
-func _on_revive_choice_requested(owner: EntityState, target: EntityState,
-		skill: ActiveSkillData) -> void:
-	if _revive_dialog == null:
+func _show_amulet_dead_selection(owner: EntityState,
+		grant: SkillGrantState) -> void:
+	if gerencia == null or skill_manager == null or _revive_dialog == null:
 		return
-	_revive_dialog.dialog_text = "%s pode usar %s para ressuscitar %s com Vida completa. O item será destruído. Usar agora?" % [
-		owner.visible_name(), skill.display_name, target.visible_name()]
-	_revive_dialog.popup_centered(Vector2i(500, 150))
+	_amulet_owner = owner
+	_amulet_grant = grant
+	_amulet_target = null
+	_clear_buttons(hex_choice_buttons)
+	for target in gerencia.campaign.get_dead_group_members():
+		var available := skill_manager.can_use_combat_active(owner, grant,
+			gerencia.campaign, combat_manager, target) if _in_combat() else \
+			skill_manager.can_use_exploration_divine_amulet(owner, grant,
+				gerencia.campaign, target)
+		if not available:
+			continue
+		var button := _make_choice_button(target.visible_name(),
+			Color(0.12, 0.48, 0.55))
+		button.pressed.connect(_select_amulet_dead_target.bind(target))
+		hex_choice_buttons.add_child(button)
+	if hex_choice_buttons.get_child_count() == 0:
+		_hide_hex_choice()
+		return
+	hex_choice_title.text = "ESCOLHA QUEM RESSUSCITAR"
+	hex_choice_title.tooltip_text = "O Amuleto só será consumido após a confirmação."
+	_close_inventory()
+	_ally_target_choice_open = true
+	hex_choice.show()
+	_position_hex_choice(action_drawer.position +
+		Vector2(action_drawer.size.x + 12.0, 0.0))
+
+
+func _select_amulet_dead_target(target: EntityState) -> void:
+	if _amulet_owner == null or _amulet_grant == null or target == null:
+		return
+	_amulet_target = target
+	_hide_hex_choice()
+	_revive_dialog.dialog_text = "Ressuscitar %s com Vida completa? Ao confirmar, o Amuleto Divino equipado será consumido e destruído permanentemente. Ele não poderá ser criado novamente nesta campanha. O escolhido receberá imunidade permanente a Doença, Terror e Tristeza." % target.visible_name()
+	_revive_dialog.popup_centered(Vector2i(590, 180))
+
+
+func _cancel_amulet_revive() -> void:
+	if _amulet_owner != null and _amulet_grant != null \
+			and _skill_is_available(_amulet_owner, _amulet_grant):
+		_show_amulet_dead_selection(_amulet_owner, _amulet_grant)
+	else:
+		_amulet_owner = null
+		_amulet_grant = null
+		_amulet_target = null
+
+
+func _confirm_amulet_revive() -> void:
+	var owner := _amulet_owner
+	var grant := _amulet_grant
+	var target := _amulet_target
+	_amulet_owner = null
+	_amulet_grant = null
+	_amulet_target = null
+	if owner == null or grant == null or target == null or gerencia == null:
+		return
+	if _in_combat():
+		var result := skill_manager.use_combat_active(owner, grant,
+			gerencia.campaign, combat_manager, target)
+		if result.get("success", false):
+			combat_manager.action_resolved.emit(owner, &"skill", result)
+			if (grant.skill as ActiveSkillData).ends_turn:
+				combat_manager.end_current_turn()
+	else:
+		skill_manager.use_exploration_divine_amulet(owner, grant,
+			gerencia.campaign, target)
+	_sync_slots()
+
+
+func _show_amulet_attunement(owner: EntityState, grant: SkillGrantState) -> void:
+	if _attune_dialog == null or not _skill_is_available(owner, grant):
+		return
+	_attune_owner = owner
+	_attune_grant = grant
+	_attune_dialog.dialog_text = "Sintonizar este Amuleto Divino com %s? Esta escolha é IRREVERSÍVEL: cada cópia pode ser sintonizada uma única vez, por um único personagem. A sintonização não destrói o item. Só %s terá as imunidades enquanto o equipar; outro personagem não poderá sintonizá-lo." % [owner.visible_name(), owner.visible_name()]
+	_attune_dialog.popup_centered(Vector2i(620, 210))
+
+
+func _cancel_amulet_attunement() -> void:
+	_attune_owner = null
+	_attune_grant = null
+
+
+func _confirm_amulet_attunement() -> void:
+	var owner := _attune_owner
+	var grant := _attune_grant
+	_cancel_amulet_attunement()
+	if owner == null or grant == null or not _skill_is_available(owner, grant):
+		return
+	var result := skill_manager.attune_divine_amulet(owner, grant,
+		gerencia.campaign if gerencia != null else null)
+	if result.get("success", false):
+		if _in_combat():
+			combat_manager.action_resolved.emit(owner, &"skill", result)
+		_sync_slots()
+		_rebuild_action_buttons()
 
 
 func _on_combat_context_attack(coord: Vector2i) -> void:
@@ -3099,12 +3625,18 @@ func _hex_classification(content: Resource) -> String:
 	return "Bloco"
 
 
-func _make_choice_button(title: String, color: Color) -> Button:
+func _make_choice_button(title: String, color: Color,
+		intent: String = "") -> Button:
 	var button := Button.new()
 	button.text = _fit_skill_label(title)
 	button.custom_minimum_size.y = 46.0 if "\n" in button.text else 35.0
 	button.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
-	_paint_action_button(button, color)
+	if intent.is_empty() and _in_combat() and (
+			title.begins_with("JOGAR DADO") or title.begins_with("ATACAR")
+			or title == "REPOSICIONAR" or title == "ANDAR ATÉ"
+			or title == "APROXIMAR"):
+		intent = "core"
+	_paint_action_button(button, color, intent == "pass", intent)
 	button.add_theme_font_size_override("font_size", 10)
 	return button
 
@@ -3147,6 +3679,10 @@ func _hide_hex_choice() -> void:
 		_hex_choice_separator.hide()
 	_companion_action_choice_open = false
 	_companion_action_target = null
+	_companion_actions_from_initiative = false
+	_initiative_action_anchor = Rect2()
+	if _initiative_action_link != null:
+		_initiative_action_link.hide()
 	_ally_target_choice_open = false
 	_ground_choice_open = false
 	_hide_skill_info()
@@ -3254,6 +3790,7 @@ func _on_item_selected(entry: InventoryItemState) -> void:
 				and inventory_panel.is_equip_candidate(entry):
 			if EquipmentManager.new().equip(_equipment_pick_actor, entry, skill_manager,
 					gerencia.campaign):
+				get_node("/root/UISFX").call("play", &"equip")
 				_equipment_pick_slot = -1
 				_equipment_pick_actor = null
 				inventory_panel.set_equip_filter(-1, null)
@@ -3267,13 +3804,8 @@ func _on_item_selected(entry: InventoryItemState) -> void:
 
 func _on_equipped_item_selected(card: PartyCharacterCard,
 		entry: InventoryItemState, anchor: Rect2) -> void:
-	if card == null or card.state == null or gerencia == null:
-		return
-	if entry != null and entry.data != null and skill_manager != null \
-			and CraftAvailability.status_for(card.state, entry.data,
-				gerencia.campaign, skill_manager.inventory_manager,
-				exploration) != CraftAvailability.Status.NONE:
-		_on_craft_requested(card.state, entry.data)
+	if card == null or card.state == null or gerencia == null \
+			or entry == null or entry.data == null:
 		return
 	_close_item_details()
 	item_menu.avoid_rect = inventory_panel.get_global_rect() if inventory_panel.visible else Rect2()
@@ -3453,7 +3985,9 @@ func _close_item_details() -> void:
 	item_details_link.hide()
 
 
-func _paint_action_button(button: Button, background: Color) -> void:
+func _paint_action_button(button: Button, background: Color,
+		danger_action: bool = false, intent: String = "") -> void:
+	button.set_meta("action_color_intent", intent)
 	var normal := StyleBoxFlat.new()
 	normal.bg_color = background
 	normal.border_color = background.lightened(0.25)
@@ -3478,6 +4012,50 @@ func _paint_action_button(button: Button, background: Color) -> void:
 	button.add_theme_color_override("font_color", Color.WHITE)
 	button.add_theme_color_override("font_hover_color", Color.WHITE)
 	button.add_theme_color_override("font_disabled_color", Color(0.67, 0.7, 0.72))
+	var palette := get_node_or_null("/root/UIColorManager")
+	if palette != null:
+		var normal_role := "action_%s" % intent if not intent.is_empty() else \
+			"button_danger" if danger_action else "button"
+		var hover_role := "action_%s_hover" % intent if not intent.is_empty() else \
+			"button_danger" if danger_action else "button_hover"
+		var pressed_role := "action_%s_pressed" % intent if not intent.is_empty() else \
+			"button_danger" if danger_action else "button_selected"
+		var text_role := "action_%s_text" % intent if not intent.is_empty() else \
+			"on_button"
+		var border_role := "danger" if danger_action else "structure"
+		if intent in ["skill", "core", "pass_only"]:
+			border_role = "action_%s_border" % intent
+		palette.call("bind_control_style", button, "normal",
+			normal_role, border_role)
+		palette.call("bind_control_style", button, "hover",
+			hover_role, "action_%s_hover_border" % intent \
+			if intent in ["skill", "core", "pass_only"] else \
+			"danger" if danger_action else "selection")
+		palette.call("bind_control_style", button, "pressed",
+			pressed_role, "action_%s_hover_border" % intent \
+			if intent in ["skill", "core", "pass_only"] else \
+			"danger" if danger_action else "selection")
+		palette.call("bind_control_style", button, "disabled", "surface", "disabled")
+		for key in ["font_color", "font_hover_color", "font_pressed_color"]:
+			palette.call("bind_color", button, key, text_role)
+		palette.call("bind_color", button, "font_disabled_color", "on_button_disabled")
+
+
+func _bind_palette() -> void:
+	var palette := get_node_or_null("/root/UIColorManager")
+	if palette == null:
+		return
+	for panel in [action_drawer, ally_drawer, hex_choice, skill_info]:
+		var style := (panel as Control).get_theme_stylebox("panel") as StyleBoxFlat
+		if style == null:
+			continue
+		var local_style := style.duplicate() as StyleBoxFlat
+		(panel as Control).add_theme_stylebox_override("panel", local_style)
+		palette.call("bind_style", local_style, "surface", "structure")
+		palette.call("bind_control_style", panel, "panel", "surface", "structure")
+	for label in [action_title, action_hint, hex_choice_title,
+			skill_info_description]:
+		palette.call("bind_color", label, "font_color", "primary")
 
 
 func _on_walk_pressed() -> void:
@@ -3492,6 +4070,15 @@ func _on_walk_pressed() -> void:
 
 
 func _on_skill_pressed(actor: EntityState, grant: SkillGrantState) -> void:
+	if grant != null and grant.skill != null \
+			and grant.skill.id == &"item_active_003":
+		_show_amulet_attunement(actor, grant)
+		return
+	if grant != null and grant.skill != null \
+			and grant.skill.id == &"item_active_002":
+		if _skill_is_available(actor, grant):
+			_show_amulet_dead_selection(actor, grant)
+		return
 	if _in_combat():
 		if not _skill_is_available(actor, grant):
 			return
@@ -3560,7 +4147,8 @@ func _time_accelerator_options(actor: EntityState,
 	for entry in actor.inventory_items:
 		if entry == null or entry.data == null:
 			continue
-		for result in entry.data.craft_result:
+		for raw_result in entry.data.craft_result:
+			var result := raw_result as ItemData
 			if inventory.can_transform_single_item(actor, entry, result) \
 					and skill_manager.can_use_exploration_active(actor, actor, grant,
 					gerencia.campaign, EntityState.UNPLACED,

@@ -26,6 +26,7 @@ script = ExtResource("2_outcome")
 id = &"ev_00059_out_01"
 id = &"ev_00059_out_01"
 display_name = "A pele ficou resistente."
+narrative_description = "A pele ficou resistente.\nA partir de agora: Concede imunidade a Sangramento e Atordoamento. Além disso, contra críticos de Maestria Distância, mantém a redução de dano pela distância ao alvo."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_status_immunity"), SubResource("Effect_ranged_critical_protection"), SubResource("Effect_grant_passive")])
 
 [resource]

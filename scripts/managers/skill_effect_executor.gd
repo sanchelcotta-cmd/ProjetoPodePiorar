@@ -7,7 +7,8 @@ extends RefCounted
 
 ## Prepara alterações que acontecem UMA vez quando a passiva é recebida.
 ## Não altera o ator aqui: o SkillManager confirma todas as etapas primeiro.
-func plan_on_granted(effect: SkillEffectData, actor: EntityState, bound_source: Resource = null) -> Dictionary:
+func plan_on_granted(effect: SkillEffectData, actor: EntityState, bound_source: Resource = null,
+		bound_item_improvements: Dictionary = {}) -> Dictionary:
 	if effect == null or actor == null:
 		return {"success": false}
 	var stats: Dictionary = {}
@@ -29,9 +30,12 @@ func plan_on_granted(effect: SkillEffectData, actor: EntityState, bound_source: 
 		SkillEffectData.EffectType.COPY_BOUND_SOURCE_TRAITS:
 			if bound_source is ItemData:
 				var item := bound_source as ItemData
-				if effect.copy_bound_bonus_attack: stats["attack"] = item.bonus_attack
-				if effect.copy_bound_bonus_max_hp: stats["max_hp"] = item.bonus_life
-				if effect.copy_bound_bonus_stamina: stats["stamina"] = item.bonus_stamina
+				if effect.copy_bound_bonus_attack:
+					stats["attack"] = item.bonus_attack + int(bound_item_improvements.get("attack", 0))
+				if effect.copy_bound_bonus_max_hp:
+					stats["max_hp"] = item.bonus_life + int(bound_item_improvements.get("life", 0))
+				if effect.copy_bound_bonus_stamina:
+					stats["stamina"] = item.bonus_stamina + int(bound_item_improvements.get("stamina", 0))
 				if effect.copy_bound_masteries and item.mastery_granted != EntityData.Mastery.NONE:
 					stats["mastery_presence:%d" % item.mastery_granted] = 1
 					stats["mastery:%d" % item.mastery_granted] = item.mastery_bonus
@@ -110,6 +114,11 @@ func can_execute_passive(effect: SkillEffectData, context: Dictionary) -> bool:
 			return effect.target == SkillEffectData.Target.SELF \
 				and effect.percent > 0.0 and effect.percent <= 1.0 \
 				and int(context.get("damage_dealt", 0)) > 0
+		SkillEffectData.EffectType.RICOCHET_DAMAGE:
+			return context.get("combat") is CombatManager \
+				and context.get("attack_target") is EntityState \
+				and int(context.get("damage_dealt", 0)) > 0 \
+				and effect.percent > 0.0 and effect.area_radius > 0
 		SkillEffectData.EffectType.MODIFY_ATTRIBUTE:
 			if effect.target != SkillEffectData.Target.SELF \
 					or effect.attribute_id != &"attack" \
@@ -140,6 +149,15 @@ func can_execute_passive(effect: SkillEffectData, context: Dictionary) -> bool:
 			return context.get("encounter_opening", false) \
 				and context.get("campaign") is CampaignState \
 				and effect.attribute_id in [&"attack", &"stamina"]
+		SkillEffectData.EffectType.COPY_ATTRIBUTES_FROM_TARGET:
+			return context.get("encounter_opening", false) \
+				and context.get("mode") == HexGrid.PPPMapMode.COMBAT \
+				and effect.target == SkillEffectData.Target.ENCOUNTER_ACTIVATOR \
+				and context.get("encounter_activator") is EntityState \
+				and effect.attribute_ids.has(&"attack") \
+				and effect.attribute_ids.has(&"max_health") \
+				and effect.attribute_ids.has(&"masteries") \
+				and effect.attribute_ids.has(&"stamina")
 		SkillEffectData.EffectType.END_COMBAT:
 			return context.get("encounter_opening", false) \
 				and context.get("mode") == HexGrid.PPPMapMode.COMBAT
@@ -180,6 +198,8 @@ func execute_passive(effect: SkillEffectData, context: Dictionary) -> Dictionary
 			if targets.is_empty():
 				return {"success": false, "reason": "Grupo da fonte não identificado."}
 			var rng := context.get("rng") as RandomNumberGenerator
+			if rng == null:
+				rng = campaign.world_rng
 			var shared_roll := _roll_dice(effect.dice_count, effect.dice_sides, rng) \
 				if not effect.roll_per_target else 0
 			var damage_results: Array[Dictionary] = []
@@ -203,6 +223,12 @@ func execute_passive(effect: SkillEffectData, context: Dictionary) -> Dictionary
 			var before := actor.current_health
 			actor.current_health = mini(actor.max_health, before + recovered)
 			return {"success": true, "healed": actor.current_health - before}
+		SkillEffectData.EffectType.RICOCHET_DAMAGE:
+			var combat := context["combat"] as CombatManager
+			return combat.apply_ricochet_damage(actor,
+				context["attack_target"] as EntityState,
+				int(context.get("damage_dealt", 0)), effect.percent,
+				effect.area_radius)
 		SkillEffectData.EffectType.MODIFY_ATTRIBUTE:
 			var combat := context["combat"] as CombatManager
 			return combat.apply_passive_attack_bonus(actor, effect)
@@ -224,6 +250,9 @@ func execute_passive(effect: SkillEffectData, context: Dictionary) -> Dictionary
 			return {"success": true, "healed": actor.current_health - before}
 		SkillEffectData.EffectType.RANDOMIZE_MASTERY:
 			var rng := context.get("rng") as RandomNumberGenerator
+			var campaign := context.get("campaign") as CampaignState
+			if rng == null and campaign != null:
+				rng = campaign.world_rng
 			var index := rng.randi_range(0, effect.mastery_options.size() - 1) \
 				if rng != null else randi_range(0, effect.mastery_options.size() - 1)
 			actor.encounter_mastery_override = effect.mastery_options[index]
@@ -235,13 +264,34 @@ func execute_passive(effect: SkillEffectData, context: Dictionary) -> Dictionary
 			var district_index := effect.context_tags.find(campaign.district)
 			if district_index >= 0 and district_index < effect.context_caps.size():
 				cap = effect.context_caps[district_index]
-			var value := mini(count, cap)
+			var value := mini(maxi(count, effect.minimum_value), cap)
 			if effect.attribute_id == &"attack":
 				actor.attack = value
 			else:
 				actor.max_stamina = value
 				actor.stamina_remaining = value
 			return {"success": true, "attribute": effect.attribute_id, "value": value}
+		SkillEffectData.EffectType.COPY_ATTRIBUTES_FROM_TARGET:
+			var original := context["encounter_activator"] as EntityState
+			actor.attack = maxi(0, original.attack)
+			actor.max_health = maxi(1, original.data.vida_base)
+			actor.current_health = actor.max_health
+			actor.max_stamina = maxi(0, original.max_stamina)
+			actor.stamina_remaining = actor.max_stamina
+			actor.granted_mastery_types.clear()
+			actor.mastery_bonuses.clear()
+			actor.encounter_mastery_override = EntityData.Mastery.NONE
+			for mastery in [EntityData.Mastery.BLADE, EntityData.Mastery.IMPACT,
+					EntityData.Mastery.RANGED]:
+				if not original.has_mastery(mastery):
+					continue
+				actor.granted_mastery_types[mastery] = 1
+				actor.mastery_bonuses[mastery] = original.get_mastery_level(mastery)
+				if actor.encounter_mastery_override == EntityData.Mastery.NONE:
+					actor.encounter_mastery_override = mastery
+			return {"success": true, "copied_from": original.instance_id,
+				"attack": actor.attack, "max_health": actor.max_health,
+				"max_stamina": actor.max_stamina}
 		SkillEffectData.EffectType.END_COMBAT:
 			# A montagem/iniciativa e a confirmação narrativa pertencem ao
 			# CombatManager; uma passiva não encerra o bloco de forma síncrona.
@@ -415,7 +465,12 @@ func can_execute(effect: SkillEffectData, context: Dictionary) -> bool:
 func execute(effect: SkillEffectData, context: Dictionary) -> Dictionary:
 	if not can_execute(effect, context):
 		return {"success": false, "reason": "Efeito indisponível neste contexto."}
-	if effect.activation_chance < 1.0 and randf() >= effect.activation_chance:
+	var campaign_for_roll := context.get("campaign") as CampaignState
+	var source := context.get("rng") as RandomNumberGenerator
+	if source == null and campaign_for_roll != null:
+		source = campaign_for_roll.world_rng
+	if effect.activation_chance < 1.0 \
+			and (source.randf() if source != null else randf()) >= effect.activation_chance:
 		return {"success": true, "chance_failed": true}
 	if effect.effect_type in [SkillEffectData.EffectType.APPLY_DEBUFF,
 			SkillEffectData.EffectType.REMOVE_DEBUFF]:
@@ -479,7 +534,7 @@ func execute(effect: SkillEffectData, context: Dictionary) -> Dictionary:
 				))
 				return {"success": true, "delayed_until_owner_turn": owner.turn_serial + effect.delay_turns}
 			var inventory := context.get("inventory_manager") as InventoryManager
-			var item := inventory.draw_random_item(effect)
+			var item := inventory.draw_random_item(effect, campaign.world_rng)
 			return inventory.deliver_created_item(recipient, item, campaign)
 		SkillEffectData.EffectType.MODIFY_CRAFT_COST:
 			var inventory := context.get("inventory_manager") as InventoryManager
@@ -513,7 +568,11 @@ func _reveal_candidates(effect: SkillEffectData, context: Dictionary) -> Array[V
 			var cell := grid.get_cell(coord)
 			if cell != null and cell.state == HexGrid.PPPBlockState.HIDDEN:
 				result.append(coord)
-		result.shuffle()
+		for index in range(result.size() - 1, 0, -1):
+			var other := campaign.world_rng.randi_range(0, index)
+			var selected: Vector2i = result[index]
+			result[index] = result[other]
+			result[other] = selected
 		result.resize(mini(count, result.size()))
 		return result
 	var actor := context.get("actor") as EntityState

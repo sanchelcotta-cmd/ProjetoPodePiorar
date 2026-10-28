@@ -284,10 +284,22 @@ func serialize() -> Dictionary:
 	var cell_data: Array = []
 	for cell in cells.values():
 		cell_data.append(cell.serialize())
+	var reveal_origins: Array[Dictionary] = []
+	for coord in revealed_by_skill_ids:
+		var serialized_ids: Array[String] = []
+		for id in revealed_by_skill_ids[coord]:
+			serialized_ids.append(str(id))
+		reveal_origins.append({"coord": [coord.x, coord.y],
+			"skill_ids": serialized_ids})
 	return {
 		"format_version": 1,
 		"map_mode": ppp_map_mode,
 		"background_path": ppp_background_path,
+		"parallax_path": ppp_parallax_path,
+		"aura_parallax_path": ppp_aura_parallax_path,
+		"snow_parallax_path": ppp_snow_parallax_path,
+		"parallax_filter": ppp_parallax_filter,
+		"revealed_by_skill_ids": reveal_origins,
 		"cells": cell_data,
 	}
 
@@ -302,6 +314,23 @@ static func deserialize(data: Dictionary) -> HexGrid:
 				grid.cells[cell.coord] = cell
 	grid.ppp_map_mode = int(data.get("map_mode", PPPMapMode.EXPLORATION))
 	grid.ppp_background_path = str(data.get("background_path", ""))
+	grid.ppp_parallax_path = str(data.get("parallax_path", ""))
+	grid.ppp_aura_parallax_path = str(data.get("aura_parallax_path", ""))
+	grid.ppp_snow_parallax_path = str(data.get("snow_parallax_path", ""))
+	grid.ppp_parallax_filter = int(data.get("parallax_filter", 0))
+	for entry in data.get("revealed_by_skill_ids", []):
+		if not entry is Dictionary:
+			continue
+		var pair: Array = entry.get("coord", [])
+		if pair.size() != 2:
+			continue
+		var coord := Vector2i(int(pair[0]), int(pair[1]))
+		if not grid.is_valid(coord):
+			continue
+		var ids: Array[StringName] = []
+		for id in entry.get("skill_ids", []):
+			ids.append(StringName(str(id)))
+		grid.revealed_by_skill_ids[coord] = ids
 	return grid
 
 

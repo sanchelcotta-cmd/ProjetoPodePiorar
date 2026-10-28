@@ -13,6 +13,13 @@ statistic = 2
 amount = 2
 math_operation = 2
 
+[sub_resource type="Resource" id="Effect_double_attack"]
+script = ExtResource("3_effect")
+effect_type = 1
+statistic = 3
+amount = 2
+math_operation = 2
+
 [sub_resource type="Resource" id="Effect_grant_passive"]
 script = ExtResource("3_effect")
 effect_type = 6
@@ -21,15 +28,15 @@ passive = ExtResource("4_passive")
 [sub_resource type="Resource" id="Outcome"]
 script = ExtResource("2_outcome")
 id = &"ev_00057_out_01"
-id = &"ev_00057_out_01"
 display_name = "A fúria desperta."
-effects = Array[ExtResource("3_effect")]([SubResource("Effect_double_max_hp"), SubResource("Effect_grant_passive")])
+narrative_description = "A fúria desperta.\nA partir de agora: sua Vida máxima e seu Ataque dobram. Em combate com arma corpo a corpo, o Ataque recebe mais força; se atacar sem arma, o Ataque final é triplicado."
+effects = Array[ExtResource("3_effect")]([SubResource("Effect_double_max_hp"), SubResource("Effect_double_attack"), SubResource("Effect_grant_passive")])
 
 [resource]
 script = ExtResource("1_event")
 id = &"ev_00057"
 display_name = "Gene da Fúria Bestial"
-description = "Dobra a Vida máxima sem alterar a Vida atual. Em combate com arma corpo a corpo, o Ataque recebe +50% arredondado para cima; sem arma, o Ataque final é triplicado."
+description = "Dobra a Vida máxima sem alterar a Vida atual e dobra o Ataque. Em combate com arma corpo a corpo, o Ataque recebe +50% arredondado para cima; sem arma, o Ataque final é triplicado."
 narrative_description = "Um cachorro abandonado para no meio da rua e rosna para você. Você rosna de volta. Não sabe nem o porquê, mas rosna. O cachorro abaixa a cabeça e vai embora. Você demora um pouco mais para lembrar como se fala."
 category = 1
 valence = 0

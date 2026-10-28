@@ -14,7 +14,7 @@ custom_rule = &"florzinha_blessing"
 script = ExtResource("2_outcome")
 id = &"ev_00045_out_01"
 display_name = "A flor concede uma bênção."
-narrative_description = "Uma luz suave envolve você. A flor concede +5 de Ataque ou Vida e proteção contra Doença ou Terror até o fim do Dia."
+narrative_description = "Uma luz suave envolve você. A flor concede +5 de Ataque ou de Vida, e concede e proteção contra Doença ou Terror até o fim do Dia."
 weight = 50
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_blessing")])
 

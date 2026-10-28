@@ -20,6 +20,7 @@ max_applications_per_entity_per_campaign = 1
 script = ExtResource("2_outcome")
 id = &"ev_00052_out_01"
 display_name = "Você vê algo impossível."
+narrative_description = "Você vê algo impossível... Isso é aterrorizante!\nVocê terá um medo irracional por um tempo."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

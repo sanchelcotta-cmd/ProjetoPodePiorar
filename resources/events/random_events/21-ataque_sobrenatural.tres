@@ -15,6 +15,7 @@ math_operation = 1
 script = ExtResource("2_outcome")
 id = &"ev_00021_out_01"
 display_name = "Você é atingido."
+narrative_description = "Você é atingido.\n\nVocê perdeu 5 de vida máxima."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_max_hp")])
 
 [resource]

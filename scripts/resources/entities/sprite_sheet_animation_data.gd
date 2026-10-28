@@ -25,6 +25,7 @@ enum Palette { ORIGINAL, CAT_ORANGE, CAT_WHITE, CAT_BLACK, CAT_TABBY, DOG_CARAME
 @export_range(1, 256) var subject_height: int = 44
 @export_range(1, 256) var maximum_subject_width: int = 54
 @export var palette: Palette = Palette.ORIGINAL
+@export var normalize_to_first_idle_frame: bool = false
 
 @export_category("Velocidade")
 @export_range(1.0, 30.0, 0.5) var idle_fps: float = 6.0
@@ -34,6 +35,7 @@ enum Palette { ORIGINAL, CAT_ORANGE, CAT_WHITE, CAT_BLACK, CAT_TABBY, DOG_CARAME
 @export var irregular_idle: bool = false
 
 var _cached_frames: SpriteFrames
+var _reference_size := Vector2i.ZERO
 
 
 func create_sprite_frames() -> SpriteFrames:
@@ -42,6 +44,17 @@ func create_sprite_frames() -> SpriteFrames:
 	var frames := SpriteFrames.new()
 	if frames.has_animation(&"default"):
 		frames.remove_animation(&"default")
+	if normalize_to_first_idle_frame and idle_sheet != null:
+		var reference := idle_sheet.get_image()
+		if reference != null and not reference.is_empty():
+			if reference.get_format() != Image.FORMAT_RGBA8:
+				reference.convert(Image.FORMAT_RGBA8)
+			var first := _find_frames(reference)
+			if not first.is_empty():
+				var factor := minf(float(subject_height) / float(first[0].size.y),
+					float(maximum_subject_width) / float(first[0].size.x))
+				_reference_size = Vector2i(maxi(1, roundi(first[0].size.x * factor)),
+					maxi(1, roundi(first[0].size.y * factor)))
 	_add_clip(frames, &"idle", idle_sheet, idle_fps, true)
 	_add_clip(frames, &"idle_alt", idle_alternative_sheet, idle_fps, true)
 	_add_clip(frames, &"walk", walk_sheet, walk_fps, true)
@@ -176,10 +189,20 @@ func _opaque_bounds(source: Image, area: Rect2i) -> Rect2i:
 func _normalized_frame(source: Image, rect: Rect2i) -> Texture2D:
 	var picture := Image.create_empty(rect.size.x, rect.size.y, false, Image.FORMAT_RGBA8)
 	picture.blit_rect(source, rect, Vector2i.ZERO)
-	var factor := minf(float(subject_height) / float(rect.size.y),
+	# O primeiro Idle define a altura aparente; cada pose usa seu próprio
+	# fator porque as folhas originais têm escalas diferentes. O limite de
+	# largura preserva cauda/salto/ataque sem estourar o quadro de 96 px.
+	var target_height := _reference_size.y if _reference_size.y > 0 else subject_height
+	var factor := minf(float(target_height) / float(rect.size.y),
 		float(maximum_subject_width) / float(rect.size.x))
 	var size := Vector2i(maxi(1, roundi(rect.size.x * factor)),
 		maxi(1, roundi(rect.size.y * factor)))
+	# Nenhum pixel do topo ou das laterais pode ser descartado pelo canvas.
+	if size.x > canvas_size.x or size.y > canvas_size.y - 3:
+		var fit := minf(float(canvas_size.x) / float(size.x),
+			float(canvas_size.y - 3) / float(size.y))
+		size = Vector2i(maxi(1, floori(size.x * fit)),
+			maxi(1, floori(size.y * fit)))
 	picture.resize(size.x, size.y, Image.INTERPOLATE_NEAREST)
 	if palette != Palette.ORIGINAL:
 		for y in picture.get_height():

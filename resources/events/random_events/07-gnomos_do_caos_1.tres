@@ -17,7 +17,7 @@ script = ExtResource("1_7yb0k")
 id = &"ev_00007_out_01"
 id = &"ev_00007_out_01"
 display_name = "Bagunça serelepe"
-narrative_description = "Todos os itens mudaram!"
+narrative_description = "O gnomo é um sapeca. Não gosta muito bem das coisas como estão!\n• Todos os itens do seu inventário mudaram."
 effects = Array[ExtResource("2_hdh5b")]([SubResource("Resource_xpajy")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 

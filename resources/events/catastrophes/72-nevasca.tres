@@ -53,6 +53,7 @@ script = ExtResource("2_outcome")
 id = &"ev_00072_out_01"
 id = &"ev_00072_out_01"
 display_name = "A nevasca tomou a cidade."
+narrative_description = "A nevasca tomou a cidade.\nPelo restante do Dia, todos só podem mover 1 bloco por turno e sofrem -10% em Vida e Ataque, exceto quem estiver equipado com armadura Épica."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_movement_limit"), SubResource("Effect_max_hp_penalty"), SubResource("Effect_attack_penalty")])
 
 [resource]

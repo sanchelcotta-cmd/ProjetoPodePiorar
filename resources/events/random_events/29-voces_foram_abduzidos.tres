@@ -22,6 +22,7 @@ activate_destination_event = true
 script = ExtResource("2_outcome")
 id = &"ev_00029_out_01"
 display_name = "O grupo é abduzido."
+narrative_description = "Vocês foram abduzidos e retornam em um novo local, em um novo dia."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_advance_day"), SubResource("Effect_change_map")])
 
 [resource]

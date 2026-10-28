@@ -61,7 +61,8 @@ static func status_for(actor: EntityState, item: ItemData,
 
 static func _has_available_result(item: ItemData,
 		campaign: CampaignState) -> bool:
-	for result in item.craft_result:
+	for raw_result in item.craft_result:
+		var result := raw_result as ItemData
 		if result != null and result.rarity == ItemData.Rarity.EPIC \
 				and (not result.cannot_craft_after_consumed \
 				or not campaign.consumed_uncraftable_item_ids.has(result.id)):

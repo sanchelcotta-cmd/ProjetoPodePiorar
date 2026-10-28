@@ -15,6 +15,7 @@ item = ExtResource("4_fruit")
 script = ExtResource("2_outcome")
 id = &"gn_00005_out_01"
 display_name = "Uma frutinha mágica foi recebida."
+narrative_description = "Uma frutinha mágica foi recebida."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

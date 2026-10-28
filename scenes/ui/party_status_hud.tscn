@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/stat_breakdown_tooltip.tscn" id="7_stats"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_drawer"]
-bg_color = Color(0.035, 0.05, 0.065, 0.8)
+bg_color = Color(0.035, 0.05, 0.065, 0.96)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -237,34 +237,37 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "▼"
 
-[node name="HexChoice" type="PanelContainer" parent="."]
+[node name="HexChoiceLayer" type="CanvasLayer" parent="."]
+layer = 65
+
+[node name="HexChoice" type="PanelContainer" parent="HexChoiceLayer"]
 visible = false
 custom_minimum_size = Vector2(292, 0)
 theme_override_styles/panel = SubResource("StyleBoxFlat_drawer")
 
-[node name="Margin" type="MarginContainer" parent="HexChoice"]
+[node name="Margin" type="MarginContainer" parent="HexChoiceLayer/HexChoice"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="Content" type="VBoxContainer" parent="HexChoice/Margin"]
+[node name="Content" type="VBoxContainer" parent="HexChoiceLayer/HexChoice/Margin"]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="Header" type="HBoxContainer" parent="HexChoice/Margin/Content"]
+[node name="Header" type="HBoxContainer" parent="HexChoiceLayer/HexChoice/Margin/Content"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="Title" type="Label" parent="HexChoice/Margin/Content/Header"]
+[node name="Title" type="Label" parent="HexChoiceLayer/HexChoice/Margin/Content/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.65, 0.88, 0.9, 1)
 theme_override_font_sizes/font_size = 11
 text = "◎ ◎ ◎ ◎"
 
-[node name="Close" type="Button" parent="HexChoice/Margin/Content/Header"]
+[node name="Close" type="Button" parent="HexChoiceLayer/HexChoice/Margin/Content/Header"]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 focus_mode = 0
@@ -276,7 +279,7 @@ theme_override_font_sizes/font_size = 16
 text = "×"
 flat = true
 
-[node name="Buttons" type="VBoxContainer" parent="HexChoice/Margin/Content"]
+[node name="Buttons" type="VBoxContainer" parent="HexChoiceLayer/HexChoice/Margin/Content"]
 layout_mode = 2
 theme_override_constants/separation = 4
 

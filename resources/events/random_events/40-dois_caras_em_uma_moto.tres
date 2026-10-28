@@ -19,6 +19,7 @@ duration_unit = 1
 script = ExtResource("2_outcome")
 id = &"ev_00040_out_01"
 display_name = "O grupo entra em Terror."
+narrative_description = "O grupo inteiro entra em Terror."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

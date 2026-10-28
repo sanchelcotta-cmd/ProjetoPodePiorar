@@ -16,6 +16,7 @@ bind_companion_to_active_entity = true
 script = ExtResource("2_outcome")
 id = &"ev_00065_out_01"
 display_name = "Um novo aliado entrou no grupo."
+narrative_description = "Um novo aliado entrou no grupo: [nome_do_aliado]."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

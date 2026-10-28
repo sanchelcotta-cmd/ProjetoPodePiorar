@@ -32,6 +32,7 @@ script = ExtResource("2_outcome")
 id = &"ev_00073_out_01"
 id = &"ev_00073_out_01"
 display_name = "Os gafanhotos cobrem o céu."
+narrative_description = "Os gafanhotos cobrem o céu.\nDurante a Rodada, todos sofrem 1 de dano antes de cada ação; à Noite, sofrem 2. Além disso, todas as passivas e habilidades ativas de Exploração ficam indisponíveis."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_damage_before_action"), SubResource("Effect_suppress_exploration_skills")])
 
 [resource]

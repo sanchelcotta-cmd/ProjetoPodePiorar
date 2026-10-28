@@ -32,13 +32,14 @@ metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 script = ExtResource("1_7bjjh")
 id = &"ev_00015_out_02"
 display_name = "É dia."
-narrative_description = "Nada acontece."
+narrative_description = "É dia. A lua nem parece querer aparecer.\nÉ só um brilho fraco... Tímido. Nada acontece."
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [resource]
 script = ExtResource("2_x3cl1")
 id = &"ev_00015"
 display_name = "Revelação Lunar"
+narrative_description = "Um brilho prateado do luar paira sobre vocês."
 description = "Se a Rodada atual for de Noite, revela todos os blocos de Encontro Indesejado do mapa. Se não for Noite, o evento não tem efeito."
 valence = 0
 resolution_mode = 4

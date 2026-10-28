@@ -96,12 +96,53 @@ func _run_test() -> void:
 			and bar._tooltip_text.text.contains("Stamina:"),
 			"Hover apresenta nome e estatísticas.")
 		inspect.pressed.emit()
+		check(bar._action_menu.visible \
+			and bar._action_buttons.get_child_count() == 1,
+			"Hostil na iniciativa oferece somente Detalhes.")
+		check(bar._selected_enemy == enemy and scene._enemy_link_glow.visible \
+			and scene._enemy_link_coord == enemy.position,
+			"Selecionar a caixa hostil acende o hex correspondente.")
+		(bar._action_buttons.get_child(0) as Button).pressed.emit()
 		check(hud.character_sheet.visible and hud.character_sheet.actor == enemy
 			and hud.character_sheet.portrait.texture != null,
-			"Clicar no quadro abre a ficha arrastável, inclusive para hostis.")
+			"Detalhes abre a ficha arrastável, inclusive para hostis.")
+	for index in combat.initiative_order.size():
+		if combat.initiative_order[index]["entity"] == actor:
+			var player_entry: Dictionary = combat.initiative_order[index]
+			combat.initiative_order.remove_at(index)
+			combat.initiative_order.push_front(player_entry)
+			break
 	combat._start_combat_turns()
 	check(bar._current_actor == combat.current_actor,
 		"A seta acompanha a entidade cujo turno começou.")
+	check(combat.current_actor == actor and combat.is_player_turn(),
+		"Jogável abre o primeiro turno neste cenário de teste.")
+	for info in bar._cards:
+		if info["actor"] != actor:
+			continue
+		var active_button := (info["frame"] as TextureRect).get_parent().get_node(
+			"Inspect") as Button
+		active_button.pressed.emit()
+		check(bar._action_menu.visible and bar._action_buttons.get_child_count() == 2 \
+			and (bar._action_buttons.get_child(1) as Button).text == "AÇÕES",
+			"Jogável ativo oferece Detalhes e Ações na iniciativa.")
+		(bar._action_buttons.get_child(1) as Button).pressed.emit()
+		check(hud.action_drawer.visible and hud._open_card.state == actor,
+			"Ações da iniciativa abre a caixa de ações do jogável.")
+		bar._process(0.2)
+		check(bar._root.position.x >= bar.LEFT_X \
+			and bar._root.position.x >= hud.action_drawer.get_global_rect().end.x + 18.0,
+			"A fila começa à direita da caixa de ações, com margem de clique.")
+		break
+	scene.request_combat_selection(enemy.position)
+	var selected_enemy_card: Dictionary = {}
+	for info in bar._cards:
+		if info["actor"] == enemy:
+			selected_enemy_card = info
+	check(bar._selected_enemy == enemy and scene._enemy_link_glow.visible \
+		and not selected_enemy_card.is_empty() \
+		and (selected_enemy_card["glow"] as Panel).visible,
+		"Selecionar o hex hostil acende também sua caixa na iniciativa.")
 	var current := combat.current_actor
 	bar._on_turn_finished(current)
 	var spent_card: Dictionary = {}

@@ -16,6 +16,7 @@ script = ExtResource("2_outcome")
 id = &"ev_00062_out_01"
 id = &"ev_00062_out_01"
 display_name = "Conhecimento fortalece."
+narrative_description = "Conhecimento fortalece.\nConcede a [nome_personagem] um bônus em Ataque e Vida máxima igual ao dobro das Informações possuídas pelo grupo. O valor é recalculado sempre que esse total muda."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

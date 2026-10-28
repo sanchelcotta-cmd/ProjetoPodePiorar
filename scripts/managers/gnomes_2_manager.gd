@@ -23,6 +23,8 @@ var _round_index := -1
 var _information_chance := 60
 var _rng := RandomNumberGenerator.new()
 var positions: Array[Vector2i] = []
+# A cor visual também é um resultado sorteado e deve sobreviver ao carregamento.
+var color_paths: Array[String] = []
 
 
 func _ready() -> void:
@@ -52,6 +54,7 @@ func stop_effect() -> void:
 	active = false
 	_round_index = -1
 	positions.clear()
+	color_paths.clear()
 	_clear_visuals()
 
 
@@ -84,8 +87,11 @@ func _on_actor_will_arrive(_actor: EntityState, destination: Vector2i) -> void:
 			break
 	if sprite != null:
 		var vanish := create_tween().set_parallel(true)
-		vanish.tween_property(sprite, "modulate:a", 0.0, 0.14)
-		vanish.tween_property(sprite, "scale", Vector2(1.28, 1.28), 0.14)
+		var comfort := get_node_or_null("/root/VisualComfort")
+		var reduced := comfort != null and bool(comfort.get("enabled"))
+		vanish.tween_property(sprite, "modulate:a", 0.0, 0.35 if reduced else 0.14)
+		if not reduced:
+			vanish.tween_property(sprite, "scale", Vector2(1.28, 1.28), 0.14)
 		vanish.chain().tween_callback(sprite.queue_free)
 
 
@@ -111,6 +117,8 @@ func _on_combat_finished(_result: Dictionary) -> void:
 			var replacement := _nearest_available(positions[index], occupied)
 			if replacement == EntityState.UNPLACED:
 				positions.remove_at(index)
+				if index < color_paths.size():
+					color_paths.remove_at(index)
 			else:
 				positions[index] = replacement
 	_clear_visuals()
@@ -141,6 +149,7 @@ func _nearest_available(origin: Vector2i, occupied: Dictionary) -> Vector2i:
 
 func _reposition() -> void:
 	positions.clear()
+	color_paths.clear()
 	_clear_visuals()
 	if not active or gerencia == null or gerencia.campaign.current_map == null:
 		return
@@ -184,10 +193,20 @@ func _reposition() -> void:
 func _draw_visuals() -> void:
 	if visual_root == null or gerencia == null or gerencia.map_view == null:
 		return
-	var colors: Array = COLORS.duplicate()
-	colors.shuffle()
+	if color_paths.size() != positions.size():
+		color_paths.clear()
+		var colors: Array = COLORS.duplicate()
+		for index in range(colors.size() - 1, 0, -1):
+			var other := _rng.randi_range(0, index)
+			var selected: Variant = colors[index]
+			colors[index] = colors[other]
+			colors[other] = selected
+		for index in positions.size():
+			color_paths.append((colors[index] as SpriteSheetAnimationData).resource_path)
 	for index in positions.size():
-		var animation := colors[index] as SpriteSheetAnimationData
+		var animation := load(color_paths[index]) as SpriteSheetAnimationData
+		if animation == null:
+			continue
 		var sprite := AnimatedSprite2D.new()
 		sprite.name = "Gnome_%d" % index
 		sprite.sprite_frames = animation.create_sprite_frames()

@@ -23,7 +23,7 @@ script = ExtResource("1_bxfxi")
 id = &"ev_00003_out_01"
 id = &"ev_00003_out_01"
 display_name = "Consequência Ruim"
-narrative_description = "O velho louco ataca! Do nada!?"
+narrative_description = "O velho louco ataca! Do nada!?\nVocês terão que enfrentar esse cara. O porquê disso — jamais saberão."
 condition = SubResource("Resource_0nf3y")
 effects = Array[ExtResource("3_djwom")]([SubResource("Resource_l4puh")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
@@ -33,7 +33,7 @@ script = ExtResource("1_bxfxi")
 id = &"ev_00003_out_02"
 id = &"ev_00003_out_02"
 display_name = "Consequência Boa"
-narrative_description = "O velho vai embora. Esquisito..."
+narrative_description = "O velho vai embora. Esquisito...\nVocês provavelmente nunca mais verão esse cara. O porquê disso — talvez vocês saibam o que ele sabe."
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 
 [resource]

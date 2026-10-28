@@ -30,7 +30,9 @@ func _run() -> void:
 		load("res://resources/entities/entities_playable/mae.tres"),
 		load("res://resources/entities/entities_playable/pedreiro.tres"),
 		load("res://resources/entities/entities_playable/jornalista.tres")]
-	_check(gerencia.start_new_game(selected), "Campanha dos eventos de mundo inicia.")
+	_check(gerencia.start_new_game(selected, EventCampaignEligibility.Mode.MEDIUM,
+		[&"orchestra", &"khainokata"]),
+		"Campanha média dos eventos de mundo inicia com meta de dez Informações.")
 	var info := load("res://resources/informacoes/orchestra/orchestra_1.tres") as Informacao
 	var grid := HexGrid.new()
 	grid.generate_ppp_exploration_map()
@@ -70,8 +72,10 @@ func _run() -> void:
 		"Portal instala novo mapa e encerra o turno, sem ativar a chegada.")
 	_check(gerencia.campaign.current_map == portal_map
 		and gerencia.campaign.day == original_day
-		and gerencia.campaign.round_period == original_period,
-		"Portal preserva Dia e Rodada.")
+		and gerencia.campaign.round_period == original_period
+		and gerencia.campaign.information_goal() == 10
+		and gerencia.campaign.campaign_status == CampaignState.CampaignStatus.ACTIVE,
+		"R04: Portal preserva Dia, Rodada e meta da campanha média.")
 	var abducted := exploration.current_actor
 	var abduction := load(
 		"res://resources/events/random_events/29-voces_foram_abduzidos.tres") as EventData
@@ -93,8 +97,10 @@ func _run() -> void:
 	_check(gerencia.campaign.day == original_day + 1
 		and gerencia.campaign.round_period == original_period
 		and gerencia.campaign.current_map == abducted_map
-		and abducted_map.is_valid(abducted.position),
-		"Abdução avança um Dia, mantém a fase e coloca o ativador no novo mapa.")
+		and abducted_map.is_valid(abducted.position)
+		and gerencia.campaign.information_goal() == 10
+		and gerencia.campaign.campaign_status == CampaignState.CampaignStatus.ACTIVE,
+		"R04: Abdução muda Dia/mapa sem alterar a meta ou encerrar a campanha.")
 	print("PPP world transitions: %d falha(s)" % failures)
 	quit(1 if failures > 0 else 0)
 

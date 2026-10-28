@@ -55,10 +55,16 @@ func transform_equipped(actor: EntityState, entry: InventoryItemState,
 		_apply_instance_bonuses(actor, entry, 1)
 		return false
 	entry.states.clear()
+	# Uma transformação cria outra identidade de item; o vínculo do antigo
+	# Amuleto não pode contaminar o equipamento resultante.
+	if replacement.id != original.id:
+		entry.attuned_owner_instance_id = &""
+		entry.attuned_owner_name = ""
 	entry.improvement_attack = 0
 	entry.improvement_life = 0
 	entry.improvement_stamina = 0
 	_apply_numeric_bonuses(actor, replacement, 1)
+	_activate_attuned_amulet(actor, entry, skill_manager)
 	actor.equipment_changed.emit()
 	return true
 
@@ -117,6 +123,9 @@ func swap_equipped_accessories(from_owner: EntityState, to_owner: EntityState,
 	to_owner.equipped_accessories.append(backpack)
 	_apply_numeric_bonuses(to_owner, backpack.data, 1)
 	_apply_instance_bonuses(to_owner, backpack, 1)
+	_activate_attuned_amulet(to_owner, backpack, skill_manager)
+	if other != null:
+		_activate_attuned_amulet(from_owner, other, skill_manager)
 	from_owner.equipment_changed.emit()
 	to_owner.equipment_changed.emit()
 	return true
@@ -172,17 +181,26 @@ func equip(actor: EntityState, entry: InventoryItemState,
 		equipped.erase(replacement)
 		actor.inventory_items.append(replacement)
 		item_unequipped.emit(actor, replacement)
+		_record_unequip(campaign, actor, replacement)
 	actor.inventory_items.erase(entry)
 	equipped.append(entry)
 	_apply_numeric_bonuses(actor, item, 1)
 	_apply_instance_bonuses(actor, entry, 1)
+	_activate_attuned_amulet(actor, entry, skill_manager)
 	actor.equipment_changed.emit()
 	item_equipped.emit(actor, entry)
+	if campaign != null:
+		campaign.append_journal_entry(&"equip_item", [
+			{"text": actor.visible_name(), "tone": "actor"},
+			{"text": " equipou ", "tone": "text"},
+			{"text": item.display_name, "tone": "item"},
+			{"text": ".", "tone": "text"},
+		], actor.instance_id, {"item_id": str(item.id)})
 	return true
 
 
 func unequip(actor: EntityState, entry: InventoryItemState,
-		skill_manager: SkillManager) -> bool:
+		skill_manager: SkillManager, campaign: CampaignState = null) -> bool:
 	if actor == null or entry == null or entry.data == null or skill_manager == null:
 		return false
 	var item := entry.data
@@ -201,6 +219,13 @@ func unequip(actor: EntityState, entry: InventoryItemState,
 	actor.inventory_items.append(entry)
 	actor.equipment_changed.emit()
 	item_unequipped.emit(actor, entry)
+	if campaign != null:
+		campaign.append_journal_entry(&"unequip_item", [
+			{"text": actor.visible_name(), "tone": "actor"},
+			{"text": " desequipou ", "tone": "text"},
+			{"text": item.display_name, "tone": "item"},
+			{"text": ".", "tone": "text"},
+		], actor.instance_id, {"item_id": str(item.id)})
 	return true
 
 
@@ -281,13 +306,24 @@ func equip_playable_from_playable(donor: EntityState, recipient: EntityState,
 		old.inventory_slot_index = -1
 		donor.inventory_items.append(old)
 		item_unequipped.emit(recipient, old)
+		_record_unequip(campaign, recipient, old)
 	donor.inventory_items.erase(entry)
 	entry.inventory_slot_index = -1
 	equipped.append(entry)
 	_apply_numeric_bonuses(recipient, item, 1)
 	_apply_instance_bonuses(recipient, entry, 1)
+	_activate_attuned_amulet(recipient, entry, skill_manager)
 	recipient.equipment_changed.emit()
 	item_equipped.emit(recipient, entry)
+	campaign.append_journal_entry(&"equip_item", [
+		{"text": donor.visible_name(), "tone": "actor"},
+		{"text": " equipou ", "tone": "text"},
+		{"text": item.display_name, "tone": "item"},
+		{"text": " em ", "tone": "text"},
+		{"text": recipient.visible_name(), "tone": "actor"},
+		{"text": ".", "tone": "text"},
+	], donor.instance_id, {"item_id": str(item.id),
+		"recipient_id": str(recipient.instance_id)})
 	return true
 
 
@@ -342,12 +378,23 @@ func equip_companion_from_playable(donor: EntityState, companion: EntityState,
 		old.inventory_slot_index = -1
 		donor.inventory_items.append(old)
 		item_unequipped.emit(companion, old)
+		_record_unequip(campaign, companion, old)
 	donor.inventory_items.erase(entry)
 	equipped.append(entry)
 	_apply_numeric_bonuses(companion, item, 1)
 	_apply_instance_bonuses(companion, entry, 1)
+	_activate_attuned_amulet(companion, entry, skill_manager)
 	companion.equipment_changed.emit()
 	item_equipped.emit(companion, entry)
+	campaign.append_journal_entry(&"equip_item", [
+		{"text": donor.visible_name(), "tone": "actor"},
+		{"text": " equipou ", "tone": "text"},
+		{"text": item.display_name, "tone": "item"},
+		{"text": " em ", "tone": "text"},
+		{"text": companion.visible_name(), "tone": "actor"},
+		{"text": ".", "tone": "text"},
+	], donor.instance_id, {"item_id": str(item.id),
+		"recipient_id": str(companion.instance_id)})
 	return true
 
 
@@ -372,7 +419,30 @@ func unequip_companion_to_playable(companion: EntityState, recipient: EntityStat
 	recipient.inventory_items.append(entry)
 	companion.equipment_changed.emit()
 	item_unequipped.emit(companion, entry)
+	_record_unequip(campaign, companion, entry)
 	return true
+
+
+func _record_unequip(campaign: CampaignState, actor: EntityState,
+		entry: InventoryItemState) -> void:
+	if campaign == null or actor == null or entry == null or entry.data == null:
+		return
+	campaign.append_journal_entry(&"unequip_item", [
+		{"text": actor.visible_name(), "tone": "actor"},
+		{"text": " desequipou ", "tone": "text"},
+		{"text": entry.data.display_name, "tone": "item"},
+		{"text": ".", "tone": "text"},
+	], actor.instance_id, {"item_id": str(entry.data.id)})
+
+
+func _activate_attuned_amulet(actor: EntityState, entry: InventoryItemState,
+		skill_manager: SkillManager) -> void:
+	if actor == null or entry == null or skill_manager == null \
+			or actor.attuned_divine_amulet() != entry:
+		return
+	var protected_ids: Array[StringName] = [&"db_00003", &"db_00004",
+		&"db_00005", &"db_00009", &"db_00010"]
+	skill_manager.debuff_manager.remove_debuffs(actor, protected_ids)
 
 
 ## Simbiose Elemental consome a arma equipada diretamente. Não há etapa
@@ -451,4 +521,7 @@ func _slot_key(slot: ItemData.EquipmentSlot) -> StringName:
 
 
 func _source_id(entry: InventoryItemState) -> StringName:
-	return StringName("equipped:%d" % entry.get_instance_id())
+	if entry.equipment_source_id == &"":
+		entry.equipment_source_id = StringName("equipped:v2:%d:%d" % [
+			Time.get_ticks_usec(), entry.get_instance_id()])
+	return entry.equipment_source_id

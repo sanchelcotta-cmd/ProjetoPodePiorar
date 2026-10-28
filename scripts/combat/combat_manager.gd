@@ -9,19 +9,23 @@ extends Node
 
 signal combat_prepared(encounter: EncounterData, enemies: Array[EntityState], initiative: Array[Dictionary])
 signal enemy_summoned(enemy: EntityState, summoner: EntityState, acts_immediately: bool)
+signal ally_revived(ally: EntityState)
 signal conclusion_requested(title: String, narrative: String, rewards: Array[Resource])
 signal combat_finished(result: Dictionary)
 signal turn_started(actor: EntityState, cycle_number: int)
 signal turn_finished(actor: EntityState)
 signal action_resolved(actor: EntityState, action: StringName, details: Dictionary)
+signal hit_prepared(target: EntityState)
 signal die_rolled(actor: EntityState, result: int)
 signal combat_trap_requested(event: EventData, actor: EntityState, coord: Vector2i)
-signal revive_choice_requested(owner: EntityState, target: EntityState, skill: ActiveSkillData)
 signal recruitment_choice_requested(enemy: EntityState, chance: float,
 	information_names: String)
+signal enemy_inspected(enemy: EntityState)
+signal loot_item_delivered(recipient: EntityState, item: ItemData)
 
 const ENEMY_SILHOUETTE_SCRIPT = preload("res://scripts/visuals/enemy_silhouette_visual.gd")
 const ENEMY_AI_SCRIPT = preload("res://scripts/combat/enemy_combat_ai.gd")
+const LOOT_RESOLVER = preload("res://scripts/combat/combat_loot_resolver.gd")
 
 @export var gerencia: GerenciaJogo
 @export var block_manager: BlockManager
@@ -50,9 +54,11 @@ var _turn_moved: bool = false
 var _retaliation_by_enemy: Dictionary = {}
 var _exploration_snapshot: Dictionary = {}
 var _combat_turns_by_id: Dictionary = {}
+var _encounter_automatic_skill_uses: Dictionary = {} # ActiveSkillData.id -> usado pela horda
 var _saved_selection_validator: Callable
 var _saved_destination_validator: Callable
 var _combat_interaction_enabled: bool = false
+var _promotion_cleanup_pending: bool = false
 var _pending_trap: Dictionary = {}
 var _pending_attack_coord := EntityState.UNPLACED
 var _timed_attack_penalties: Array[Dictionary] = []
@@ -64,7 +70,6 @@ var _mother_attack_bonuses: Dictionary = {} # instance_id -> {actor, amount, exp
 var _encounter_reveal_sources: Array[StringName] = []
 var _selected_skill_grant: SkillGrantState
 var _previous_skill_targets: Dictionary = {}
-var _pending_revive: Dictionary = {}
 var _pending_recruitment: Dictionary = {}
 var _recruitment_feedback_pending := false
 var _attack_animation_pending := false
@@ -74,10 +79,19 @@ var _solo_actor: EntityState
 var _solo_restored := false
 var _pending_event_reward: ItemData
 var _event_reward_claimed := false
+var _loot_participant_ids: Dictionary = {}
+var _loot_entry_max_health := 0
+var _loot_damage_taken := 0
+var _loot_rolled := false
+var _loot_items: Array[ItemData] = []
+var _loot_resolved_count := 0
+var _loot_resolutions: Array[Dictionary] = []
 
 
 func _ready() -> void:
 	_rng.randomize()
+	if skill_manager != null:
+		skill_manager.incoming_damage_applied.connect(_on_incoming_damage_applied)
 	if block_manager != null:
 		block_manager.combat_requested.connect(_on_combat_requested)
 	if gerencia != null:
@@ -115,10 +129,20 @@ func _on_combat_requested(context: Dictionary) -> void:
 			if member != null and member != _solo_actor:
 				member.temporarily_absent_from_map = true
 		campaign.temporary_event_changed.emit()
+	# O limiar é fotografado ANTES das passivas de abertura causarem dano.
+	_capture_loot_participants()
 	var occupied: Dictionary = {}
 	for playable in _combat_playables():
 		if playable != null and playable.position != EntityState.UNPLACED:
 			occupied[playable.position] = true
+	if _solo_actor == null:
+		# Reserva primeiro os hexes dos aliados: hostis não podem tomar todas as
+		# vagas até dois passos do dono e empurrá-los para fora do combate.
+		_place_companions_for_combat(campaign)
+		for companion in campaign.companion_states:
+			if companion != null and companion.current_health > 0 \
+					and companion.position != EntityState.UNPLACED:
+				occupied[companion.position] = true
 	var exit_narrative := ""
 	var exit_requested := false
 	if current_encounter != null:
@@ -152,9 +176,9 @@ func _on_combat_requested(context: Dictionary) -> void:
 								var passive := (result["grant"] as SkillGrantState).skill as PassiveSkillData
 								if passive != null and exit_narrative.is_empty():
 									exit_narrative = passive.completion_narrative
+				_apply_easy_enemy_attack_adjustment(enemy)
 	if _solo_actor == null:
-		_place_companions_for_combat(campaign)
-		_draw_human_companions(campaign)
+		_draw_silhouette_companions(campaign)
 	_build_initiative(campaign)
 	# Disparos de abertura usam os Resources das próprias entidades. Uma cópia
 	# evita que invocações recém-criadas sejam processadas recursivamente.
@@ -185,6 +209,13 @@ func _offer_encounter_recruitment(activator: EntityState,
 		owner = playables[0] if not playables.is_empty() else null
 	if owner == null:
 		return false
+	var orchestra_active := campaign.has_active_ending(&"orchestra")
+	var global_threshold := 2 if campaign.campaign_mode \
+		== EventCampaignEligibility.Mode.SHORT else 4
+	var global_rule: bool = not orchestra_active and campaign.campaign_mode in [
+		EventCampaignEligibility.Mode.SHORT, EventCampaignEligibility.Mode.MEDIUM] \
+		and current_encounter != null and current_encounter.id \
+		== EventCampaignDependencies.EXPERIENCE_ENCOUNTER_ID
 	for enemy in enemies:
 		for grant in skill_manager.get_passive_grants(enemy):
 			var passive := grant.skill as PassiveSkillData
@@ -193,20 +224,32 @@ func _offer_encounter_recruitment(activator: EntityState,
 					or passive.effects.is_empty() \
 					or passive.effects[0].effect_type != SkillEffectData.EffectType.CHANGE_ALLEGIANCE:
 				continue
+			if global_rule and (passive.id \
+					!= EventCampaignDependencies.EXPERIENCE_ONE_CLUE_PASSIVE_ID \
+					or campaign.obtained_information_ids.size() < global_threshold):
+				continue
 			var matching := 0
 			for id in passive.required_information_ids:
 				if campaign.obtained_information_ids.has(id):
 					matching += 1
-			if matching < maxi(1, passive.minimum_matching_information) \
+			if not global_rule and (matching < maxi(1, passive.minimum_matching_information) \
 					or passive.maximum_matching_information > 0 \
-					and matching > passive.maximum_matching_information:
+					and matching > passive.maximum_matching_information):
 				continue
-			_pending_recruitment = {"enemy": enemy, "owner": owner, "grant": grant}
+			_pending_recruitment = {"enemy": enemy, "owner": owner, "grant": grant,
+				"global_rule": global_rule}
 			var information_names: Array[String] = []
-			if campaign.obtained_information_ids.has(&"in_00017"):
-				information_names.append("Orchestra 2/5")
-			if campaign.obtained_information_ids.has(&"in_00018"):
-				information_names.append("Orchestra 3/5")
+			if global_rule:
+				information_names.append("contagem global de %d Informações " % \
+					campaign.obtained_information_ids.size()
+					+ "(mínimo %d nesta campanha)" % global_threshold)
+			else:
+				if campaign.obtained_information_ids.has(
+						EventCampaignDependencies.EXPERIENCE_CLUE_IDS[0]):
+					information_names.append("pista Orchestra 2/5")
+				if campaign.obtained_information_ids.has(
+						EventCampaignDependencies.EXPERIENCE_CLUE_IDS[1]):
+					information_names.append("pista Orchestra 3/5")
 			recruitment_choice_requested.emit(enemy, passive.activation_chance,
 				" e ".join(information_names))
 			return true
@@ -229,6 +272,8 @@ func confirm_encounter_recruitment(accept: bool) -> Dictionary:
 		{"mode": HexGrid.PPPMapMode.COMBAT, "combat_id": _combat_id,
 		"combat_turn_number": 0, "encounter_opening": true,
 		"encounter_activator": owner, "combat": self,
+		"global_experience_recruitment": request.get("global_rule", false),
+		"recruitment_encounter_id": current_encounter.id,
 		"player_confirmed": true}, _rng)
 	var recruited := results.any(func(entry: Dictionary) -> bool:
 		return entry.get("grant") == request["grant"]) \
@@ -259,10 +304,23 @@ func finish_recruitment_feedback() -> bool:
 func request_victory(rewards: Array[Resource] = []) -> bool:
 	if current_encounter == null or not pending_conclusion.is_empty():
 		return false
+	if not _loot_rolled:
+		_loot_rolled = true
+		if enemies.any(func(enemy: EntityState) -> bool:
+			return enemy != null and enemy.current_health <= 0):
+			var loot: Dictionary = LOOT_RESOLVER.roll(gerencia.campaign.district,
+				_loot_damage_taken, _loot_entry_max_health, _rng)
+			if not loot.get("success", false):
+				_loot_rolled = false
+				push_error("CombatManager: %s" % loot.get("reason", "Saque inválido."))
+				return false
+			_loot_items.assign(loot["items"])
 	if event_executor != null:
 		_pending_event_reward = event_executor.get_pending_event_combat_reward()
 	if _pending_event_reward != null and _pending_event_reward not in rewards:
 		rewards.append(_pending_event_reward)
+	for item in _loot_items:
+		rewards.append(item)
 	pending_conclusion = {"title": "Vocês venceram",
 		"narrative": "", "rewards": rewards.duplicate(),
 		"result": {"reason": "victory"}}
@@ -305,7 +363,18 @@ func confirm_conclusion() -> bool:
 	if pending_conclusion.is_empty() or block_manager == null:
 		return false
 	var result: Dictionary = pending_conclusion.get("result", {})
+	if result.get("reason") == "victory" and not get_pending_loot_item().is_empty():
+		return false
 	if result.get("reason") == "defeat":
+		# A janela de ressurreição já foi resolvida. Confirmar as mortes reais
+		# antes de sair da cena registra derrota uma vez; ausentes não contam.
+		if gerencia != null and gerencia.campaign != null:
+			gerencia.campaign.finalize_dead_playables(skill_manager, _rng)
+			if gerencia.campaign.is_terminal():
+				gerencia.save_repository.record_terminal_line(gerencia.campaign)
+			# Confirmar a derrota é uma saída normal, não uma interrupção
+			# recuperável. Os slots manuais anteriores permanecem intactos.
+			gerencia.save_repository.mark_session_closed(gerencia.campaign.campaign_id)
 		_clear_session()
 		get_tree().change_scene_to_file("res://scenes/ui/playable_selection.tscn")
 		return true
@@ -318,11 +387,12 @@ func confirm_conclusion() -> bool:
 	_restore_exploration_turns()
 	if not block_manager.finish_combat(result):
 		return false
-	# Aliados recrutados, inclusive pets derrubados a 0, voltam com Vida cheia.
+	# Companheiros sobreviventes (Vida >= 1) se recuperam. Vida 0 é morte:
+	# preservá-la para uma ressurreição posterior, inclusive na Exploração.
 	# Os três jogáveis conservam sua Vida de fim de Encontro.
 	if gerencia != null and gerencia.campaign != null:
 		for companion in gerencia.campaign.companion_states:
-			if companion != null:
+			if companion != null and companion.current_health > 0:
 				companion.current_health = companion.max_health
 		gerencia.campaign.finalize_dead_playables(skill_manager, _rng)
 	_clear_session()
@@ -347,6 +417,69 @@ func exchange_pending_reward(outgoing: Array[InventoryItemState]) -> bool:
 	return true
 
 
+func get_pending_loot_item() -> Dictionary:
+	if pending_conclusion.get("result", {}).get("reason") != "victory" \
+			or _loot_resolved_count >= _loot_items.size():
+		return {}
+	return {"item": _loot_items[_loot_resolved_count],
+		"index": _loot_resolved_count + 1, "count": _loot_items.size()}
+
+
+func claim_pending_loot(recipient: EntityState) -> bool:
+	var pending := get_pending_loot_item()
+	if pending.is_empty() or gerencia == null or gerencia.campaign == null \
+			or recipient not in gerencia.campaign.active_entity_states:
+		return false
+	var item := pending["item"] as ItemData
+	if not skill_manager.inventory_manager.add_item(recipient, item):
+		return false
+	_loot_resolved_count += 1
+	_loot_resolutions.append({"kind": &"claimed", "recipient": recipient.visible_name()})
+	loot_item_delivered.emit(recipient, item)
+	return true
+
+
+func exchange_pending_loot(recipient: EntityState,
+		outgoing: Array[InventoryItemState]) -> bool:
+	var pending := get_pending_loot_item()
+	if pending.is_empty() or gerencia == null or gerencia.campaign == null \
+			or recipient not in gerencia.campaign.active_entity_states:
+		return false
+	var item := pending["item"] as ItemData
+	if not skill_manager.inventory_manager.exchange_items(recipient, outgoing, item):
+		return false
+	_loot_resolved_count += 1
+	_loot_resolutions.append({"kind": &"claimed", "recipient": recipient.visible_name()})
+	loot_item_delivered.emit(recipient, item)
+	return true
+
+
+func decline_pending_loot() -> bool:
+	if get_pending_loot_item().is_empty():
+		return false
+	_loot_resolved_count += 1
+	_loot_resolutions.append({"kind": &"declined"})
+	return true
+
+
+func _capture_loot_participants() -> void:
+	_loot_participant_ids.clear()
+	_loot_entry_max_health = 0
+	_loot_damage_taken = 0
+	for member in _combat_playables() + _combat_companions():
+		if member == null or member.current_health <= 0 \
+				or member.temporarily_absent_from_map:
+			continue
+		_loot_participant_ids[member.instance_id] = true
+		_loot_entry_max_health += member.max_health
+
+
+func _on_incoming_damage_applied(target: EntityState, damage: int) -> void:
+	if current_encounter != null and pending_conclusion.is_empty() \
+			and target != null and _loot_participant_ids.has(target.instance_id):
+		_loot_damage_taken += maxi(0, damage)
+
+
 ## Ponto de entrada das Skills SUMMON_ENTITY quando seu executor de Combate
 ## estiver ligado. O agendamento de turno (imediato ou não) fica com ele.
 func spawn_summoned_enemy(enemy_data: EntityData, summoner: EntityState,
@@ -361,7 +494,9 @@ func spawn_summoned_enemy(enemy_data: EntityData, summoner: EntityState,
 	var encounter_id := current_encounter.id if current_encounter != null else &"event_combat"
 	var enemy := EntityState.from_encounter_member(enemy_data, encounter_id,
 		enemies.size() + 1, coord)
+	_apply_easy_enemy_attack_adjustment(enemy)
 	enemy.summoned_by_instance_id = summoner.instance_id
+	enemy.summoned_can_summon = false
 	if effect != null:
 		enemy.summoned_can_summon = effect.summoned_can_summon
 		enemy.summoned_acts_immediately = effect.summoned_acts_immediately
@@ -375,6 +510,19 @@ func spawn_summoned_enemy(enemy_data: EntityData, summoner: EntityState,
 	_sync_combat_view()
 	enemy_summoned.emit(enemy, summoner, enemy.summoned_acts_immediately)
 	return enemy
+
+
+func _apply_easy_enemy_attack_adjustment(enemy: EntityState) -> void:
+	if enemy != null and gerencia != null and gerencia.campaign != null \
+			and gerencia.campaign.difficulty == GameDifficulty.Mode.SUGAR \
+			and enemy.controller == EntityState.Controller.AI \
+			and not enemy.sugar_attack_adjusted:
+		# Após os atributos de abertura (ex.: Homens de Preto), uma vez por
+		# instância. Não alterar EntityData nem reaplicar ao carregar um save.
+		if enemy.attack > 3:
+			enemy.attack -= 1
+			enemy.sugar_enemy_attack_penalty = 1
+		enemy.sugar_attack_adjusted = true
 
 
 func count_living_summons(summoner: EntityState, entity_id: StringName) -> int:
@@ -467,34 +615,26 @@ func convert_enemy_to_companion(owner: EntityState, target: EntityState,
 			playable_owner, target, _rng):
 		return {"success": false}
 	enemies.erase(target)
-	var silhouette := enemy_visual_root.get_node_or_null("Enemy_%s" % target.instance_id) \
-		if enemy_visual_root != null else null
+	var silhouette := _visual_for_actor(target)
 	if silhouette != null:
-		silhouette.modulate = Color(0.18, 0.91, 0.97)
+		silhouette.name = "Ally_%s" % target.instance_id
+		silhouette.call("bind_state", target, true)
+		if silhouette.body_clicked.is_connected(_on_enemy_body_clicked):
+			silhouette.body_clicked.disconnect(_on_enemy_body_clicked)
 	if check_combat_end:
 		_check_combat_end()
 	return {"success": true, "companion": target}
 
 
+func can_consume_skill_source_item(actor: EntityState, grant: SkillGrantState) -> bool:
+	return skill_manager != null \
+		and skill_manager.equipped_source_item(actor, grant) != null
+
+
 func consume_skill_source_item(actor: EntityState, grant: SkillGrantState) -> bool:
-	if actor == null or grant == null or skill_manager == null \
-			or grant.source_kind != &"equipment":
-		return false
-	for slot in [actor.equipped_weapons, actor.equipped_armors,
-			actor.equipped_accessories]:
-		for entry in slot:
-			if StringName("equipped:%d" % entry.get_instance_id()) != grant.source_id:
-				continue
-			var equipment := EquipmentManager.new()
-			equipment._apply_numeric_bonuses(actor, entry.data, -1)
-			equipment._apply_instance_bonuses(actor, entry, -1)
-			slot.erase(entry)
-			skill_manager.remove_source(actor, grant.source_kind, grant.source_id)
-			if entry.data.cannot_craft_after_consumed and gerencia != null:
-				gerencia.campaign.consumed_uncraftable_item_ids[entry.data.id] = true
-			actor.equipment_changed.emit()
-			return true
-	return false
+	return skill_manager != null and gerencia != null \
+		and skill_manager.consume_equipment_source_item(actor, grant,
+			gerencia.campaign)
 
 
 ## Hostis com PREVENT_MOVEMENT são exceção: sorteio em qualquer hex livre.
@@ -627,41 +767,64 @@ func _place_companions_for_combat(campaign: CampaignState) -> void:
 	for playable in campaign.active_entity_states:
 		if playable != null and playable.position != EntityState.UNPLACED:
 			occupied[playable.position] = true
-	for enemy in enemies:
-		if enemy != null and enemy.current_health > 0:
-			occupied[enemy.position] = true
 	for companion in campaign.companion_states:
 		if companion == null or companion.current_health <= 0:
 			continue
 		var owner := campaign.get_playable_slot(companion.owner_instance_id)
 		if owner == null:
+			companion.position = EntityState.UNPLACED
 			continue
-		# Sempre começa junto ao dono. Se os seis vizinhos estiverem ocupados,
-		# amplia a busca um anel por vez; dentro do anel prefere longe dos hostis.
+		if owner.turn_serial < companion.unavailable_until_owner_turn_serial:
+			companion.position = EntityState.UNPLACED
+			continue
+		# Um ou dois passos do dono, incluindo a segunda coroa quando os vizinhos
+		# imediatos estão ocupados. A vaga já fica reservada antes dos hostis.
 		var nearest := 999
-		var best_safety := -1
+		var candidates: Array[Vector2i] = []
+		for coord in grid.cells:
+			if occupied.has(coord) or not grid.can_traverse_ppp(coord):
+				continue
+			var distance := HexGrid.distance(owner.position, coord)
+			if distance < 1 or distance > 2:
+				continue
+			if distance < nearest:
+				nearest = distance
+				candidates.clear()
+			if distance == nearest:
+				candidates.append(coord)
+		if candidates.is_empty():
+			companion.position = EntityState.UNPLACED
+			push_warning("CombatManager: sem hex a até dois passos do dono para %s." % companion.visible_name())
+			continue
+		companion.position = candidates[_rng.randi_range(0, candidates.size() - 1)]
+		occupied[companion.position] = true
+
+
+func _place_returning_companions_for_owner(owner: EntityState) -> void:
+	if owner == null or gerencia == null or gerencia.campaign.current_map == null:
+		return
+	var grid := gerencia.campaign.current_map
+	for companion in _combat_companions():
+		if companion == null or companion.current_health <= 0 \
+				or companion.owner_instance_id != owner.instance_id \
+				or companion.position != EntityState.UNPLACED \
+				or companion.unavailable_until_owner_turn_serial <= 0 \
+				or owner.turn_serial < companion.unavailable_until_owner_turn_serial:
+			continue
+		var occupied := _occupied_positions(companion)
+		var nearest := 999
 		var candidates: Array[Vector2i] = []
 		for coord in grid.cells:
 			if occupied.has(coord):
 				continue
 			var distance := HexGrid.distance(owner.position, coord)
-			var safety := 999
-			for enemy in enemies:
-				if enemy != null and enemy.current_health > 0:
-					safety = mini(safety, HexGrid.distance(coord, enemy.position))
 			if distance < nearest:
 				nearest = distance
-				best_safety = safety
 				candidates.clear()
-			elif distance == nearest and safety > best_safety:
-				best_safety = safety
-				candidates.clear()
-			if distance == nearest and safety == best_safety:
+			if distance == nearest:
 				candidates.append(coord)
-		if candidates.is_empty():
-			continue
-		companion.position = candidates[_rng.randi_range(0, candidates.size() - 1)]
-		occupied[companion.position] = true
+		if not candidates.is_empty():
+			companion.position = candidates[_rng.randi_range(0, candidates.size() - 1)]
 
 
 func _combat_playables() -> Array[EntityState]:
@@ -701,7 +864,7 @@ func _start_combat_turns() -> void:
 
 
 func _advance_turn() -> void:
-	if not pending_conclusion.is_empty() or initiative_order.is_empty() \
+	if _promotion_cleanup_pending or not pending_conclusion.is_empty() or initiative_order.is_empty() \
 			or gerencia == null:
 		return
 	if _check_combat_end():
@@ -716,12 +879,23 @@ func _advance_turn() -> void:
 				if participant != null and participant.current_health > 0:
 					participant.turn_state = EntityState.TurnState.AVAILABLE
 		var candidate := initiative_order[_turn_index]["entity"] as EntityState
-		if candidate == null or candidate.current_health <= 0 \
-				or candidate.position == EntityState.UNPLACED:
+		if candidate == null or candidate.current_health <= 0:
+			continue
+		# Vai Pegar! deixa o companheiro fora de cena até o turno agendado do
+		# dono. Ele permanece na fila para poder voltar neste mesmo combate,
+		# mas jamais recebe um turno impossível de comandar enquanto ausente.
+		if gerencia.campaign.companion_states.has(candidate):
+			var owner := gerencia.campaign.get_playable_slot(candidate.owner_instance_id)
+			if owner != null and owner.turn_serial < candidate.unavailable_until_owner_turn_serial:
+				candidate.turn_state = EntityState.TurnState.INACTIVE
+				continue
+		if candidate.position == EntityState.UNPLACED:
 			continue
 		current_actor = candidate
 		candidate.turn_state = EntityState.TurnState.TURNING
 		candidate.turn_serial += 1
+		if candidate in gerencia.campaign.active_entity_states:
+			_place_returning_companions_for_owner(candidate)
 		gerencia.campaign.on_temporary_event_turn_started(candidate)
 		_expire_damage_guards_for(candidate)
 		_combat_turns_by_id[candidate.instance_id] = int(_combat_turns_by_id.get(
@@ -739,6 +913,8 @@ func _advance_turn() -> void:
 		var allies := _allies_of(candidate)
 		if skill_manager != null:
 			skill_manager.on_entity_turn_started(candidate, gerencia.campaign, _rng, allies)
+			if candidate in gerencia.campaign.active_entity_states and candidate.current_health > 0:
+				skill_manager.resolve_delayed_effects_for_owner(candidate, gerencia.campaign)
 			_dispatch_combat_passive(candidate, PassiveSkillData.Trigger.ON_TURN_START, {})
 		# Para hostis comuns, a mesma rolagem determina a movimentação deste
 		# turno. As fichas que fixam/copiam Stamina e os imóveis são exceções.
@@ -753,17 +929,22 @@ func _advance_turn() -> void:
 		if candidate.current_health <= 0 or (skill_manager != null \
 				and not skill_manager.debuff_manager.can_take_action(candidate)):
 			call_deferred("end_current_turn")
+		elif _charm_due_this_turn(candidate):
+			call_deferred("_run_charmed_turn", candidate)
 		elif candidate.controller == EntityState.Controller.AI:
 			call_deferred("_run_automatic_turn", candidate)
 		return
 	_check_combat_end()
 
 
-func end_current_turn() -> bool:
-	if _attack_animation_pending:
+func end_current_turn(completed_forced_charm: bool = false) -> bool:
+	if _attack_animation_pending or _promotion_cleanup_pending:
 		return false
 	if current_actor == null or not pending_conclusion.is_empty() \
-			or not _pending_trap.is_empty() or not _pending_revive.is_empty():
+			or not _pending_trap.is_empty():
+		return false
+	if _charm_due_this_turn(current_actor) and not completed_forced_charm \
+			and skill_manager.debuff_manager.can_take_action(current_actor):
 		return false
 	var finished := current_actor
 	if skill_manager != null:
@@ -789,7 +970,7 @@ func end_current_turn() -> bool:
 
 
 func is_player_turn() -> bool:
-	return current_actor != null and gerencia != null \
+	return not _promotion_cleanup_pending and current_actor != null and gerencia != null \
 		and (current_actor in gerencia.campaign.active_entity_states \
 		or current_actor in gerencia.campaign.companion_states) \
 		and current_actor.controller == EntityState.Controller.PLAYER \
@@ -802,12 +983,14 @@ func has_rolled_turn_die() -> bool:
 
 func can_roll_player_turn_die() -> bool:
 	return is_player_turn() and _turn_die == 0 and not _attack_animation_pending \
-		and _pending_trap.is_empty() and _pending_revive.is_empty() \
+		and _pending_trap.is_empty() \
+		and not _charm_due_this_turn(current_actor) \
 		and _attacks_used < 1 + current_actor.extra_attacks_this_turn
 
 
 func select_player_skill(grant: SkillGrantState) -> bool:
-	if not is_player_turn() or grant == null or skill_manager == null:
+	if not is_player_turn() or grant == null or skill_manager == null \
+			or _charm_due_this_turn(current_actor):
 		return false
 	var skill := grant.skill as ActiveSkillData
 	if skill == null or skill.use_context == ActiveSkillData.UseContext.EXPLORATION \
@@ -866,7 +1049,10 @@ func roll_player_turn_die() -> int:
 
 func select_player_action(mode: StringName) -> bool:
 	if not is_player_turn() or _attack_animation_pending or _turn_die <= 0 or not _pending_trap.is_empty() \
-			or mode not in [&"move", &"attack"]:
+			or _charm_due_this_turn(current_actor) or mode not in [&"move", &"attack"]:
+		return false
+	if mode == &"attack" and skill_manager != null \
+			and not skill_manager.debuff_manager.can_attack(current_actor):
 		return false
 	action_mode = mode
 	return true
@@ -940,7 +1126,7 @@ func player_move(coord: Vector2i) -> bool:
 	path.assign(paths[coord])
 	_apply_move(current_actor, path)
 	_attack_animation_pending = true
-	_finish_player_move(current_actor, path.size() * 0.24 + 0.03)
+	_finish_player_move(current_actor, _visual_move_wait(current_actor, path.size()))
 	action_mode = &""
 	return true
 
@@ -953,11 +1139,17 @@ func _finish_player_move(actor: EntityState, duration: float) -> void:
 	action_resolved.emit(actor, &"move_finished", {})
 
 
+func _visual_move_wait(actor: EntityState, steps: int) -> float:
+	var seconds_per_hex := PlayableActorVisual.MAX_HEX_MOVE_SECONDS \
+		if actor != null and actor.playable_slot_id != &"" else 0.24
+	return float(steps) * seconds_per_hex + 0.03
+
+
 func can_player_attack(coord: Vector2i) -> bool:
 	if not is_player_turn() or _attack_animation_pending or _turn_die <= 0 or not _pending_trap.is_empty() \
 			or _attacks_used >= 1 + current_actor.extra_attacks_this_turn \
 			or skill_manager == null \
-			or not skill_manager.debuff_manager.can_take_action(current_actor):
+			or not skill_manager.debuff_manager.can_attack(current_actor):
 		return false
 	var target := _opponent_at(current_actor, coord)
 	if target == null:
@@ -992,9 +1184,10 @@ func player_attack(coord: Vector2i) -> bool:
 			_pending_attack_coord = coord
 			return true
 		_attack_animation_pending = true
-		# O desvio visual entre entidades pode durar 0,24 s por hex.
+		# O desvio visual entre entidades pode durar 0,30 s por hex.
 		# A resolução do golpe espera o sprite parar adjacente ao alvo.
-		_finish_player_melee_attack(attacker, target, path.size() * 0.24 + 0.03)
+		_finish_player_melee_attack(attacker, target,
+			_visual_move_wait(attacker, path.size()))
 		return true
 	_resolve_attack(attacker, target)
 	action_mode = &""
@@ -1172,7 +1365,8 @@ func _run_automatic_turn(expected: EntityState) -> void:
 		path.assign(paths[destination])
 		if skill_manager == null or skill_manager.debuff_manager.can_follow_path(expected, path):
 			_apply_move(expected, path)
-			await get_tree().create_timer(path.size() * 0.24 + 0.03).timeout
+			await get_tree().create_timer(_visual_move_wait(expected,
+				path.size())).timeout
 	if current_actor != expected or not pending_conclusion.is_empty():
 		return
 	var distance := HexGrid.distance(expected.position, target.position)
@@ -1183,6 +1377,53 @@ func _run_automatic_turn(expected: EntityState) -> void:
 	await get_tree().create_timer(0.25).timeout
 	if current_actor == expected and pending_conclusion.is_empty():
 		end_current_turn()
+
+
+## Charme interrompe a decisão normal no PRÓXIMO turno, inclusive para IA e
+## aliados. O controle CANT_ATTACK já vale imediatamente após a aplicação.
+func _charm_due_this_turn(actor: EntityState) -> bool:
+	if actor == null or skill_manager == null:
+		return false
+	var charm := skill_manager.debuff_manager.get_debuff(actor, &"db_00011")
+	return charm != null and charm.applied_turn_serial < actor.turn_serial
+
+
+func is_charm_forced_turn(actor: EntityState) -> bool:
+	return actor == current_actor and _charm_due_this_turn(actor)
+
+
+func _run_charmed_turn(expected: EntityState) -> void:
+	await get_tree().create_timer(0.2).timeout
+	if current_actor != expected or not pending_conclusion.is_empty() \
+			or not _charm_due_this_turn(expected):
+		return
+	var charm := skill_manager.debuff_manager.get_debuff(expected, &"db_00011")
+	var source := charm.source if charm != null else null
+	var grid := gerencia.campaign.current_map
+	var limit := mini(expected.stamina_remaining, ceili(float(expected.max_stamina) * 0.5))
+	var best_path: Array[Vector2i] = []
+	if source != null and source.current_health > 0 \
+			and source.position != EntityState.UNPLACED and grid != null and limit > 0:
+		var closest := HexGrid.distance(expected.position, source.position)
+		var paths: Dictionary = _ai.reachable_paths(grid, expected.position,
+			limit, _occupied_positions(expected))
+		for destination in paths:
+			var path: Array[Vector2i] = []
+			path.assign(paths[destination])
+			if path.is_empty() or not skill_manager.debuff_manager.can_follow_path(expected, path):
+				continue
+			var distance := HexGrid.distance(destination, source.position)
+			if distance < closest or (distance == closest and not best_path.is_empty() \
+					and path.size() < best_path.size()):
+				closest = distance
+				best_path = path
+	if not best_path.is_empty():
+		_apply_move(expected, best_path)
+		await get_tree().create_timer(_visual_move_wait(expected,
+			best_path.size())).timeout
+	if current_actor == expected and pending_conclusion.is_empty() \
+			and _pending_trap.is_empty():
+		end_current_turn(true)
 
 
 func _run_automatic_actives(actor: EntityState,
@@ -1197,6 +1438,9 @@ func _run_automatic_actives(actor: EntityState,
 		var skill := grant.skill as ActiveSkillData
 		if skill == null or trigger not in skill.automatic_triggers \
 				or not _automatic_skill_due(actor, skill):
+			continue
+		if skill.activate_once_per_encounter \
+				and _encounter_automatic_skill_uses.has(skill.id):
 			continue
 		if actor.summoned_by_instance_id != &"" and not actor.summoned_can_summon \
 				and skill.effects.any(func(effect: SkillEffectData) -> bool:
@@ -1229,6 +1473,8 @@ func _run_automatic_actives(actor: EntityState,
 			gerencia.campaign, self, target, true)
 		if not outcome.get("success", false):
 			continue
+		if skill.activate_once_per_encounter:
+			_encounter_automatic_skill_uses[skill.id] = true
 		if target != null:
 			_previous_skill_targets[actor.instance_id] = target.instance_id
 		action_resolved.emit(actor, &"skill", outcome)
@@ -1238,7 +1484,8 @@ func _run_automatic_actives(actor: EntityState,
 
 
 func _automatic_skill_due(actor: EntityState, skill: ActiveSkillData) -> bool:
-	var turn_number := int(_combat_turns_by_id.get(actor.instance_id, 0))
+	var turn_number := combat_cycle if skill.activate_once_per_encounter else \
+		int(_combat_turns_by_id.get(actor.instance_id, 0))
 	if skill.first_activation_turn > 0 and turn_number < skill.first_activation_turn:
 		return false
 	if skill.repeat_every_turns > 0 and skill.first_activation_turn > 0 \
@@ -1327,8 +1574,7 @@ func _animate_non_playable_move(actor: EntityState, origin: Vector2i,
 		path: Array[Vector2i]) -> void:
 	if enemy_visual_root == null or actor == null:
 		return
-	var prefix := "Enemy_" if actor in enemies else "Ally_"
-	var visual := enemy_visual_root.get_node_or_null("%s%s" % [prefix, actor.instance_id])
+	var visual := _visual_for_actor(actor)
 	if visual != null and visual.has_method("animate_path"):
 		visual.animate_path(origin, path)
 
@@ -1356,6 +1602,9 @@ func resolve_pending_trap() -> Dictionary:
 			_resolve_attack(actor, target)
 	_pending_attack_coord = EntityState.UNPLACED
 	_check_combat_end()
+	if actor == current_actor and _charm_due_this_turn(actor) \
+			and pending_conclusion.is_empty():
+		call_deferred("end_current_turn", true)
 	return result
 
 
@@ -1410,6 +1659,8 @@ func _resolve_attack(attacker: EntityState, target: EntityState,
 		ranged_override: int = -1) -> Dictionary:
 	if attacker == null or target == null or target.current_health <= 0:
 		return {"success": false}
+	if skill_manager != null and not skill_manager.debuff_manager.can_attack(attacker):
+		return {"success": false, "reason": "Charme impede o ataque."}
 	var distance := HexGrid.distance(attacker.position, target.position)
 	var ranged := (ranged_override == 1) if ranged_override >= 0 else \
 		_uses_ranged_attack(attacker)
@@ -1419,12 +1670,17 @@ func _resolve_attack(attacker: EntityState, target: EntityState,
 				attacker, _attack_mastery(attacker)))):
 		return {"success": false}
 	var weapon := attacker.primary_equipped(ItemData.EquipmentSlot.WEAPON)
+	var dagger_aspect: StringName = attacker.dagger_next_aspect \
+		if weapon != null and weapon.data != null and weapon.data.id == &"aa_00001" \
+		else &""
 	var attack_context := {"attack_target": target, "selected_target": target,
 		"damage_source": attacker, "damage_source_adjacent": distance == 1,
+		"direct_attack": true,
 		"is_melee_attack": not ranged,
 		"incoming_attack_type": PassiveSkillData.IncomingAttackType.RANGED \
 			if ranged else PassiveSkillData.IncomingAttackType.MELEE,
 		"attack_item_id": weapon.data.id if weapon != null else &"",
+		"attack_aspect": dagger_aspect,
 		"has_weapon_for_attack": weapon != null or _has_absorbed_weapon(attacker),
 		"damage_source_item_id": weapon.data.id if weapon != null else &"",
 		"damage_die_result": _turn_die,
@@ -1468,25 +1724,41 @@ func _resolve_attack(attacker: EntityState, target: EntityState,
 		# continua, mas um disparo acertado não vira alcance "infinito" de 0 dano.
 		raw_damage = maxi(1, raw_damage)
 	_attacks_used += 1
+	if dagger_aspect != &"":
+		attacker.dagger_next_aspect = &"shadow" if dagger_aspect == &"light" else &"light"
 	_consume_next_attack_bonus(attacker)
 	var result := {"success": raw_damage > 0, "damage": 0,
 		"raw_damage": raw_damage, "die": _turn_die, "distance": distance}
+	var previous_debuff_ids: Array[StringName] = []
+	for active_debuff in target.debuffs:
+		if active_debuff != null and active_debuff.data != null:
+			previous_debuff_ids.append(active_debuff.data.id)
+	var critical_status := &""
+	var ricochet_results: Array[Dictionary] = []
 	if raw_damage > 0 and skill_manager != null:
+		hit_prepared.emit(target)
 		var guarded_fraction := float(_guard_reductions.get(target.instance_id, 1.0))
 		var guarded_damage := maxi(1, floori(float(raw_damage) * guarded_fraction))
 		var incoming_context := _combat_context(attacker, attack_context)
+		incoming_context["protection_basis"] = raw_damage
 		var applied := skill_manager.apply_incoming_damage(target, guarded_damage,
 			gerencia.campaign, incoming_context, _rng)
 		result["damage"] = applied.get("damage", 0)
 		result["dodged"] = applied.get("dodged", false)
+		result["survived_lethal_hit"] = applied.get("survived_lethal_hit", false)
 		attack_context["damage_dealt"] = result["damage"]
-		attack_context["attack_hit"] = result["damage"] > 0
+		attack_context["attack_hit"] = result["damage"] > 0 \
+			or result["survived_lethal_hit"]
 		if int(result["damage"]) > 0 and critical_hit:
-			_apply_mastery_critical(attacker, target, mastery)
+			critical_status = _apply_mastery_critical(attacker, target, mastery)
 		_dispatch_combat_passive(attacker, PassiveSkillData.Trigger.ON_AFTER_ATTACK,
 			attack_context)
-		_dispatch_combat_passive(attacker, PassiveSkillData.Trigger.ON_AFTER_DAMAGE_DEALT,
-			attack_context)
+		var after_damage := _dispatch_combat_passive(attacker,
+			PassiveSkillData.Trigger.ON_AFTER_DAMAGE_DEALT, attack_context)
+		for passive_result in after_damage:
+			for effect_result in passive_result.get("effects", []):
+				if effect_result.get("ricochet", false):
+					ricochet_results.append(effect_result)
 		_dispatch_combat_passive(target, PassiveSkillData.Trigger.ON_AFTER_DAMAGE_RECEIVED,
 			attack_context)
 		for ally in _allies_of(target):
@@ -1501,16 +1773,38 @@ func _resolve_attack(attacker: EntityState, target: EntityState,
 			_retaliation_by_enemy[target.instance_id] = retaliation
 		if target.current_health <= 0:
 			_hide_dead_enemy(target)
-			_offer_revive_for(target)
 	var resolved_die := _turn_die
 	if attacker == current_actor and attacker.controller == EntityState.Controller.PLAYER:
 		_turn_die = 0
+	var applied_statuses: Array[String] = []
+	if critical_status == &"db_00008":
+		applied_statuses.append("sangramento")
+	elif critical_status == &"db_00002":
+		applied_statuses.append("atordoamento")
+	for active_debuff in target.debuffs:
+		if active_debuff == null or active_debuff.data == null \
+				or active_debuff.data.id in previous_debuff_ids:
+			continue
+		var status_name := ""
+		match active_debuff.data.id:
+			&"db_00008": status_name = "sangramento"
+			&"db_00002": status_name = "atordoamento"
+		if not status_name.is_empty() and status_name not in applied_statuses:
+			applied_statuses.append(status_name)
 	_sync_combat_view()
 	_show_damage_popup(target, int(result["damage"]),
-		"ESQUIVA" if result.get("dodged", false) else "SEM DANO")
+		"ESQUIVA" if result.get("dodged", false) else \
+		"SEM DANO", result.get("survived_lethal_hit", false))
 	action_resolved.emit(attacker, &"attack", {"target": target,
+		"ranged": ranged,
+		"dagger_aspect": dagger_aspect,
 		"damage": result["damage"], "raw_damage": raw_damage,
-		"dodged": result.get("dodged", false), "die": resolved_die})
+		"dodged": result.get("dodged", false), "die": resolved_die,
+		"survived_lethal_hit": result.get("survived_lethal_hit", false),
+		"critical": critical_hit and int(result["damage"]) > 0,
+		"applied_statuses": applied_statuses})
+	for ricochet in ricochet_results:
+		action_resolved.emit(attacker, &"ricochet", ricochet)
 	_check_combat_end()
 	return result
 
@@ -1553,18 +1847,19 @@ func _is_critical_roll(actor: EntityState) -> bool:
 
 
 func _apply_mastery_critical(attacker: EntityState, target: EntityState,
-		mastery: EntityData.Mastery) -> void:
+		mastery: EntityData.Mastery) -> StringName:
 	if skill_manager == null or target.current_health <= 0:
-		return
+		return &""
 	var debuff_id := &""
 	match mastery:
 		EntityData.Mastery.BLADE: debuff_id = &"db_00008"
 		EntityData.Mastery.IMPACT: debuff_id = &"db_00002"
 	if debuff_id == &"" or skill_manager.is_status_immune(target, debuff_id):
-		return
-	skill_manager.debuff_manager.apply_by_id(target, debuff_id, attacker,
+		return &""
+	var applied := skill_manager.debuff_manager.apply_by_id(target, debuff_id, attacker,
 		0, gerencia.campaign.day, -1, attacker.data.id if attacker.data != null else &"",
 		-1.0, _turn_die)
+	return debuff_id if bool(applied.get("success", false)) else &""
 
 
 func _attack_base_for_roll(actor: EntityState, unarmed: bool) -> int:
@@ -1635,6 +1930,8 @@ func try_passive_counterattack(actor: EntityState, attacker: EntityState) -> Dic
 		return {"success": true, "skipped": true}
 	var distance := HexGrid.distance(actor.position, attacker.position)
 	var ranged := weapon.data.mastery_granted == EntityData.Mastery.RANGED
+	var dagger_aspect: StringName = actor.dagger_next_aspect \
+		if weapon.data.id == &"aa_00001" else &""
 	var roll := gerencia.campaign.player_dice_luck.roll_for_player(_rng) \
 		if actor.controller == EntityState.Controller.PLAYER else \
 		gerencia.campaign.enemy_dice_luck.roll_for_enemy(_rng)
@@ -1643,29 +1940,44 @@ func try_passive_counterattack(actor: EntityState, attacker: EntityState) -> Dic
 	var raw := maxi(0, actor.attack + roll - (maxi(0, distance - 1) if ranged else 0))
 	if raw <= 0:
 		return {"success": true, "skipped": true}
+	if dagger_aspect == &"light":
+		raw *= 2
+	if dagger_aspect != &"":
+		actor.dagger_next_aspect = &"shadow" if dagger_aspect == &"light" else &"light"
+	hit_prepared.emit(attacker)
 	var applied := skill_manager.apply_incoming_damage(attacker, raw,
 		gerencia.campaign, _combat_context(actor, {"damage_source": actor,
-			"is_melee_attack": not ranged, "damage_source_adjacent": distance == 1}), _rng)
+			"is_melee_attack": not ranged, "damage_source_adjacent": distance == 1,
+			"incoming_attack_type": PassiveSkillData.IncomingAttackType.RANGED \
+				if ranged else PassiveSkillData.IncomingAttackType.MELEE,
+			"direct_attack": true}), _rng)
 	var dealt := int(applied.get("damage", 0))
-	_show_damage_popup(attacker, dealt, "SEM DANO")
+	if dagger_aspect == &"shadow" and dealt > 0:
+		actor.current_health = mini(actor.max_health,
+			actor.current_health + floori(float(dealt) * 0.6))
+	_show_damage_popup(attacker, dealt,
+		"SEM DANO", applied.get("survived_lethal_hit", false))
 	action_resolved.emit(actor, &"counterattack", {"target": attacker,
-		"damage": dealt, "die": roll})
+		"damage": dealt, "die": roll, "dagger_aspect": dagger_aspect,
+		"ranged": ranged,
+		"survived_lethal_hit": applied.get("survived_lethal_hit", false)})
 	if attacker.current_health <= 0:
 		_hide_dead_enemy(attacker)
-		_offer_revive_for(attacker)
 	_check_combat_end()
 	return {"success": true, "damage": dealt, "counterattack": true}
 
 
 func _show_damage_popup(target: EntityState, damage: int,
-		zero_label: String = "SEM DANO") -> void:
+		zero_label: String = "SEM DANO", survived_lethal_hit: bool = false) -> void:
 	if enemy_visual_root == null or target == null:
 		return
 	var label := Label.new()
 	label.name = "DamagePopup"
 	label.z_index = 20
-	label.text = "-%d" % damage if damage > 0 else zero_label
-	label.add_theme_color_override("font_color", Color(1.0, 0.10, 0.15)
+	label.text = ("-%d · 1 DE VIDA" % damage if damage > 0 else "1 DE VIDA") \
+		if survived_lethal_hit else "-%d" % damage if damage > 0 else zero_label
+	label.add_theme_color_override("font_color", Color(0.94, 0.77, 0.35)
+		if survived_lethal_hit else Color(1.0, 0.10, 0.15)
 		if damage > 0 else Color(0.86, 0.90, 0.94))
 	label.add_theme_color_override("font_shadow_color", Color(0.05, 0.0, 0.0))
 	label.add_theme_constant_override("shadow_offset_x", 1)
@@ -1674,67 +1986,11 @@ func _show_damage_popup(target: EntityState, damage: int,
 	label.position = PPPMapView.reference_hex_position(target.position) + Vector2(-20, -170)
 	enemy_visual_root.add_child(label)
 	var tween := label.create_tween().set_parallel(true)
-	tween.tween_property(label, "position:y", label.position.y - 38.0, 0.8)
+	var comfort := get_node_or_null("/root/VisualComfort")
+	if comfort == null or not bool(comfort.get("enabled")):
+		tween.tween_property(label, "position:y", label.position.y - 38.0, 0.8)
 	tween.tween_property(label, "modulate:a", 0.0, 0.8)
 	tween.finished.connect(label.queue_free)
-
-
-func _offer_revive_for(target: EntityState) -> void:
-	if target == null or target in enemies or not _pending_revive.is_empty() \
-			or skill_manager == null or gerencia == null:
-		return
-	var candidates: Array[Dictionary] = []
-	for owner in _allies_of(target):
-		if owner == target or owner.current_health <= 0:
-			continue
-		for grant in skill_manager.get_active_grants(owner):
-			var skill := grant.skill as ActiveSkillData
-			if skill == null or not skill.requires_player_confirmation \
-					or ActiveSkillData.AutomaticTrigger.ON_ALLY_DEATH not in skill.automatic_triggers:
-				continue
-			if skill_manager.can_use_combat_active(owner, grant,
-					gerencia.campaign, self, target, true):
-				candidates.append({"owner": owner, "grant": grant})
-	if candidates.is_empty():
-		return
-	_pending_revive = {"target": target, "candidates": candidates}
-	_show_next_revive_choice()
-
-
-func _show_next_revive_choice() -> void:
-	if _pending_revive.is_empty():
-		return
-	var candidates := _pending_revive["candidates"] as Array
-	if candidates.is_empty():
-		_pending_revive.clear()
-		if not _check_combat_end() and current_actor != null \
-				and current_actor.controller == EntityState.Controller.AI:
-			call_deferred("end_current_turn")
-		return
-	var owner := candidates[0]["owner"] as EntityState
-	var grant := candidates[0]["grant"] as SkillGrantState
-	revive_choice_requested.emit(owner, _pending_revive["target"] as EntityState,
-		grant.skill as ActiveSkillData)
-
-
-func confirm_revive_choice(accept: bool) -> Dictionary:
-	if _pending_revive.is_empty():
-		return {"success": false}
-	var candidates := _pending_revive["candidates"] as Array
-	var entry := candidates.pop_front() as Dictionary
-	var target := _pending_revive["target"] as EntityState
-	var result := {"success": false}
-	if accept:
-		result = skill_manager.use_combat_active(entry["owner"] as EntityState,
-			entry["grant"] as SkillGrantState, gerencia.campaign, self, target, true)
-	if result.get("success", false):
-		_pending_revive.clear()
-		_sync_combat_view()
-		if current_actor != null and current_actor.controller == EntityState.Controller.AI:
-			call_deferred("end_current_turn")
-	else:
-		_show_next_revive_choice()
-	return result
 
 
 func _dispatch_combat_passive(actor: EntityState, trigger: PassiveSkillData.Trigger,
@@ -1866,14 +2122,46 @@ func _occupied_positions(except_actor: EntityState = null) -> Dictionary:
 	return occupied
 
 
-func _allies_of(actor: EntityState) -> Array[EntityState]:
+func _allies_of(actor: EntityState, include_dead: bool = false) -> Array[EntityState]:
 	var allies: Array[EntityState] = []
 	if actor in enemies:
 		allies.append_array(enemies)
 	else:
 		allies.append_array(_combat_playables())
 		allies.append_array(_combat_companions())
+	for index in range(allies.size() - 1, -1, -1):
+		if allies[index] == null or (not include_dead and allies[index].current_health <= 0) \
+				or allies[index].position == EntityState.UNPLACED:
+			allies.remove_at(index)
 	return allies
+
+
+func place_revived_ally(target: EntityState, owner: EntityState) -> void:
+	if target == null or owner == null or gerencia == null \
+			or gerencia.campaign.current_map == null:
+		return
+	var grid := gerencia.campaign.current_map
+	var occupied := _occupied_positions(target)
+	if not grid.is_valid(target.position) or occupied.has(target.position):
+		var nearest := EntityState.UNPLACED
+		var distance := 999999
+		for coord in grid.cells:
+			if occupied.has(coord):
+				continue
+			var candidate_distance := HexGrid.distance(owner.position, coord)
+			if candidate_distance < distance:
+				distance = candidate_distance
+				nearest = coord
+		if nearest != EntityState.UNPLACED:
+			target.position = nearest
+	if target.position == EntityState.UNPLACED:
+		return
+	_draw_silhouette_companions(gerencia.campaign)
+	if not initiative_order.any(func(entry: Dictionary) -> bool:
+		return entry.get("entity") == target):
+		target.turn_state = EntityState.TurnState.AVAILABLE
+		initiative_order.append(_roll_initiative_entry(target))
+		ally_revived.emit(target)
 
 
 func _opponents_of(actor: EntityState) -> Array[EntityState]:
@@ -1883,7 +2171,56 @@ func _opponents_of(actor: EntityState) -> Array[EntityState]:
 		opponents.append_array(_combat_companions())
 	else:
 		opponents.append_array(enemies)
+	for index in range(opponents.size() - 1, -1, -1):
+		if opponents[index] == null or opponents[index].current_health <= 0 \
+				or opponents[index].position == EntityState.UNPLACED \
+				or actor in enemies and skill_manager != null \
+					and skill_manager.debuff_manager.has_exploration_event_control(opponents[index]):
+			opponents.remove_at(index)
 	return opponents
+
+
+## Ricochete da Espada Irada Eletrizante. O centro é o alvo atingido, não o
+## atacante; nunca atinge o mesmo inimigo nem inicia outro ricochete em cadeia.
+func apply_ricochet_damage(attacker: EntityState, primary: EntityState,
+		primary_damage: int, fraction: float, max_hexes: int) -> Dictionary:
+	if attacker == null or primary == null or skill_manager == null \
+			or gerencia == null or gerencia.campaign == null or primary_damage <= 0:
+		return {"success": false}
+	var damage := floori(float(primary_damage) * fraction)
+	if damage <= 0:
+		return {"success": true, "damage": 0, "skipped": true}
+	var closest := 999999
+	var candidates: Array[EntityState] = []
+	for enemy in _opponents_of(attacker):
+		if enemy == primary:
+			continue
+		var distance := HexGrid.distance(primary.position, enemy.position)
+		if distance > max_hexes:
+			continue
+		if distance < closest:
+			closest = distance
+			candidates.clear()
+		if distance == closest:
+			candidates.append(enemy)
+	if candidates.is_empty():
+		return {"success": true, "damage": 0, "skipped": true}
+	var chosen := candidates[_rng.randi_range(0, candidates.size() - 1)]
+	hit_prepared.emit(chosen)
+	var applied := skill_manager.apply_incoming_damage(chosen, damage,
+		gerencia.campaign, {"mode": HexGrid.PPPMapMode.COMBAT,
+			"damage_source": attacker,
+			"combat_id": _combat_id, "direct_attack": true,
+			"generated_damage_can_trigger_passives": false}, _rng)
+	var dealt := int(applied.get("damage", 0))
+	_show_damage_popup(chosen, dealt,
+		"ESQUIVA" if applied.get("dodged", false) else \
+		"SEM DANO", applied.get("survived_lethal_hit", false))
+	if chosen.current_health <= 0:
+		_hide_dead_enemy(chosen)
+	return {"success": true, "ricochet": true, "target": chosen,
+		"damage": dealt, "source_target": primary,
+		"survived_lethal_hit": applied.get("survived_lethal_hit", false)}
 
 
 func _opponent_at(actor: EntityState, coord: Vector2i) -> EntityState:
@@ -1894,12 +2231,29 @@ func _opponent_at(actor: EntityState, coord: Vector2i) -> EntityState:
 
 
 func _check_combat_end() -> bool:
-	if not _pending_revive.is_empty():
+	if _promotion_cleanup_pending:
 		return true
 	if current_encounter == null or not pending_conclusion.is_empty():
 		return not pending_conclusion.is_empty()
 	if _solo_actor != null and _solo_actor.current_health <= 0:
 		return request_solo_defeat()
+	# Fechar a morte depois da oportunidade de ressuscitar, mas antes de
+	# declarar derrota: um aliado humano jogável assume imediatamente a vaga.
+	if _solo_actor == null and gerencia != null and gerencia.campaign != null \
+			and gerencia.campaign.has_dead_playable_slot() \
+			and gerencia.campaign.first_promotable_playable_companion() != null:
+		_promotion_cleanup_pending = true
+		var companion_ids: Dictionary = {}
+		for companion in gerencia.campaign.companion_states:
+			if companion != null:
+				companion_ids[companion] = companion.instance_id
+		gerencia.campaign.finalize_dead_playables(skill_manager, _rng)
+		for companion in companion_ids:
+			if companion in gerencia.campaign.active_entity_states:
+				_remap_combat_participant_id(companion_ids[companion],
+					companion.instance_id)
+		_remove_promoted_ally_visuals_after_animation.call_deferred()
+		return true
 	var living_enemy := enemies.any(func(enemy: EntityState) -> bool:
 		return enemy != null and enemy.current_health > 0)
 	if not living_enemy:
@@ -1908,13 +2262,77 @@ func _check_combat_end() -> bool:
 		func(actor: EntityState) -> bool: return actor != null and actor.current_health > 0)
 	if not living_playable:
 		return request_solo_defeat() if _solo_actor != null else request_defeat()
+	# Se ninguém mais puder ser alvejado, a proteção temporária não pode
+	# tornar o combate interminável. Duração em turnos liberta o sobrevivente;
+	# duração por rodada mantém a derrota definida pelo jogo.
+	if _solo_actor == null and skill_manager != null:
+		var allies := _combat_playables() + _combat_companions()
+		var targetable := allies.any(func(actor: EntityState) -> bool:
+			return actor != null and actor.current_health > 0 \
+				and actor.position != EntityState.UNPLACED \
+				and not skill_manager.debuff_manager.has_exploration_event_control(actor))
+		if not targetable:
+			for actor in allies:
+				if actor != null and actor.current_health > 0:
+					skill_manager.debuff_manager.release_exploration_event_turn_controls(actor)
+			targetable = allies.any(func(actor: EntityState) -> bool:
+				return actor != null and actor.current_health > 0 \
+					and actor.position != EntityState.UNPLACED \
+					and not skill_manager.debuff_manager.has_exploration_event_control(actor))
+			if not targetable:
+				return request_defeat()
 	return false
+
+
+## Chamado só depois do OK da redistribuição obrigatória. O combate não
+## avança enquanto o jogador decide para onde vai o espólio.
+func on_promotion_cleanup_confirmed() -> void:
+	if not _promotion_cleanup_pending:
+		return
+	_promotion_cleanup_pending = false
+	if _check_combat_end():
+		return
+	if current_actor == null or current_actor.current_health <= 0:
+		call_deferred("_advance_turn")
+	elif current_actor.controller == EntityState.Controller.AI:
+		call_deferred("end_current_turn")
+
+
+func _remove_promoted_ally_visuals_after_animation() -> void:
+	await get_tree().create_timer(2.5).timeout
+	if not is_inside_tree() or enemy_visual_root == null or gerencia == null:
+		return
+	for visual in enemy_visual_root.get_children():
+		if visual is EnemySilhouetteVisual and visual.state in \
+				gerencia.campaign.active_entity_states:
+			visual.queue_free()
+
+
+func _remap_combat_participant_id(old_id: StringName, new_id: StringName) -> void:
+	if old_id == new_id:
+		return
+	if _loot_participant_ids.has(old_id):
+		_loot_participant_ids[new_id] = _loot_participant_ids[old_id]
+		_loot_participant_ids.erase(old_id)
+	for bucket in [_combat_turns_by_id, _previous_skill_targets, _damage_guards,
+			_guard_reductions, _guard_expiry_turn_by_id, _next_attack_bonuses,
+			_mother_attack_bonuses, _retaliation_by_enemy]:
+		if bucket.has(old_id):
+			bucket[new_id] = bucket[old_id]
+			bucket.erase(old_id)
+	for owner_id in _previous_skill_targets:
+		if _previous_skill_targets[owner_id] == old_id:
+			_previous_skill_targets[owner_id] = new_id
+	for retaliations in _retaliation_by_enemy.values():
+		if retaliations is Dictionary and retaliations.has(old_id):
+			retaliations[new_id] = retaliations[old_id]
+			retaliations.erase(old_id)
 
 
 func _hide_dead_enemy(enemy: EntityState) -> void:
 	if enemy_visual_root == null:
 		return
-	var visual := enemy_visual_root.get_node_or_null("Enemy_%s" % enemy.instance_id)
+	var visual := _visual_for_actor(enemy)
 	if visual != null:
 		visual.call("play_death")
 
@@ -1929,6 +2347,14 @@ func _sync_combat_view() -> void:
 
 
 func _clear_session() -> void:
+	_loot_participant_ids.clear()
+	_loot_entry_max_health = 0
+	_loot_damage_taken = 0
+	_loot_rolled = false
+	_loot_items.clear()
+	_loot_resolved_count = 0
+	_loot_resolutions.clear()
+	_promotion_cleanup_pending = false
 	_pending_recruitment.clear()
 	_recruitment_feedback_pending = false
 	if _solo_actor != null and not _solo_restored \
@@ -1969,10 +2395,10 @@ func _clear_session() -> void:
 	_turn_moved = false
 	_retaliation_by_enemy.clear()
 	_pending_trap.clear()
-	_pending_revive.clear()
 	_previous_skill_targets.clear()
 	_pending_attack_coord = EntityState.UNPLACED
 	_combat_turns_by_id.clear()
+	_encounter_automatic_skill_uses.clear()
 	_exploration_snapshot.clear()
 	_solo_actor = null
 	_solo_restored = false
@@ -2078,6 +2504,16 @@ func _draw_enemy(enemy: EntityState) -> void:
 	visual.body_clicked.connect(_on_enemy_body_clicked)
 
 
+func _visual_for_actor(actor: EntityState) -> EnemySilhouetteVisual:
+	if actor == null or enemy_visual_root == null:
+		return null
+	for child in enemy_visual_root.get_children():
+		var visual := child as EnemySilhouetteVisual
+		if visual != null and visual.state == actor:
+			return visual
+	return null
+
+
 func get_enemies_under_pointer(screen_position: Vector2) -> Array[EntityState]:
 	var under_pointer: Array[EntityState] = []
 	if map_view == null:
@@ -2100,7 +2536,7 @@ func get_body_target_index(screen_position: Vector2, count: int) -> int:
 
 
 func _on_enemy_body_clicked(_clicked: EntityState, screen_position: Vector2) -> void:
-	if map_view == null or not is_player_turn():
+	if map_view == null:
 		return
 	var under_pointer := get_enemies_under_pointer(screen_position)
 	if under_pointer.is_empty():
@@ -2110,16 +2546,22 @@ func _on_enemy_body_clicked(_clicked: EntityState, screen_position: Vector2) -> 
 	else:
 		_last_enemy_click_index += 1
 	_last_enemy_click_position = screen_position
-	map_view.request_combat_selection(under_pointer[_last_enemy_click_index % under_pointer.size()].position)
+	var selected := under_pointer[_last_enemy_click_index % under_pointer.size()]
+	enemy_inspected.emit(selected)
+	if is_player_turn():
+		map_view.request_combat_selection(selected.position)
 
 
-func _draw_human_companions(campaign: CampaignState) -> void:
+func _draw_silhouette_companions(campaign: CampaignState) -> void:
 	if enemy_visual_root == null or map_view == null:
 		return
 	for companion in campaign.companion_states:
 		if companion == null or companion.current_health <= 0 \
 				or companion.position == EntityState.UNPLACED or companion.data == null \
-				or not companion.data.tags.has(&"jogavel"):
+				or companion.data.tags.has(&"gatinho_vira_lata") \
+				or companion.data.tags.has(&"doguinho_caramelo"):
+			continue
+		if _visual_for_actor(companion) != null:
 			continue
 		var visual := ENEMY_SILHOUETTE_SCRIPT.new() as Node2D
 		visual.name = "Ally_%s" % companion.instance_id
@@ -2135,7 +2577,8 @@ func _build_initiative(campaign: CampaignState) -> void:
 			participants.append(playable)
 	for companion in _combat_companions():
 		if companion != null and companion.current_health > 0 \
-				and companion.position != EntityState.UNPLACED:
+				and (companion.position != EntityState.UNPLACED \
+				or _companion_is_fetching(companion, campaign)):
 			participants.append(companion)
 	participants.append_array(enemies)
 	for participant in participants:
@@ -2151,6 +2594,13 @@ func _build_initiative(campaign: CampaignState) -> void:
 			return a_player
 		return a["registration_order"] < b["registration_order"]
 	)
+
+
+func _companion_is_fetching(companion: EntityState, campaign: CampaignState) -> bool:
+	if companion == null or campaign == null:
+		return false
+	var owner := campaign.get_playable_slot(companion.owner_instance_id)
+	return owner != null and owner.turn_serial < companion.unavailable_until_owner_turn_serial
 
 
 func _roll_initiative_entry(participant: EntityState) -> Dictionary:

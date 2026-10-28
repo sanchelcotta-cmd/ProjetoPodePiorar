@@ -14,6 +14,7 @@ custom_rule = &"vortice_mortal"
 script = ExtResource("2_outcome")
 id = &"ev_00028_out_01"
 display_name = "Você é puxado para outra dimensão."
+narrative_description = "Você é puxado para outra dimensão.... E agora deve enfrentar um inimigo aleatório. Se vencer, ganha uma boa recompensa, mas se perder... Bom, é permanente."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

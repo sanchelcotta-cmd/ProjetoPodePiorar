@@ -21,6 +21,7 @@ expiration_mode = 2
 script = ExtResource("2_outcome")
 id = &"ev_00038_out_01"
 display_name = "Você prevê os blocos."
+narrative_description = "Você pode prever alguns caminhos."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

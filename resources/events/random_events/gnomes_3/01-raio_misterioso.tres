@@ -27,6 +27,7 @@ math_operation = 2
 script = ExtResource("2_outcome")
 id = &"gn_00001_out_01"
 display_name = "Força"
+narrative_description = "Força"
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_force_attack"), SubResource("Effect_force_current_hp")])
 
 [sub_resource type="Resource" id="Effect_teleport"]
@@ -40,6 +41,7 @@ ignore_stamina_range = true
 script = ExtResource("2_outcome")
 id = &"gn_00001_out_02"
 display_name = "Teletransporte"
+narrative_description = "Você ganhou: Teletransporte."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_teleport")])
 
 [sub_resource type="Resource" id="Effect_agility"]
@@ -52,6 +54,7 @@ passive = ExtResource("4_agility")
 script = ExtResource("2_outcome")
 id = &"gn_00001_out_03"
 display_name = "Super-agilidade"
+narrative_description = "Você ganhou: Super-agilidade."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_agility")])
 
 [sub_resource type="Resource" id="Effect_damage"]
@@ -66,6 +69,7 @@ math_operation = 1
 script = ExtResource("2_outcome")
 id = &"gn_00001_out_04"
 display_name = "Raio doloroso"
+narrative_description = "Esse raio foi direto na sua cabeça. E isso doeu!"
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_damage")])
 
 [resource]

@@ -130,8 +130,8 @@ func _run_test() -> void:
 	check(block.is_busy(), "Evento recusado deve aguardar seu executor.")
 	check(block.finish_event_resolution(), "Executor deve concluir o Evento recusado.")
 	check(exploration.current_actor.playable_slot_id == &"Playable_1", "Depois dos efeitos, o turno termina.")
-	# Nenhum dos três consegue alcançar o único bloco disponível: a Exploração
-	# libera esse destino mais próximo, sem alterar permanentemente a Estamina.
+	# A exceção pertence ao jogável ilhado, mesmo quando outro ainda consegue
+	# alcançar um bloco. Ela não altera permanentemente sua Estamina.
 	var stranded_grid := _make_grid(information, bad_event)
 	for coord in stranded_grid.cells:
 		stranded_grid.activate_ppp_block(coord)
@@ -142,8 +142,9 @@ func _run_test() -> void:
 	var stranded_actor := exploration.current_actor
 	stranded_actor.stamina_remaining = 1
 	var far_destination := Vector2i(7, 1)
-	check(not exploration.get_available_destinations().has(far_destination),
-		"Não libera exceção enquanto outro jogável alcança um bloco disponível.")
+	check(exploration.get_available_destinations().has(Vector2i(0, 2))
+		and not exploration.get_available_destinations().has(far_destination),
+		"O jogável ilhado pode ir ao bloco mais próximo mesmo se outro puder avançar.")
 	stranded_grid.activate_ppp_block(Vector2i(0, 2))
 	stranded_grid.set_ppp_block(Vector2i(6, 1), HexGrid.PPPBlockType.INFORMATION, information)
 	check(exploration.get_available_destinations().has(Vector2i(6, 1))

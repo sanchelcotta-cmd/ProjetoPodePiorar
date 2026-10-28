@@ -2,6 +2,7 @@ class_name EnemySilhouetteVisual
 extends Node2D
 
 signal body_clicked(actor: EntityState, screen_position: Vector2)
+signal attack_contact_frame(actor: EntityState, target: EntityState)
 const DEBUFF_MARKER_SCRIPT := preload("res://scripts/visuals/entity_debuff_marker.gd")
 const DEATH_BLINK := preload("res://scripts/visuals/death_blink.gd")
 
@@ -15,6 +16,8 @@ var _walk_tween: Tween
 var debuff_marker: Node2D
 var _death_tween: Tween
 var _dying := false
+var _combat_hit_held := false
+var _attack_tween: Tween
 
 
 func _ready() -> void:
@@ -57,6 +60,9 @@ func bind_state(enemy: EntityState, allied: bool = false) -> void:
 		state.health_changed.disconnect(_on_health_changed)
 	state = enemy
 	_dying = false
+	_combat_hit_held = false
+	if _attack_tween != null and _attack_tween.is_running():
+		_attack_tween.kill()
 	if _death_tween != null and _death_tween.is_running():
 		_death_tween.kill()
 	modulate.a = 1.0
@@ -71,9 +77,11 @@ func bind_state(enemy: EntityState, allied: bool = false) -> void:
 
 
 func play_death() -> void:
-	if _dying:
+	if _dying or _combat_hit_held:
 		return
 	_dying = true
+	if _attack_tween != null and _attack_tween.is_running():
+		_attack_tween.kill()
 	if _walk_tween != null and _walk_tween.is_running():
 		_walk_tween.kill()
 	var hit_area := get_node_or_null("BodyClickArea") as Area2D
@@ -85,9 +93,52 @@ func play_death() -> void:
 	queue_redraw()
 
 
+func play_attack(target: EntityState) -> void:
+	# Silhuetas ainda não têm sprites de ataque. Três poses deslocadas
+	# representam a preparação, avanço e contato até a arte final existir.
+	if state == null or target == null or _dying:
+		return
+	if _attack_tween != null and _attack_tween.is_running():
+		_attack_tween.kill()
+	var origin := PPPMapView.reference_hex_position(state.position)
+	position = origin
+	var direction := -1.0 if target.position.x < state.position.x else 1.0
+	_attack_tween = create_tween()
+	_attack_tween.tween_property(self, "position", origin + Vector2(7.0 * direction, -3.0), 0.06)
+	_attack_tween.tween_property(self, "position", origin + Vector2(15.0 * direction, -5.0), 0.06)
+	_attack_tween.tween_callback(func() -> void:
+		if is_instance_valid(state) and is_instance_valid(target):
+			attack_contact_frame.emit(state, target))
+	_attack_tween.tween_property(self, "position", origin, 0.13)
+
+
+func hold_combat_hit() -> void:
+	_combat_hit_held = true
+
+
+func cancel_combat_hit() -> void:
+	_combat_hit_held = false
+
+
+func present_combat_hit() -> void:
+	_combat_hit_held = false
+	if state == null:
+		return
+	if state.current_health <= 0:
+		play_death()
+	else:
+		var flash := create_tween()
+		flash.tween_property(self, "modulate", Color(1.0, 0.32, 0.35), 0.07)
+		flash.tween_property(self, "modulate", Color.WHITE, 0.17)
+
+
 func _on_health_changed(_previous: int, current: int) -> void:
+	if _combat_hit_held and current < _previous:
+		return
 	if current <= 0:
 		play_death()
+	elif current < _previous:
+		present_combat_hit()
 	elif _dying:
 		if _death_tween != null and _death_tween.is_running():
 			_death_tween.kill()

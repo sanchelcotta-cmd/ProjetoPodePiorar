@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_6oeeo"]
 [ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="7_nuq77"]
 [ext_resource type="Resource" path="res://resources/skills/actives/items/ressurreicao_amuleto_divino.tres" id="8_active"]
+[ext_resource type="Resource" path="res://resources/skills/actives/items/sintonizacao_amuleto_divino.tres" id="9_attune"]
 
 [ext_resource type="Texture2D" path="res://sprites/itens_icons/acessorios_epicos_1.png" id="ppp_icon_sheet"]
 
@@ -20,7 +21,7 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 script = ExtResource("3_6oeeo")
 id = &"item_passive_004"
 display_name = "Imunidade Divina"
-description = "Não pode ser afetado por Doença, Tristeza, Terror ou Maldições."
+description = "Após sintonizar, concede imunidade a Doença, Tristeza, Terror e Maldições somente ao personagem vinculado e enquanto o Amuleto estiver equipado."
 continuous_effects = Array[ExtResource("7_nuq77")]([SubResource("Resource_mfpx3")])
 tags = Array[StringName]([&"amuleto_divino"])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"
@@ -34,13 +35,13 @@ script = ExtResource("1_i4qyf")
 icon = SubResource("ppp_item_icon")
 id = &"ac_00001"
 display_name = "Amuleto Divino"
-description = "Imunidade a Doença, Tristeza, Terror e Maldições. Quando um aliado morrer, pode quebrar o amuleto para ressuscitá-lo com a Vida máxima completa. O Amuleto Divino não pode ser criado novamente nesta partida."
+description = "Pode ser sintonizado uma única vez, por um único personagem. A escolha é irreversível e não destrói o amuleto. Enquanto o personagem vinculado o equipar, fica imune a Doença, Tristeza, Terror e Maldições. A proteção também remove Doença, Tristeza e Terror já ativos. Ao desequipar, perde a proteção; ao reequipar, ela volta. Outros personagens podem equipá-lo, mas não recebem a imunidade nem podem sintonizá-lo. Sacrifício Divino ressuscita um aliado, mas destrói o amuleto."
 rarity = 4
 acquisition_sources = 4
 tags = Array[StringName]([&"acessorio", &"epica", &"imunidade"])
 equipment_slot = 3
 granted_passives = Array[ExtResource("3_6oeeo")]([SubResource("Resource_5vmoc")])
-granted_active_skills = Array[ExtResource("2_vre7k")]([ExtResource("8_active")])
+granted_active_skills = Array[ExtResource("2_vre7k")]([ExtResource("8_active"), ExtResource("9_attune")])
 consumed_on_use = false
 cannot_craft_after_consumed = true
 metadata/_custom_type_script = "uid://bql64fe8a0w24"

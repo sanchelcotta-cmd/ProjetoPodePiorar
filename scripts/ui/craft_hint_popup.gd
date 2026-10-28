@@ -8,7 +8,7 @@ var message: Label
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.04, 0.045, 0.05, 0.80)
+	style.bg_color = Color(0.04, 0.045, 0.05, 0.94)
 	style.border_color = Color(1.0, 0.80, 0.16, 0.95)
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(4)

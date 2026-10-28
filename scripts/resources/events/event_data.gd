@@ -52,6 +52,9 @@ enum EventSource {
 
 @export_category("Resultados")
 @export var outcomes: Array[EventOutcomeData] = []
+# Texto de resultado ao recusar eventos do tipo PLAYER_ACCEPTS_THEN_OUTCOME.
+# Sem outcome/effects: a recusa continua sem consequência mecânica.
+@export_multiline var refusal_narrative_description: String
 # Cara/coroa reutilizável: qualquer Evento pode cadastrar duas opções distintas.
 # A UI exibe A/B apenas como placeholder visual (substituível por ícones de
 # moeda); o executor sorteia uma das duas com peso igual depois da confirmação.
@@ -64,7 +67,9 @@ enum EventSource {
 
 @export_category("Eventos gerados")
 ## Usado quando este evento cria outros eventos no mapa, como os cinco Gnomos Misteriosos.
-@export var generated_events: Array[EventData] = []
+# Resource evita referência circular do script EventData ao próprio tipo no cache do Godot.
+# Os elementos continuam sendo EventData; validar/castar ao consumi-los.
+@export var generated_events: Array[Resource] = []
 
 @export_category("Regra Especial")
 @export var custom_rule: StringName

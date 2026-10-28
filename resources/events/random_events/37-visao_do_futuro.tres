@@ -17,6 +17,7 @@ reveal_detail = 1
 script = ExtResource("2_outcome")
 id = &"ev_00037_out_01"
 display_name = "Você vê três caminhos."
+narrative_description = "Você vê três caminhos possíveis de futuro. Basta decidir, vai aceitá-los, ou rejeitá-los?"
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

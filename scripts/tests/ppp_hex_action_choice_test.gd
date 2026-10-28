@@ -63,6 +63,8 @@ func _run_test() -> void:
 	check(actor.position == before \
 		and gerencia.campaign.current_map.get_cell(coord).state == HexGrid.PPPBlockState.REVEALED,
 		"Selecionar a Ativa revela sem mover nem ativar o bloco.")
+	check(area.modulate == scene._renderer._palette.revealed_color,
+		"Hex revelado permanece rosa mesmo estando ao alcance da Estamina.")
 	check(not hud.hex_choice.visible, "A caixa fecha após a ação.")
 	scene._on_cell_pressed(coord, click)
 	check(not hud.hex_title_popup.visible and hud.hex_choice.visible \
@@ -112,6 +114,18 @@ func _run_test() -> void:
 	scene._on_cell_pressed(coord, click)
 	check(actor.position == coord and not hud.hex_choice.visible,
 		"Andar até armado ainda pode ativar o hex revelado.")
+	var resolved_grid := HexGrid.new()
+	resolved_grid.generate_ppp_exploration_map()
+	resolved_grid.set_ppp_block(coord, HexGrid.PPPBlockType.CONSUMABLE, preview_item)
+	resolved_grid.activate_ppp_block(coord)
+	var resolved_hexes := Node2D.new()
+	scene._renderer.create_hex_visual(resolved_hexes, coord, Vector2.ZERO)
+	scene._renderer.update_ppp_feedback(resolved_hexes, resolved_grid,
+		{coord: true}, Vector2i(-999, -999), Vector2i(-999, -999))
+	var resolved_area := resolved_hexes.get_node("Hex_0_2") as Area2D
+	check(resolved_area.modulate == scene._renderer._palette.inactive_color,
+		"Hex ativado sem o destaque do personagem ativo fica cinza.")
+	resolved_hexes.free()
 
 	# Verifica também o outro caminho: botão da ficha antes do clique no hex.
 	var walk_scene := load("res://teste.tscn").instantiate() as PPPMapView

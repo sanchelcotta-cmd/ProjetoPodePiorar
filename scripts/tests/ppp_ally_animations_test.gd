@@ -1,5 +1,7 @@
 extends SceneTree
 
+const ORIENTATION_SCALE := preload("res://scripts/visuals/sprite_orientation_reference.gd")
+
 ## Cobertura visual: recorte dos novos sheets, cor fixa por instância e
 ## cinco duendes de cores embaralhadas sem substituir Informação.
 var failures := 0
@@ -23,13 +25,17 @@ func _run_test() -> void:
 	for playable in CampaignState.new().get_playable_catalog():
 		var playable_frames := playable.playable_animation.create_sprite_frames()
 		for clip in playable_frames.get_animation_names():
-			check(is_equal_approx(playable_frames.get_animation_speed(clip), 6.0),
-				"Idle/Walk/Hurt dos jogáveis usam 6 quadros por segundo.")
+			var expected_fps := 8.0 if String(clip).begins_with("attack_") else 6.0
+			check(is_equal_approx(playable_frames.get_animation_speed(clip), expected_fps),
+				"Cadência atual dos jogáveis corresponde ao tipo de animação.")
 	var base_animation := (CampaignState.new().get_playable_catalog()[0] as EntityData).playable_animation
 	var short_animation := PlayableAnimationData.new()
 	short_animation.idle_sheet = base_animation.idle_sheet
 	short_animation.walk_sheet = base_animation.walk_sheet
 	short_animation.hurt_sheet = base_animation.hurt_sheet
+	short_animation.blade_attack_sheet = base_animation.blade_attack_sheet
+	short_animation.impact_attack_sheet = base_animation.impact_attack_sheet
+	short_animation.ranged_attack_sheet = base_animation.ranged_attack_sheet
 	short_animation.idle_frames = 5
 	short_animation.walk_frames = 5
 	short_animation.hurt_frames = 5
@@ -46,6 +52,35 @@ func _run_test() -> void:
 				"A volta da animação curta usa os mesmos quadros da ida.")
 	for variant in cats.animation_variants:
 		var frames := variant.create_sprite_frames()
+		check(variant.normalize_to_first_idle_frame and variant.canvas_size == Vector2i(96, 96),
+			"As quatro paletas usam o primeiro Idle como referência de tamanho.")
+		var idle_used := frames.get_frame_texture(&"idle", 0).get_image().get_used_rect()
+		check(idle_used.size.y > 0 and idle_used.size.y <= variant.subject_height,
+			"Primeiro Idle define altura visual válida para cada gatinho.")
+		for clip in [&"idle", &"idle_alt", &"walk", &"jump", &"carrying", &"attack"]:
+			for pose_index in frames.get_frame_count(clip):
+				var rendered := frames.get_frame_texture(clip,
+					pose_index).get_image().get_used_rect()
+				check(rendered.size.x <= variant.maximum_subject_width
+					and rendered.size.y <= idle_used.size.y + 1
+					and rendered.position.x >= 0 and rendered.position.y >= 0
+					and rendered.end.x <= variant.canvas_size.x
+					and rendered.end.y <= variant.canvas_size.y - 3,
+					"%s/%s/%d respeita o tamanho do Idle sem recorte." % [
+						variant.palette, clip, pose_index])
+		var carrying_rects := variant._find_frames(variant.carrying_sheet.get_image())
+		for pose_index in carrying_rects.size():
+			var source_rect: Rect2i = carrying_rects[pose_index]
+			var rendered := frames.get_frame_texture(&"carrying",
+				pose_index).get_image().get_used_rect()
+			var factor := minf(float(idle_used.size.y) / source_rect.size.y,
+				float(variant.maximum_subject_width) / source_rect.size.x)
+			var expected := Vector2i(roundi(source_rect.size.x * factor),
+				roundi(source_rect.size.y * factor))
+			check(abs(rendered.size.x - expected.x) <= 2
+				and abs(rendered.size.y - expected.y) <= 2,
+				"%s/Carrying/%d mantém cabeça e corpo completos." % [
+					variant.palette, pose_index])
 		for clip in frames.get_animation_names():
 			check(is_equal_approx(frames.get_animation_speed(clip),
 				2.0 if clip == &"carrying_held" else 6.0),
@@ -85,18 +120,19 @@ func _run_test() -> void:
 				continue
 			for index in frames.get_frame_count(clip):
 				var frame := frames.get_frame_texture(clip, index)
-				check(frame.get_size() == Vector2(64, 64),
-					"Quadros de gato têm 64×64 e pés alinhados.")
+				check(frame.get_size() == Vector2(96, 96)
+					and frame.get_image().get_used_rect().end.y == 93,
+					"Quadros de gato têm 96×96 e pés alinhados.")
 	if "--preview" in OS.get_cmdline_user_args():
-		var preview := Image.create_empty(64 * 4, 64 * 6, false, Image.FORMAT_RGBA8)
+		var preview := Image.create_empty(96 * 4, 96 * 6, false, Image.FORMAT_RGBA8)
 		preview.fill(Color(0.19, 0.21, 0.24))
 		var clips := [&"idle", &"idle_alt", &"walk", &"jump", &"carrying", &"attack"]
 		for column in cats.animation_variants.size():
 			var sample := cats.animation_variants[column].create_sprite_frames()
 			for row in clips.size():
 				var picture := sample.get_frame_texture(clips[row], 0).get_image()
-				preview.blend_rect(picture, Rect2i(0, 0, 64, 64),
-					Vector2i(column * 64, row * 64))
+				preview.blend_rect(picture, Rect2i(0, 0, 96, 96),
+					Vector2i(column * 96, row * 96))
 		preview.save_png("user://ppp_cat_palette_preview.png")
 	var dog_frames := dog.animation_variants[0].create_sprite_frames()
 	check(dog_frames.get_frame_count(&"walk") == 8
@@ -162,11 +198,11 @@ func _run_test() -> void:
 		"Gatinho recrutado aparece na camada das entidades.")
 	cat.position = Vector2i(4, 3)
 	var cat_visual := party.visuals_by_id[cat.instance_id] as CompanionActorVisual
-	check(cat_visual.sprite.animation == &"carrying_pickup",
-		"Ao posicionar o Gatinho, mostra primeiro 1→2→3.")
-	await create_timer(1.6).timeout
-	check(cat_visual.sprite.animation == &"carrying_held",
-		"Durante o trajeto o Gatinho alterna 2↔3.")
+	check(cat_visual.sprite.animation == &"walk" and cat_visual._motion != null,
+		"Habilidade de revelar faz o Gatinho andar, nunca flutuar em Carrying.")
+	await create_timer(0.3).timeout
+	check(cat_visual.sprite.animation == &"walk",
+		"Durante o trajeto por habilidade o Gatinho permanece em Walk.")
 	check(cat.visual_variant_index == initial_variant,
 		"Posicionar o Gatinho não muda sua cor.")
 	cat.position = EntityState.UNPLACED
@@ -181,12 +217,40 @@ func _run_test() -> void:
 	check(hud._skill_is_available(cat, cat_grant),
 		"O dono inativo ainda pode usar o Sexto-Sentido do Gatinho.")
 	var loose_position := cat_visual.position
+	var shadows := scene.get_node("MapRoot/ActorGroundShadows") as ActorGroundShadows
+	cat_visual._stop_motion()
+	cat_visual._jump_to(loose_position + Vector2(80.0, 0.0))
+	await create_timer(0.20).timeout
+	var jump_shadow := shadows._shadow_feet(cat_visual)
+	check(cat_visual.jump_ground_shadow_position() != Vector2.INF \
+		and jump_shadow.y > shadows._visual_feet(cat_visual).y + 8.0,
+		"No salto, a sombra do Gatinho permanece projetada no ground.")
+	cat_visual._stop_motion()
+	cat_visual.position = loose_position
+	check(cat_visual.jump_ground_shadow_position() == Vector2.INF,
+		"Interromper o salto limpa a projeção antiga da sombra.")
 	var press := InputEventMouseButton.new()
 	press.button_index = MOUSE_BUTTON_LEFT
 	press.pressed = true
+	press.position = Vector2(12.0, 10.0)
 	hud._on_companion_map_input(press, cat)
-	check(hud._drag_pet_visual == cat_visual,
-		"Pressionar o corpo do Gatinho inicia Carrying pelo HUD.")
+	check(hud._pending_cat_visual == cat_visual and hud._drag_pet_visual == null,
+		"Pressionar o Gatinho aguarda deslocamento antes de iniciar Carrying.")
+	var cat_hit := hud._companion_map_hit_buttons.get(cat.instance_id) as Button
+	check(hud._pending_cat_press.is_equal_approx(
+		cat_hit.get_global_transform_with_canvas() * press.position),
+		"Limiar de arrasto compara coordenadas de viewport com viewport.")
+	# Em jogo, _process detecta o arrasto após 12 px com o botão pressionado.
+	# O teste headless não injeta um cursor físico; reproduz a transição validada.
+	check(cat_visual.begin_mouse_carry(), "Arrastar inicia Carrying após o clique.")
+	check(cat_visual.suppress_ground_shadow() \
+		and shadows._shadow_feet(cat_visual) == Vector2.INF,
+		"Gatinho suspenso pelo cursor não desenha sombra.")
+	hud._drag_pet_visual = cat_visual
+	hud._drop_actor = cat
+	hud._drop_grant = cat_grant
+	hud._pending_cat_visual = null
+	hud._pending_cat_actor = null
 	var release := InputEventMouseButton.new()
 	release.button_index = MOUSE_BUTTON_LEFT
 	release.pressed = false
@@ -195,6 +259,9 @@ func _run_test() -> void:
 	check(cat.position == EntityState.UNPLACED and hud.hex_choice.visible \
 		and hud._drop_preview_visual == cat_visual,
 		"Soltar no céu pousa visualmente em ground e pede confirmação sem revelar.")
+	check(not cat_visual.suppress_ground_shadow() \
+		and shadows._shadow_feet(cat_visual) != Vector2.INF,
+		"A sombra volta quando o Gatinho pousa para pré-visualizar o hex.")
 	hud._hide_hex_choice()
 	check(cat.position == EntityState.UNPLACED \
 		and cat_visual.position.is_equal_approx(loose_position),
@@ -216,6 +283,21 @@ func _run_test() -> void:
 			"Só após confirmar a habilidade posiciona logicamente o Gatinho e revela.")
 	cat.position = EntityState.UNPLACED
 	owner.turn_state = old_turn_state
+	var combat_for_animation := scene.get_node("CombatManager") as CombatManager
+	combat_for_animation.action_resolved.emit(cat, &"attack", {})
+	check(cat_visual.sprite.animation == &"attack",
+		"Todo ataque básico resolvido do Gatinho dispara sua animação Attack.")
+	combat_for_animation.action_resolved.emit(cat, &"counterattack", {})
+	check(cat_visual.sprite.animation == &"attack",
+		"Contra-ataque resolvido do Gatinho também dispara Attack.")
+	combat_for_animation.action_resolved.emit(cat, &"ricochet", {})
+	check(cat_visual.sprite.animation == &"attack",
+		"Ricochete ofensivo do Gatinho também dispara Attack.")
+	skills.active_skill_used.emit(cat, cat_grant,
+		{"effects": [{"missed_reach": true}]})
+	check(cat_visual.sprite.animation == &"attack",
+		"Tentativa de ataque por Ativa sem alcance também dispara Attack.")
+	cat_visual.play_idle()
 	var dog_state := EntityState.from_playable_selection(dog, &"TestDog", EntityState.UNPLACED)
 	check(campaign.register_companion(campaign.active_entity_states[0], dog_state, rng),
 		"Doguinho também aparece junto ao dono.")
@@ -261,6 +343,13 @@ func _run_test() -> void:
 		"Nenhum duende substitui Informação.")
 	var markers := scene.get_node("MapRoot/DepthSorted/SpecialEventVisuals") as Node2D
 	check(markers.get_child_count() == 5, "Os cinco duendes são desenhados no mapa.")
+	var expected_gnome_scale := ORIENTATION_SCALE.gnome_reference_height() / 48.0
+	for marker in markers.get_children():
+		var visual := marker.get_child(0) as AnimatedSprite2D
+		check(visual != null and is_equal_approx(visual.scale.x, expected_gnome_scale)
+			and is_equal_approx(visual.scale.y, expected_gnome_scale)
+			and is_equal_approx(visual.position.y, -32.0 * expected_gnome_scale),
+			"Cada cor de duende usa a altura do Duende 1 sem distorção e apoia os pés no hex.")
 	for index in mini(3, gnome_coords.size()):
 		check(block.begin_activation(gnome_coords[index], campaign.active_entity_states[0]),
 			"O duende pode ser ativado como Evento.")

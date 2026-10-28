@@ -27,6 +27,7 @@ metadata/_custom_type_script = "uid://bknff8de8c2u0"
 script = ExtResource("1_xhfau")
 id = &"ev_00014_out_01"
 display_name = "Revelação misteriosa."
+narrative_description = "Revelação misteriosa.\n\nEste pequeno guia invisível revela todos os blocos de Encontro Indesejado ao seu redor."
 effects = Array[ExtResource("2_f7eep")]([SubResource("Resource_5u88t")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 

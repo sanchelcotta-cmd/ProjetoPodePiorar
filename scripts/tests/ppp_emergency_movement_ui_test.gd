@@ -29,10 +29,21 @@ func _run() -> void:
 	grid.set_ppp_block(destination, HexGrid.PPPBlockType.INFORMATION, info)
 	_check(exploration.enter_map(true), "Turno do jogável reinicia.")
 	var actor := exploration.current_actor
-	actor.stamina_remaining = 1
+	var sadness := load("res://resources/skills/effects/debuffs/tristeza.tres") as DebuffData
+	_check(exploration.player_skill_manager.skill_manager.debuff_manager.apply_debuff(
+		actor, sadness).get("success", false), "Tristeza é aplicada ao jogável ilhado.")
+	actor.stamina_remaining = 0
 	exploration.refresh_map_feedback()
+	var other_destination := Vector2i(0, 2)
+	grid.set_ppp_block(other_destination, HexGrid.PPPBlockType.INFORMATION, info)
+	_check(exploration.get_emergency_destination() == other_destination,
+		"A saída do jogável ilhado existe mesmo se outro membro alcança o bloco.")
+	grid.activate_ppp_block(other_destination)
+	for member in gerencia.campaign.active_entity_states:
+		if member != actor:
+			member.current_health = 0
 	_check(exploration.get_emergency_destination() == destination,
-		"Destinação excepcional é o único bloco disponível.")
+		"Último jogável vivo avança mesmo com Tristeza e Estamina zero.")
 	hud._walk_target_actor = actor
 	hud._on_hex_choice_requested(destination)
 	_check(hud.hex_choice.visible

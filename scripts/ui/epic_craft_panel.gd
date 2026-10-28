@@ -83,7 +83,8 @@ func open_for(game_campaign: CampaignState, items: InventoryManager,
 	if not found_preferred and preferred_actor != null and preferred_item != null \
 			and not preferred_item.craft_result.is_empty():
 		var results: Array[ItemData] = []
-		for result in preferred_item.craft_result:
+		for raw_result in preferred_item.craft_result:
+			var result := raw_result as ItemData
 			if result != null and result.rarity == ItemData.Rarity.EPIC:
 				results.append(result)
 		if not results.is_empty():
@@ -349,19 +350,33 @@ func _choose_result(item: ItemData) -> void:
 	else:
 		result = inventory.craft(actor, ingredient.id, item.id, 3, skill_manager)
 	if not result.get("success", false):
+		get_node("/root/UISFX").call("play", &"blocked_button")
 		status_label.text = "Não foi possível criar agora. Confira espaço, itens e habilidade disponível."
 		_rebuild_options()
 		return
 	_crafted_entry = result.get("crafted_copy") as InventoryItemState
+	get_node("/root/UISFX").call("play", &"epic_craft")
 	_crafted_actor = actor
+	if campaign != null:
+		campaign.append_journal_entry(&"craft_item", [
+			{"text": actor.visible_name(), "tone": "actor"},
+			{"text": " criou ", "tone": "text"},
+			{"text": item.display_name, "tone": "item"},
+			{"text": " usando %d %s." % [int(option["required_copies"]),
+				ingredient.display_name], "tone": "positive"},
+		], actor.instance_id, {"item_id": str(item.id),
+			"ingredient_id": str(ingredient.id),
+			"ingredient_count": int(option["required_copies"])})
 	_phase = &"success"
 	success_title.text = "VOCÊ CRIOU %s" % item.display_name.to_upper()
 	success_icon.texture = item.icon
 	success_icon.scale = Vector2.ONE
 	_render()
-	var flash := create_tween()
-	flash.tween_property(success_icon, "scale", Vector2(1.30, 1.30), 0.28)
-	flash.tween_property(success_icon, "scale", Vector2.ONE, 0.23)
+	var comfort := get_node_or_null("/root/VisualComfort")
+	if comfort == null or not bool(comfort.get("enabled")):
+		var flash := create_tween()
+		flash.tween_property(success_icon, "scale", Vector2(1.30, 1.30), 0.28)
+		flash.tween_property(success_icon, "scale", Vector2.ONE, 0.23)
 	inventory_changed.emit()
 
 
@@ -369,9 +384,11 @@ func _finish_success(equip_item: bool) -> void:
 	if equip_item and _crafted_entry != null and _crafted_actor != null:
 		if not EquipmentManager.new().equip(_crafted_actor, _crafted_entry,
 				skill_manager, campaign):
+			get_node("/root/UISFX").call("play", &"blocked_button")
 			status_label.text = "Não há espaço/condição para equipar. O item permanece no inventário."
 			return
 		inventory_changed.emit()
+		get_node("/root/UISFX").call("play", &"equip")
 	_rebuild_options()
 	if _options.is_empty():
 		close()
@@ -566,7 +583,6 @@ func _build() -> void:
 	add_child(details)
 	var detail_style := _style(Color(0.027, 0.044, 0.058, 0.94), GOLD, 2)
 	details.add_theme_stylebox_override("panel", detail_style)
-	(details.get_node("Frame") as TextureRect).hide()
 	details.z_index = 2
 	details.close_requested.connect(func() -> void: details.hide())
 	details.hide()

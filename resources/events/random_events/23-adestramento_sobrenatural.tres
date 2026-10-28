@@ -15,6 +15,7 @@ bind_companion_to_active_entity = true
 script = ExtResource("2_outcome")
 id = &"ev_00023_out_01"
 display_name = "A criatura se torna aliada."
+narrative_description = "A criatura se torna sua aliada.\n\nA criatura se torna um aliado extra para você."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

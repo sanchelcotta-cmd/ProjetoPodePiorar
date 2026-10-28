@@ -1,0 +1,1416 @@
+[gd_scene format=3 uid="uid://dj8pb2c31jbvq"]
+
+[ext_resource type="Script" path="res://scripts/visuals/sprite_orientation_reference.gd" id="script_orientation"]
+[ext_resource type="Texture2D" uid="uid://e2sh17mwdlc4" path="res://sprites/playable/v2/cozinheiro/cozinheiro_idle_1x.png" id="tex_0"]
+[ext_resource type="Texture2D" uid="uid://bsmctigu46nu" path="res://sprites/playable/v2/jornalista/jornalista_idle_1x.png" id="tex_1"]
+[ext_resource type="Texture2D" uid="uid://lwb7cxpaaako" path="res://sprites/playable/v2/mae/mae_idle_1x.png" id="tex_2"]
+[ext_resource type="Texture2D" uid="uid://ka82gj5b8she" path="res://sprites/playable/v2/pedreiro/pedreiro_idle_1x.png" id="tex_3"]
+[ext_resource type="Texture2D" uid="uid://sh7d3lyjouvn" path="res://sprites/playable/v2/professora/professora_idle_1x.png" id="tex_4"]
+[ext_resource type="Texture2D" uid="uid://bevhmf18qxmh" path="res://sprites/playable/v2/universitario/universitario_idle_1x.png" id="tex_5"]
+[ext_resource type="Texture2D" uid="uid://cpatbg3527y78" path="res://sprites/playable/v2/velha/velha_idle_1x.png" id="tex_6"]
+[ext_resource type="Texture2D" uid="uid://cy48pl2ojupdt" path="res://sprites/entities_allies/gatinho_idle_orange_1x.png" id="tex_7"]
+[ext_resource type="Texture2D" uid="uid://c73r17hymdeq7" path="res://sprites/entities_allies/gatinho_idle_branco_1x.png" id="tex_8"]
+[ext_resource type="Texture2D" uid="uid://ca8dhbmnfv873" path="res://sprites/entities_allies/gatinho_idle_preto_1x.png" id="tex_9"]
+[ext_resource type="Texture2D" uid="uid://b5c2vorg38i5a" path="res://sprites/entities_allies/gatinho_idle_rajado_1x.png" id="tex_10"]
+[ext_resource type="Texture2D" uid="uid://bbi8h7f48wfcl" path="res://sprites/entities_allies/doguinho_idle_sit_1x.png" id="tex_11"]
+[ext_resource type="Texture2D" uid="uid://bojtbkylp3abp" path="res://sprites/duendes/duende_caos_1.png" id="tex_12"]
+
+[node name="OrientacaoSprites" type="Node2D" unique_id=2130441676]
+script = ExtResource("script_orientation")
+metadata/_editor_description = "Régua de tamanhos: arraste a escala dos Sprites no editor 2D. A proporção é mantida. Os sete jogáveis são fixos; Duende 1 rege todas as cores."
+
+[node name="Fundo" type="ColorRect" parent="." unique_id=1675009344]
+offset_right = 1600.0
+offset_bottom = 2380.0
+mouse_filter = 2
+color = Color(0.055, 0.068, 0.082, 1)
+
+[node name="Titulo" type="Label" parent="." unique_id=647351788]
+offset_left = 40.0
+offset_top = 18.0
+offset_right = 1020.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.87, 0.94, 0.98, 1)
+theme_override_font_sizes/font_size = 26
+text = "ORIENTAÇÃO SPRITES · RÉGUA VISUAL"
+
+[node name="Instrucao" type="Label" parent="." unique_id=2128170056]
+offset_left = 40.0
+offset_top = 55.0
+offset_right = 1540.0
+offset_bottom = 85.0
+theme_override_colors/font_color = Color(0.68, 0.75, 0.79, 1)
+theme_override_font_sizes/font_size = 16
+text = "Selecione um Sprite ajustável e arraste a escala no editor 2D; largura e altura ficam proporcionais. Não altere as sete réguas."
+
+[node name="ReguasTitulo" type="Label" parent="." unique_id=1633561454]
+offset_left = 40.0
+offset_top = 105.0
+offset_right = 1140.0
+offset_bottom = 135.0
+theme_override_colors/font_color = Color(0.33, 0.88, 0.94, 1)
+theme_override_font_sizes/font_size = 18
+text = "SETE JOGÁVEIS · TAMANHO FIXO DE JOGO (1,70×)"
+
+[node name="PetsTitulo" type="Label" parent="." unique_id=2090811232]
+offset_left = 40.0
+offset_top = 365.0
+offset_right = 1140.0
+offset_bottom = 395.0
+theme_override_colors/font_color = Color(1, 0.72, 0.84, 1)
+theme_override_font_sizes/font_size = 18
+text = "COMPANHEIROS · ARRASTE A ESCALA DO SPRITE"
+
+[node name="DuendesTitulo" type="Label" parent="." unique_id=1198162894]
+offset_left = 40.0
+offset_top = 615.0
+offset_right = 1140.0
+offset_bottom = 645.0
+theme_override_colors/font_color = Color(0.66, 0.9, 0.6, 1)
+theme_override_font_sizes/font_size = 18
+text = "DUENDES · DUENDE 1 É A RÉGUA DE TODAS AS CORES"
+
+[node name="LinhaReguas" type="Line2D" parent="." unique_id=688187020]
+points = PackedVector2Array(40, 280, 1560, 280)
+width = 1.0
+default_color = Color(0.24, 0.7, 0.76, 0.6)
+
+[node name="LinhaCompanheiros" type="Line2D" parent="." unique_id=1874511102]
+points = PackedVector2Array(40, 530, 1560, 530)
+width = 1.0
+default_color = Color(0.85, 0.37, 0.55, 0.6)
+
+[node name="LinhaDuendes" type="Line2D" parent="." unique_id=1082676507]
+points = PackedVector2Array(40, 770, 1560, 770)
+width = 1.0
+default_color = Color(0.49, 0.74, 0.41, 0.6)
+
+[node name="ReguasFixas" type="Node2D" parent="." unique_id=101971331]
+
+[node name="Cozinheiro" type="Node2D" parent="ReguasFixas" unique_id=834210979]
+position = Vector2(150, 280)
+metadata/source_resource = "res://resources/entities/animations/cozinheiro_animation.tres"
+metadata/reference_fixed = true
+
+[node name="Sprite" type="Sprite2D" parent="ReguasFixas/Cozinheiro" unique_id=787620643]
+texture_filter = 1
+scale = Vector2(1.7, 1.7)
+texture = ExtResource("tex_0")
+centered = false
+offset = Vector2(-32, -96)
+region_enabled = true
+region_rect = Rect2(0, 0, 64, 96)
+metadata/base_scale = 1.7
+metadata/reference_fixed = true
+
+[node name="Nome" type="Label" parent="ReguasFixas/Cozinheiro" unique_id=627469848]
+offset_left = -100.0
+offset_top = 9.0
+offset_right = 100.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.86, 0.91, 0.94, 1)
+theme_override_font_sizes/font_size = 14
+text = "cozinheiro"
+horizontal_alignment = 1
+
+[node name="Jornalista" type="Node2D" parent="ReguasFixas" unique_id=865070076]
+position = Vector2(360, 280)
+metadata/source_resource = "res://resources/entities/animations/jornalista_animation.tres"
+metadata/reference_fixed = true
+
+[node name="Sprite" type="Sprite2D" parent="ReguasFixas/Jornalista" unique_id=906465137]
+texture_filter = 1
+scale = Vector2(1.7, 1.7)
+texture = ExtResource("tex_1")
+centered = false
+offset = Vector2(-32, -96)
+region_enabled = true
+region_rect = Rect2(0, 0, 64, 96)
+metadata/base_scale = 1.7
+metadata/reference_fixed = true
+
+[node name="Nome" type="Label" parent="ReguasFixas/Jornalista" unique_id=1479571573]
+offset_left = -100.0
+offset_top = 9.0
+offset_right = 100.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.86, 0.91, 0.94, 1)
+theme_override_font_sizes/font_size = 14
+text = "jornalista"
+horizontal_alignment = 1
+
+[node name="Mae" type="Node2D" parent="ReguasFixas" unique_id=1847806866]
+position = Vector2(570, 280)
+metadata/source_resource = "res://resources/entities/animations/mae_animation.tres"
+metadata/reference_fixed = true
+
+[node name="Sprite" type="Sprite2D" parent="ReguasFixas/Mae" unique_id=442354460]
+texture_filter = 1
+scale = Vector2(1.7, 1.7)
+texture = ExtResource("tex_2")
+centered = false
+offset = Vector2(-32, -96)
+region_enabled = true
+region_rect = Rect2(0, 0, 64, 96)
+metadata/base_scale = 1.7
+metadata/reference_fixed = true
+
+[node name="Nome" type="Label" parent="ReguasFixas/Mae" unique_id=1311453977]
+offset_left = -100.0
+offset_top = 9.0
+offset_right = 100.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.86, 0.91, 0.94, 1)
+theme_override_font_sizes/font_size = 14
+text = "Mãe"
+horizontal_alignment = 1
+
+[node name="Pedreiro" type="Node2D" parent="ReguasFixas" unique_id=319913580]
+position = Vector2(780, 280)
+metadata/source_resource = "res://resources/entities/animations/pedreiro_animation.tres"
+metadata/reference_fixed = true
+
+[node name="Sprite" type="Sprite2D" parent="ReguasFixas/Pedreiro" unique_id=655667275]
+texture_filter = 1
+scale = Vector2(1.7, 1.7)
+texture = ExtResource("tex_3")
+centered = false
+offset = Vector2(-32, -96)
+region_enabled = true
+region_rect = Rect2(0, 0, 64, 96)
+metadata/base_scale = 1.7
+metadata/reference_fixed = true
+
+[node name="Nome" type="Label" parent="ReguasFixas/Pedreiro" unique_id=1026439653]
+offset_left = -100.0
+offset_top = 9.0
+offset_right = 100.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.86, 0.91, 0.94, 1)
+theme_override_font_sizes/font_size = 14
+text = "Pedreiro"
+horizontal_alignment = 1
+
+[node name="Professora" type="Node2D" parent="ReguasFixas" unique_id=967261043]
+position = Vector2(990, 280)
+metadata/source_resource = "res://resources/entities/animations/professora_animation.tres"
+metadata/reference_fixed = true
+
+[node name="Sprite" type="Sprite2D" parent="ReguasFixas/Professora" unique_id=1441108175]
+texture_filter = 1
+scale = Vector2(1.7, 1.7)
+texture = ExtResource("tex_4")
+centered = false
+offset = Vector2(-32, -96)
+region_enabled = true
+region_rect = Rect2(0, 0, 64, 96)
+metadata/base_scale = 1.7
+metadata/reference_fixed = true
+
+[node name="Nome" type="Label" parent="ReguasFixas/Professora" unique_id=1786788736]
+offset_left = -100.0
+offset_top = 9.0
+offset_right = 100.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.86, 0.91, 0.94, 1)
+theme_override_font_sizes/font_size = 14
+text = "Professora"
+horizontal_alignment = 1
+
+[node name="Universitario" type="Node2D" parent="ReguasFixas" unique_id=185792513]
+position = Vector2(1200, 280)
+metadata/source_resource = "res://resources/entities/animations/universitario_animation.tres"
+metadata/reference_fixed = true
+
+[node name="Sprite" type="Sprite2D" parent="ReguasFixas/Universitario" unique_id=2109032412]
+texture_filter = 1
+scale = Vector2(1.7, 1.7)
+texture = ExtResource("tex_5")
+centered = false
+offset = Vector2(-32, -96)
+region_enabled = true
+region_rect = Rect2(0, 0, 64, 96)
+metadata/base_scale = 1.7
+metadata/reference_fixed = true
+
+[node name="Nome" type="Label" parent="ReguasFixas/Universitario" unique_id=1647778672]
+offset_left = -100.0
+offset_top = 9.0
+offset_right = 100.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.86, 0.91, 0.94, 1)
+theme_override_font_sizes/font_size = 14
+text = "Universitário"
+horizontal_alignment = 1
+
+[node name="Velha" type="Node2D" parent="ReguasFixas" unique_id=1072639418]
+position = Vector2(1410, 280)
+metadata/source_resource = "res://resources/entities/animations/velha_animation.tres"
+metadata/reference_fixed = true
+
+[node name="Sprite" type="Sprite2D" parent="ReguasFixas/Velha" unique_id=1239826574]
+texture_filter = 1
+scale = Vector2(1.7, 1.7)
+texture = ExtResource("tex_6")
+centered = false
+offset = Vector2(-32, -96)
+region_enabled = true
+region_rect = Rect2(0, 0, 64, 96)
+metadata/base_scale = 1.7
+metadata/reference_fixed = true
+
+[node name="Nome" type="Label" parent="ReguasFixas/Velha" unique_id=1109163424]
+offset_left = -100.0
+offset_top = 9.0
+offset_right = 100.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.86, 0.91, 0.94, 1)
+theme_override_font_sizes/font_size = 14
+text = "Velha Fofoqueira"
+horizontal_alignment = 1
+
+[node name="Companheiros" type="Node2D" parent="." unique_id=729190180]
+
+[node name="GatoLaranja" type="Node2D" parent="Companheiros" unique_id=2119566958]
+position = Vector2(190, 530)
+metadata/source_resource = "res://resources/entities/animations/gatinho_orange_animation.tres"
+metadata/reference_fixed = false
+
+[node name="Sprite" type="Sprite2D" parent="Companheiros/GatoLaranja" unique_id=747702010]
+texture_filter = 1
+position = Vector2(0, -3.75)
+scale = Vector2(1.486486, 1.486486)
+texture = ExtResource("tex_7")
+centered = false
+offset = Vector2(-20, -37)
+region_enabled = true
+region_rect = Rect2(8, 42, 40, 37)
+metadata/base_scale = 1.486486
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="Companheiros/GatoLaranja" unique_id=783390188]
+offset_left = -100.0
+offset_top = 9.0
+offset_right = 100.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.86, 0.91, 0.94, 1)
+theme_override_font_sizes/font_size = 14
+text = "Gatinho laranja"
+horizontal_alignment = 1
+
+[node name="GatoBranco" type="Node2D" parent="Companheiros" unique_id=795209236]
+position = Vector2(480, 530)
+metadata/source_resource = "res://resources/entities/animations/gatinho_branco_animation.tres"
+metadata/reference_fixed = false
+
+[node name="Sprite" type="Sprite2D" parent="Companheiros/GatoBranco" unique_id=1540963749]
+texture_filter = 1
+position = Vector2(0, -3.75)
+scale = Vector2(1.447368, 1.447368)
+texture = ExtResource("tex_8")
+centered = false
+offset = Vector2(-20.5, -38)
+region_enabled = true
+region_rect = Rect2(6, 41, 41, 38)
+metadata/base_scale = 1.447368
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="Companheiros/GatoBranco" unique_id=1523420760]
+offset_left = -100.0
+offset_top = 9.0
+offset_right = 100.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.86, 0.91, 0.94, 1)
+theme_override_font_sizes/font_size = 14
+text = "Gatinho branco"
+horizontal_alignment = 1
+
+[node name="GatoPreto" type="Node2D" parent="Companheiros" unique_id=276165822]
+position = Vector2(770, 530)
+metadata/source_resource = "res://resources/entities/animations/gatinho_preto_animation.tres"
+metadata/reference_fixed = false
+
+[node name="Sprite" type="Sprite2D" parent="Companheiros/GatoPreto" unique_id=466077570]
+texture_filter = 1
+position = Vector2(0, -3.75)
+scale = Vector2(0.932203, 0.932203)
+texture = ExtResource("tex_9")
+centered = false
+offset = Vector2(-31.5, -59)
+region_enabled = true
+region_rect = Rect2(23, 114, 63, 59)
+metadata/base_scale = 0.932203
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="Companheiros/GatoPreto" unique_id=312406488]
+offset_left = -100.0
+offset_top = 9.0
+offset_right = 100.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.86, 0.91, 0.94, 1)
+theme_override_font_sizes/font_size = 14
+text = "Gatinho preto"
+horizontal_alignment = 1
+
+[node name="GataRajada" type="Node2D" parent="Companheiros" unique_id=744488977]
+position = Vector2(1060, 530)
+metadata/source_resource = "res://resources/entities/animations/gatinho_rajado_animation.tres"
+metadata/reference_fixed = false
+
+[node name="Sprite" type="Sprite2D" parent="Companheiros/GataRajada" unique_id=225570886]
+texture_filter = 1
+position = Vector2(0, -3.75)
+scale = Vector2(1.309524, 1.309524)
+texture = ExtResource("tex_10")
+centered = false
+offset = Vector2(-24.5, -42)
+region_enabled = true
+region_rect = Rect2(4, 43, 49, 42)
+metadata/base_scale = 1.309524
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="Companheiros/GataRajada" unique_id=1643301131]
+offset_left = -100.0
+offset_top = 9.0
+offset_right = 100.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.86, 0.91, 0.94, 1)
+theme_override_font_sizes/font_size = 14
+text = "Gatinha rajada"
+horizontal_alignment = 1
+
+[node name="Doguinho" type="Node2D" parent="Companheiros" unique_id=1204980706]
+position = Vector2(1350, 530)
+metadata/source_resource = "res://resources/entities/animations/doguinho_caramelo_animation.tres"
+metadata/reference_fixed = false
+
+[node name="Sprite" type="Sprite2D" parent="Companheiros/Doguinho" unique_id=711722083]
+texture_filter = 1
+position = Vector2(0, -3.75)
+scale = Vector2(0.873494, 0.873494)
+texture = ExtResource("tex_11")
+centered = false
+offset = Vector2(-36, -83)
+region_enabled = true
+region_rect = Rect2(18, 114, 72, 83)
+metadata/base_scale = 0.873494
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="Companheiros/Doguinho" unique_id=628884035]
+offset_left = -100.0
+offset_top = 9.0
+offset_right = 100.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.86, 0.91, 0.94, 1)
+theme_override_font_sizes/font_size = 14
+text = "Doguinho caramelo"
+horizontal_alignment = 1
+
+[node name="Duendes" type="Node2D" parent="." unique_id=708828003]
+
+[node name="Duende1" type="Node2D" parent="Duendes" unique_id=1863770719]
+position = Vector2(190, 770)
+metadata/source_resource = "res://resources/events/random_events/gnomes_3/duende_cor_1.tres"
+metadata/reference_fixed = false
+
+[node name="Sprite" type="Sprite2D" parent="Duendes/Duende1" unique_id=156107841]
+texture_filter = 1
+position = Vector2(-1.0000002, -1)
+scale = Vector2(1.5757585, 1.5757585)
+texture = ExtResource("tex_12")
+centered = false
+offset = Vector2(-16.5, -44)
+region_enabled = true
+region_rect = Rect2(15, 19, 33, 45)
+metadata/base_scale = 1.5757585
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="Duendes/Duende1" unique_id=591924267]
+offset_left = -100.0
+offset_top = 9.0
+offset_right = 100.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.86, 0.91, 0.94, 1)
+theme_override_font_sizes/font_size = 14
+text = "Duende 1"
+horizontal_alignment = 1
+
+[node name="EntidadesTitulo" type="Label" parent="."]
+offset_left = 40.0
+offset_top = 850.0
+offset_right = 1550.0
+offset_bottom = 884.0
+theme_override_colors/font_color = Color(1, 0.76, 0.45, 1)
+theme_override_font_sizes/font_size = 18
+text = "ENTIDADES DO MAPA · ESPAÇOS PARA UM SPRITE DE CADA CADASTRO"
+
+[node name="EntidadesInstrucao" type="Label" parent="."]
+offset_left = 40.0
+offset_top = 883.0
+offset_right = 1550.0
+offset_bottom = 920.0
+theme_override_colors/font_color = Color(0.68, 0.75, 0.79, 1)
+theme_override_font_sizes/font_size = 14
+text = "Espaços vazios até receberem arte. Arraste o Sprite para ajustar; a escala se mantém proporcional."
+
+[node name="EntidadesPendentes" type="Node2D" parent="."]
+
+[node name="a_experiencia" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(170, 1110)
+metadata/source_resource = "res://resources/entities/entities_general/a_experiencia.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/a_experiencia"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/a_experiencia"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/a_experiencia"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "A Experiência"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="aranha_interdimensional" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(470, 1110)
+metadata/source_resource = "res://resources/entities/entities_general/aranha_interdimensional.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/aranha_interdimensional"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/aranha_interdimensional"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/aranha_interdimensional"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Aranha Interdimensional"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="barata_voadora" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(770, 1110)
+metadata/source_resource = "res://resources/entities/entities_general/barata_voadora.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/barata_voadora"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/barata_voadora"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/barata_voadora"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Barata Gigante Voadora"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="bonequinha_de_pano" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(1070, 1110)
+metadata/source_resource = "res://resources/entities/entities_general/bonequinha_de_pano.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/bonequinha_de_pano"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/bonequinha_de_pano"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/bonequinha_de_pano"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Bonequinha de Pano"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="cao_infernal" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(1370, 1110)
+metadata/source_resource = "res://resources/entities/entities_general/cao_infernal.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/cao_infernal"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/cao_infernal"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/cao_infernal"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Cão Infernal"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="capanga_do_mal" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(170, 1290)
+metadata/source_resource = "res://resources/entities/entities_general/capanga_do_mal.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/capanga_do_mal"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/capanga_do_mal"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/capanga_do_mal"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Capanga Do Mal"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="cobaia_mutante" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(470, 1290)
+metadata/source_resource = "res://resources/entities/entities_general/cobaia_mutante.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/cobaia_mutante"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/cobaia_mutante"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/cobaia_mutante"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Cobaia Mutante"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="criatura_esquisita_de_outra_dimensao" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(770, 1290)
+metadata/source_resource = "res://resources/entities/entities_general/criatura_esquisita_de_outra_dimensao.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/criatura_esquisita_de_outra_dimensao"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/criatura_esquisita_de_outra_dimensao"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/criatura_esquisita_de_outra_dimensao"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Criatura Esquisita de Outra Dimensão"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="cultista_encapuzado" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(1070, 1290)
+metadata/source_resource = "res://resources/entities/entities_general/cultista_encapuzado.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/cultista_encapuzado"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/cultista_encapuzado"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/cultista_encapuzado"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Cultista Encapuzado"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="dama_elemental" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(1370, 1290)
+metadata/source_resource = "res://resources/entities/entities_general/dama_elemental.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/dama_elemental"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/dama_elemental"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/dama_elemental"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Dama Elemental"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="diabretes_flamejantes" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(170, 1470)
+metadata/source_resource = "res://resources/entities/entities_general/diabretes_flamejantes.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/diabretes_flamejantes"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/diabretes_flamejantes"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/diabretes_flamejantes"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Diabretes Flamejantes"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="esfera_flamejante" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(470, 1470)
+metadata/source_resource = "res://resources/entities/entities_general/esfera_flamejante.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/esfera_flamejante"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/esfera_flamejante"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/esfera_flamejante"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Esfera Flamejante"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="goblin_1" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(770, 1470)
+metadata/source_resource = "res://resources/entities/entities_general/goblin_1.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/goblin_1"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/goblin_1"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/goblin_1"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Goblin"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="goblin_2" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(1070, 1470)
+metadata/source_resource = "res://resources/entities/entities_general/goblin_2.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/goblin_2"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/goblin_2"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/goblin_2"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Goblin"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="goblin_3" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(1370, 1470)
+metadata/source_resource = "res://resources/entities/entities_general/goblin_3.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/goblin_3"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/goblin_3"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/goblin_3"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Goblin"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="guarda_fantoche" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(170, 1650)
+metadata/source_resource = "res://resources/entities/entities_general/guarda_fantoche.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/guarda_fantoche"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/guarda_fantoche"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/guarda_fantoche"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Guarda-Fantoche"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="homem_de_preto" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(470, 1650)
+metadata/source_resource = "res://resources/entities/entities_general/homem_de_preto.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/homem_de_preto"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/homem_de_preto"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/homem_de_preto"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Homem de Preto"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="mimico_1" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(770, 1650)
+metadata/source_resource = "res://resources/entities/entities_general/mimico_1.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/mimico_1"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/mimico_1"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/mimico_1"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Mímico"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="mimico_2" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(1070, 1650)
+metadata/source_resource = "res://resources/entities/entities_general/mimico_2.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/mimico_2"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/mimico_2"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/mimico_2"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Mímico"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="palhaco_assassino" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(1370, 1650)
+metadata/source_resource = "res://resources/entities/entities_general/palhaco_assassino.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/palhaco_assassino"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/palhaco_assassino"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/palhaco_assassino"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Palhaço Assassino"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="pinscher_raivoso" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(170, 1830)
+metadata/source_resource = "res://resources/entities/entities_general/pinscher_raivoso.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/pinscher_raivoso"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/pinscher_raivoso"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/pinscher_raivoso"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Pinscher Raivoso"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="planta_carnivora" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(470, 1830)
+metadata/source_resource = "res://resources/entities/entities_general/planta_carnivora.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/planta_carnivora"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/planta_carnivora"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/planta_carnivora"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Planta Carnívora"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="pomba_maligna" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(770, 1830)
+metadata/source_resource = "res://resources/entities/entities_general/pomba_maligna.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/pomba_maligna"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/pomba_maligna"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/pomba_maligna"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Pomba Maligna"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="raizes_mutantes" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(1070, 1830)
+metadata/source_resource = "res://resources/entities/entities_general/raizes_mutantes.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/raizes_mutantes"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/raizes_mutantes"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/raizes_mutantes"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Raízes Mutantes"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="rato_mutante_do_baixo_centro" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(1370, 1830)
+metadata/source_resource = "res://resources/entities/entities_general/rato_mutante_do_baixo_centro.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/rato_mutante_do_baixo_centro"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/rato_mutante_do_baixo_centro"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/rato_mutante_do_baixo_centro"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Rato-Mutante do Baixo-Centro"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="servo_invocador_1" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(170, 2010)
+metadata/source_resource = "res://resources/entities/entities_general/servo_invocador_1.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/servo_invocador_1"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/servo_invocador_1"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/servo_invocador_1"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Servo Invocador 1"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="servo_invocador_2" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(470, 2010)
+metadata/source_resource = "res://resources/entities/entities_general/servo_invocador_2.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/servo_invocador_2"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/servo_invocador_2"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/servo_invocador_2"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Servo Invocador 2"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="sombra_disforme" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(770, 2010)
+metadata/source_resource = "res://resources/entities/entities_general/sombra_disforme.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/sombra_disforme"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/sombra_disforme"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/sombra_disforme"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Sombra Disforme"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="uma_versao_do_mal" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(1070, 2010)
+metadata/source_resource = "res://resources/entities/entities_general/uma_versao_do_mal.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/uma_versao_do_mal"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/uma_versao_do_mal"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/uma_versao_do_mal"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Uma versão igual a você só que do mal"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="vilao_tipicamente_do_mal" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(1370, 2010)
+metadata/source_resource = "res://resources/entities/entities_general/vilao_tipicamente_do_mal.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/vilao_tipicamente_do_mal"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/vilao_tipicamente_do_mal"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/vilao_tipicamente_do_mal"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Vilão-Tipicamente Do Mal"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="zumbi_dancarino" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(170, 2190)
+metadata/source_resource = "res://resources/entities/entities_general/zumbi_dancarino.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/zumbi_dancarino"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/zumbi_dancarino"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/zumbi_dancarino"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Zumbi Dançarino"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="zumbi_que_taca_gosma" type="Node2D" parent="EntidadesPendentes"]
+position = Vector2(470, 2190)
+metadata/source_resource = "res://resources/entities/entities_general/zumbi_que_taca_gosma.tres"
+metadata/pending_sprite = true
+
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/zumbi_que_taca_gosma"]
+offset_left = -90.0
+offset_top = -145.0
+offset_right = 90.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.1, 0.12, 0.14, 1)
+
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/zumbi_que_taca_gosma"]
+texture_filter = 1
+offset = Vector2(0, -48)
+metadata/base_scale = 1.0
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="EntidadesPendentes/zumbi_que_taca_gosma"]
+offset_left = -135.0
+offset_top = 9.0
+offset_right = 135.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.78, 0.84, 0.87, 1)
+theme_override_font_sizes/font_size = 13
+text = "Zumbi que Taca Gosma"
+horizontal_alignment = 1
+autowrap_mode = 2

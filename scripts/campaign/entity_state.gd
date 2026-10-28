@@ -69,14 +69,21 @@ var max_stamina: int = 0
 var stamina_remaining: int = 0
 var turn_state: TurnState = TurnState.AVAILABLE
 var controller: Controller = Controller.PLAYER
+# Água com Açúcar: uma sobrevivência a golpe letal por combate e por instância.
+# StringName salva junto à entidade; não altera a ficha compartilhada.
+var sugar_lethal_guard_combat_id: StringName = &""
+var sugar_attack_adjusted: bool = false
+var sugar_enemy_attack_penalty: int = 0
 # Estado de criaturas invocadas em Combate. A ficha compartilhada não muda.
 var summoned_by_instance_id: StringName = &""
-var summoned_can_summon: bool = true
+var summoned_can_summon: bool = false
 var summoned_acts_immediately: bool = false
 
 # Cada origem conserva sua própria concessão. Uma Skill inata e a mesma Skill
 # vinda de um item são duas entradas, podendo acumular conforme a regra do jogo.
 var skill_grants: Array[SkillGrantState] = []
+# Próximo ataque da Adaga de Sombra e Luz; o save serializa este campo.
+var dagger_next_aspect: StringName = &"light"
 # Debuffs aplicados nesta instância; nunca são gravados no EntityData.
 var debuffs: Array[DebuffInstanceState] = []
 # Cada sucesso contra Terror melhora a resistência a uma FONTE do mesmo
@@ -111,6 +118,25 @@ var consumable_timed_modifiers: Array[Dictionary] = []
 var equipped_weapons: Array[InventoryItemState] = []
 var equipped_armors: Array[InventoryItemState] = []
 var equipped_accessories: Array[InventoryItemState] = []
+
+
+func attuned_divine_amulet() -> InventoryItemState:
+	if instance_id == &"":
+		return null
+	for entry in equipped_accessories:
+		if entry != null and entry.data != null and entry.data.id == &"ac_00001" \
+				and entry.attuned_owner_instance_id == instance_id:
+			return entry
+	return null
+
+
+func has_divine_amulet_status_immunity(status_id: StringName) -> bool:
+	return status_id in [&"db_00003", &"db_00004", &"db_00005", \
+		&"db_00009", &"db_00010"] and attuned_divine_amulet() != null
+
+
+func is_curse_immune() -> bool:
+	return permanent_curse_immunity or attuned_divine_amulet() != null
 var unavailable_until_owner_turn_serial: int = 0
 # EntityData registra QUAIS Maestrias existem. Bônus numéricos recebidos
 # durante a campanha ficam separados até definirmos a fórmula de combate.

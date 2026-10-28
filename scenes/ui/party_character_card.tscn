@@ -1,8 +1,7 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/party_character_card.gd" id="1_card"]
 [ext_resource type="Texture2D" path="res://sprites/ui/uielementx_00004.png" id="2_portrait_frame"]
-[ext_resource type="Texture2D" path="res://sprites/ui/uielementx_00008.png" id="3_trace"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
 bg_color = Color(0.045, 0.06, 0.074, 0.96)
@@ -34,19 +33,6 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 script = ExtResource("1_card")
-
-[node name="CardTrace" type="TextureRect" parent="."]
-modulate = Color(1, 1, 1, 0.1)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("3_trace")
-expand_mode = 1
-stretch_mode = 0
 
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 2

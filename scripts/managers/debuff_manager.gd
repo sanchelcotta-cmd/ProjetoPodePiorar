@@ -17,6 +17,7 @@ const DURATION_ROUND := 5
 
 var _catalog: Dictionary = {}
 var _catalog_loaded := false
+var campaign: CampaignState
 
 
 ## Novos .tres nesta pasta entram no catálogo automaticamente. Também é
@@ -75,7 +76,8 @@ func apply_debuff(target: EntityState, data: DebuffData,
 	# A imunidade concedida por Eventos mora no personagem. Conferir aqui também
 	# impede que contágio e outras aplicações diretas ignorem essa proteção.
 	if data.id in target.permanent_status_immunities \
-			or data.id in target.temporary_status_immunities:
+			or data.id in target.temporary_status_immunities \
+			or target.has_divine_amulet_status_immunity(data.id):
 		return {"success": false, "immune": true}
 	if data.duration_from_die_result and source_die_result <= 0:
 		return {"success": false, "reason": "Falta o resultado do dado da fonte."}
@@ -98,6 +100,7 @@ func apply_debuff(target: EntityState, data: DebuffData,
 		identity = source.data.id
 	if existing != null:
 		existing.source = source
+		existing.exploration_event_control = false
 		existing.source_instance_id = source.instance_id if source != null else &""
 		existing.source_key = identity
 		existing.resistance_chance_base = resistance_chance_override if resistance_chance_override >= 0.0 else data.percent
@@ -239,7 +242,8 @@ func _activate_controls(instance: DebuffInstanceState,
 	instance.active_controls.clear()
 	var chance := instance.data.percent if instance.data.percent > 0.0 else 1.0
 	for control in instance.data.control_effects:
-		if chance >= 1.0 or (rng.randf() if rng != null else randf()) < chance:
+		var source := rng if rng != null else campaign.world_rng if campaign != null else null
+		if chance >= 1.0 or (source.randf() if source != null else randf()) < chance:
 			instance.active_controls.append(control)
 
 
@@ -254,6 +258,28 @@ func has_control(target: EntityState, control: DebuffData.ControlEffect) -> bool
 
 func can_take_action(target: EntityState) -> bool:
 	return not has_control(target, DebuffData.ControlEffect.LOSE_TURN)
+
+
+func has_exploration_event_control(target: EntityState) -> bool:
+	if target == null:
+		return false
+	for instance in target.debuffs:
+		if instance != null and instance.exploration_event_control \
+				and int(DebuffData.ControlEffect.LOSE_TURN) in instance.active_controls:
+			return true
+	return false
+
+
+func release_exploration_event_turn_controls(target: EntityState) -> bool:
+	if target == null:
+		return false
+	var released := false
+	for instance in target.debuffs.duplicate():
+		if instance != null and instance.exploration_event_control \
+				and instance.duration_kind == DebuffData.DurationType.TURNS \
+				and int(DebuffData.ControlEffect.LOSE_TURN) in instance.active_controls:
+			released = remove_debuff(target, instance.data.id) or released
+	return released
 
 
 func can_attack(target: EntityState) -> bool:
@@ -324,7 +350,8 @@ func on_turn_started(target: EntityState, campaign: CampaignState,
 			var bonus := float(target.terror_resistance_bonus_by_source.get(instance.source_key, 0.0)) \
 				if instance.data.id == &"db_00009" else 0.0
 			var chance := clampf(instance.resistance_chance_base + bonus, 0.0, 1.0)
-			if (rng.randf() if rng != null else randf()) < chance:
+			var source := rng if rng != null else campaign.world_rng if campaign != null else null
+			if (source.randf() if source != null else randf()) < chance:
 				remove_debuff(target, instance.data.id)
 				if instance.data.id == &"db_00009" and instance.source_key != &"":
 					target.terror_resistance_bonus_by_source[instance.source_key] = minf(1.0, bonus + 0.05)
@@ -401,8 +428,9 @@ func on_day_started(target: EntityState, campaign: CampaignState,
 func _try_spread_status(target: EntityState, instance: DebuffInstanceState,
 		campaign: CampaignState, skill_manager: Variant,
 		rng: RandomNumberGenerator, allies: Array[EntityState]) -> Dictionary:
+	var source := rng if rng != null else campaign.world_rng if campaign != null else null
 	if instance.data.contagion_result_id == &"" \
-			or (rng.randf() if rng != null else randf()) >= instance.data.contagion_chance_per_round:
+			or (source.randf() if source != null else randf()) >= instance.data.contagion_chance_per_round:
 		return {}
 	var pool := allies
 	if pool.is_empty():

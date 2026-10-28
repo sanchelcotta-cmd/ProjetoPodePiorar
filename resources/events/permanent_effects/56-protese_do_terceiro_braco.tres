@@ -30,6 +30,7 @@ script = ExtResource("2_outcome")
 id = &"ev_00056_out_01"
 id = &"ev_00056_out_01"
 display_name = "O terceiro braço se encaixa."
+narrative_description = "O terceiro braço se encaixa.\nA partir de agora: recebe a nova Maestria escolhida ou +1 se já a possui. O personagem ganha um slot extra para arma e um ataque extra por turno de combate."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_apply_mastery"), SubResource("Effect_grant_passive")])
 
 [resource]

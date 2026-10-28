@@ -11,13 +11,18 @@ config_version=5
 [application]
 
 config/name="Projeto de Jogo"
-run/main_scene="res://scenes/ui/playable_selection.tscn"
+run/main_scene="res://scenes/ui/main_menu.tscn"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
 [autoload]
 
 UniversalFontScale="*res://scripts/ui/universal_font_scale.gd"
+UIColorManager="*res://scripts/ui/ui_palette_manager.gd"
+VisualComfort="*res://scripts/ui/visual_comfort_settings.gd"
+GameAudio="*res://scripts/ui/game_audio_settings.gd"
+UISFX="*res://scripts/ui/game_ui_sfx.gd"
+GameCursor="*res://scripts/ui/game_cursor_manager.gd"
 
 [display]
 
@@ -35,6 +40,10 @@ theme/default_font_size=21
 [physics]
 
 3d/physics_engine="Jolt Physics"
+
+[ppp]
+
+debug/enabled=true
 
 [rendering]
 

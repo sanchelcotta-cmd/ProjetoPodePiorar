@@ -55,6 +55,9 @@ var _combat_from_event: bool = false
 var _combat_encounter: EncounterData
 var _combat_announced: bool = false
 var _event_announced: bool = false
+var last_information_grant_result: Dictionary = {}
+var _debug_virtual := false
+var _debug_force := false
 
 
 func is_busy() -> bool:
@@ -142,6 +145,56 @@ func begin_activation(coord: Vector2i, actor: Variant = null) -> bool:
 	return false
 
 
+## Conteúdo de debug usa o mesmo executor e combate, mas nenhum hex real.
+## Não escreve no grid nem consome Encontros já sorteados.
+func begin_debug_content(content: Resource, actor: EntityState,
+		force: bool = false, outcome_id: StringName = &"") -> Dictionary:
+	if not OS.has_feature("debug") \
+			or not bool(ProjectSettings.get_setting("ppp/debug/enabled", false)):
+		return {"success": false, "reason": "Debug indisponível nesta versão."}
+	if is_busy() or gerencia == null or gerencia.campaign == null \
+			or gerencia.campaign.current_map == null or gerencia.campaign.is_terminal():
+		return {"success": false, "reason": "Conclua a ação atual antes de abrir conteúdo de debug."}
+	if actor == null or actor.current_health <= 0 \
+			or actor not in gerencia.campaign.active_entity_states:
+		return {"success": false, "reason": "Selecione um jogável vivo."}
+	if gerencia.campaign.current_map.ppp_map_mode != HexGrid.PPPMapMode.EXPLORATION:
+		return {"success": false, "reason": "Eventos e Encontros virtuais exigem Exploração."}
+	if content is EventData:
+		var event := content as EventData
+		if not force and not EventCampaignEligibility.allows_event(
+				event, gerencia.campaign.campaign_mode):
+			return {"success": false, "reason": "Evento excluído deste modo. Use Forçar (debug)."}
+		if not gerencia.record_event_activated(event):
+			return {"success": false, "reason": "O Evento não pôde ser registrado."}
+		_set_pending(gerencia.campaign.current_map, EntityState.UNPLACED,
+			event, actor, Phase.WAITING_EVENT)
+		_debug_virtual = true
+		_debug_force = force
+		block_started.emit(_context())
+		if outcome_id != &"":
+			_event_announced = true
+			var context := _context()
+			context["decision"] = {"outcome_id": outcome_id, "accepted": true}
+			event_resolution_requested.emit(context)
+		else:
+			event_confirmation_requested.emit(_context())
+		return {"success": true, "virtual": true}
+	if content is EncounterData:
+		var encounter := content as EncounterData
+		if not encounter.has_valid_composition():
+			return {"success": false, "reason": "Encontro sem composição válida."}
+		_set_pending(gerencia.campaign.current_map, EntityState.UNPLACED,
+			encounter, actor, Phase.WAITING_COMBAT)
+		_debug_virtual = true
+		_debug_force = force
+		_combat_encounter = encounter
+		block_started.emit(_context())
+		encounter_confirmation_requested.emit(_context())
+		return {"success": true, "virtual": true}
+	return {"success": false, "reason": "O Resource não é Evento nem Encontro."}
+
+
 func confirm_solo_cricket() -> bool:
 	if _phase != Phase.WAITING_SOLO_CRICKET:
 		return false
@@ -195,7 +248,9 @@ func confirm_encounter() -> bool:
 func confirm_information() -> bool:
 	if _phase != Phase.RESOLVING_INFORMATION or not _content is Informacao:
 		return false
-	if not gerencia.record_information_obtained(_content as Informacao):
+	last_information_grant_result = gerencia.grant_information(
+		_content as Informacao, &"hex")
+	if not last_information_grant_result.get("success", false):
 		return false
 	_finish(CompletionKind.INFORMATION_OBTAINED)
 	return true
@@ -207,7 +262,9 @@ func finish_item_resolution(collected: bool) -> bool:
 	if _phase != Phase.WAITING_ITEM:
 		return false
 	if not collected and _grid.get_ppp_block_type(_coord) == HexGrid.PPPBlockType.CURSE \
-			and not (_actor is EntityState and _actor.permanent_curse_immunity):
+			and not (_actor is EntityState and _actor.is_curse_immune()) \
+			and not (gerencia != null and gerencia.campaign != null \
+				and gerencia.campaign.has_sacred_temple_blessing()):
 		return false
 	_finish(CompletionKind.ITEM_COLLECTED if collected else CompletionKind.ITEM_LEFT)
 	return true
@@ -285,6 +342,8 @@ func destroy_event_before_activation(coord: Vector2i, actor: EntityState, skill_
 func _can_begin(coord: Vector2i) -> bool:
 	if is_busy() or gerencia == null or gerencia.campaign.current_map == null:
 		return false
+	if gerencia.campaign.is_terminal():
+		return false
 	var grid := gerencia.campaign.current_map
 	var cell := grid.get_cell(coord)
 	if cell == null or cell.state not in [HexGrid.PPPBlockState.HIDDEN, HexGrid.PPPBlockState.REVEALED]:
@@ -295,6 +354,8 @@ func _can_begin(coord: Vector2i) -> bool:
 
 
 func _set_pending(grid: HexGrid, coord: Vector2i, content: Resource, actor: Variant, phase: Phase) -> void:
+	_debug_virtual = false
+	_debug_force = false
 	_grid = grid
 	_coord = coord
 	_content = content
@@ -330,6 +391,8 @@ func _context() -> Dictionary:
 		"actor": _actor,
 		"block_type": _original_block_type,
 		"origin_mode": _origin_mode,
+		"debug_virtual": _debug_virtual,
+		"debug_force": _debug_force,
 	}
 
 
@@ -353,6 +416,8 @@ func _finish(kind: CompletionKind, details: Dictionary = {}) -> void:
 
 
 func _clear_pending() -> void:
+	_debug_virtual = false
+	_debug_force = false
 	_phase = Phase.IDLE
 	_grid = null
 	_content = null

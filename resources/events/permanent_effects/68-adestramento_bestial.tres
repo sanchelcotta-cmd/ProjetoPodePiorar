@@ -16,6 +16,7 @@ script = ExtResource("2_outcome")
 id = &"ev_00068_out_01"
 id = &"ev_00068_out_01"
 display_name = "Adestramento Bestial disponível."
+narrative_description = "Adestramento Bestial disponível.\nA partir de agora: Em combate, pode tentar adestrar um inimigo-alvo. Se conseguir, ele torna seu aliado."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

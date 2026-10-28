@@ -1,12 +1,32 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/visuals/playable_actor_visual.gd" id="1_visual"]
+[ext_resource type="Script" path="res://scripts/visuals/weapon_hand_bone.gd" id="2_bone"]
 
 [node name="PlayableActorVisual" type="Node2D"]
 script = ExtResource("1_visual")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
+
+[node name="WeaponSkeleton" type="Skeleton2D" parent="."]
+
+[node name="WeaponHandBone" type="Bone2D" parent="WeaponSkeleton"]
+script = ExtResource("2_bone")
+
+[node name="HeldWeapon" type="Sprite2D" parent="WeaponSkeleton/WeaponHandBone"]
+visible = false
+texture_filter = 1
+
+[node name="SlingElastic" type="Line2D" parent="WeaponSkeleton"]
+visible = false
+width = 2.5
+default_color = Color(0.196078, 0.117647, 0.0392157, 1)
+
+[node name="SlingElasticHighlight" type="Line2D" parent="WeaponSkeleton"]
+visible = false
+width = 1.0
+default_color = Color(0.901961, 0.901961, 0.745098, 1)
 
 [node name="ActiveArrow" type="Polygon2D" parent="."]
 visible = false

@@ -80,7 +80,9 @@ enum EffectType {
 	IGNORE_ATTACK_RANGE,
 	MODIFY_EQUIPMENT_SLOT_CAPACITY,
 	COPY_BOUND_SOURCE_TRAITS,
-	DECLARE_RIVAL
+	DECLARE_RIVAL,
+	# Espada Irada Eletrizante: metade do dano real ricocheteia uma vez.
+	RICOCHET_DAMAGE
 }
 
 enum ModifyMode {
@@ -284,7 +286,8 @@ enum MasteryGrantMode {
 @export_range(0, 99) var minimum_amount: int = 0
 @export_range(0, 99) var maximum_amount: int = 0
 @export_range(0, 99) var maximum_active_instances: int = 0
-@export var summoned_can_summon: bool = true
+# Regra de ouro: convidado não convida. Marcar true só quando a Skill disser explicitamente.
+@export var summoned_can_summon: bool = false
 @export var summoned_acts_immediately: bool = false
 # Duas listas paralelas: a tag na posição N usa o limite na posição N.
 @export var context_tags: Array[StringName] = []

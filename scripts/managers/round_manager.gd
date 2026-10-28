@@ -8,8 +8,10 @@ extends Node
 signal destination_choice_opened(options: Array[StringName])
 signal advance_rejected(reason: String)
 signal round_advanced(day: int, period: int, district: StringName, new_map: HexGrid)
+signal new_day_started(day: int)
 
 const DISTRICT_ORDER: Array[StringName] = [&"suburbio", &"baixo_centro", &"centro"]
+const DESTINATION_PICKER_SCENE := preload("res://scenes/ui/campaign_destination_picker.tscn")
 
 @export var gerencia: GerenciaJogo
 @export var exploration: ExplorationManager
@@ -18,15 +20,15 @@ const DISTRICT_ORDER: Array[StringName] = [&"suburbio", &"baixo_centro", &"centr
 @export var skill_manager: SkillManager
 @export var catastrophe_manager: CatastropheManager
 @export var advance_button: Button
-@export var destination_dialog: ConfirmationDialog
-@export var district_options: OptionButton
+var destination_picker: CampaignDestinationPicker
 
 
 func _ready() -> void:
 	if advance_button != null:
 		advance_button.pressed.connect(_on_advance_button_pressed)
-	if destination_dialog != null:
-		destination_dialog.confirmed.connect(_on_destination_confirmed)
+	destination_picker = DESTINATION_PICKER_SCENE.instantiate() as CampaignDestinationPicker
+	get_parent().add_child.call_deferred(destination_picker)
+	destination_picker.destination_confirmed.connect(_on_destination_confirmed)
 	if block_manager != null:
 		block_manager.block_started.connect(_on_block_state_changed)
 		block_manager.block_finished.connect(_on_block_state_changed)
@@ -63,11 +65,14 @@ func can_advance() -> bool:
 		and not player_skill_manager.has_pending_choice()
 
 
-## Permanecer ou caminhar apenas para um vizinho. Não se pula do Subúrbio
-## diretamente para o Centro, nem do Centro diretamente para o Subúrbio.
+## Permanecer ou caminhar para um vizinho; em 19/20 na Completa, o destino
+## excepcional é sempre o Centro, mesmo vindo diretamente do Subúrbio.
 func available_districts() -> Array[StringName]:
 	var result: Array[StringName] = []
 	if gerencia == null:
+		return result
+	if gerencia.campaign.requires_final_center_map():
+		result.append(&"centro")
 		return result
 	var index := DISTRICT_ORDER.find(gerencia.campaign.district)
 	if index < 0:
@@ -83,11 +88,20 @@ func available_districts() -> Array[StringName]:
 ## A tela ou um teste chama isto após a escolha. O próximo mapa é preparado
 ## ANTES de alterar Dia/Rodada; se faltar um Resource, tudo permanece igual.
 func advance_to_district(chosen_district: StringName,
-		rng: RandomNumberGenerator = null) -> bool:
-	if not can_advance():
+		rng: RandomNumberGenerator = null, force_debug: bool = false) -> bool:
+	if force_debug and (not OS.has_feature("debug") \
+			or not bool(ProjectSettings.get_setting("ppp/debug/enabled", false))):
+		return _reject("Avanço forçado indisponível nesta versão.")
+	if not force_debug and not can_advance():
 		return _reject("Encontre uma Informação e conclua a ação pendente antes de avançar.")
+	if force_debug and (not _dependencies_ready() or block_manager.is_busy() \
+			or player_skill_manager.has_pending_choice() \
+			or not exploration.can_leave_map_now() \
+			or gerencia.campaign.is_terminal() or gerencia.campaign.current_map == null):
+		return _reject("Conclua a ação ou o combate antes de avançar.")
 	if chosen_district not in available_districts():
 		return _reject("Só é possível permanecer ou ir a um distrito adjacente.")
+	chosen_district = gerencia.resolve_next_map_district(chosen_district)
 	var campaign := gerencia.campaign
 	var next_day := campaign.day
 	var next_period := campaign.round_period + 1
@@ -96,7 +110,8 @@ func advance_to_district(chosen_district: StringName,
 		next_day += 1
 	var next_round_index := (next_day - 1) * 3 + next_period
 	var new_map := gerencia.prepare_map(gerencia.get_information_catalog(),
-		chosen_district, next_period, next_round_index, rng)
+		chosen_district, next_period, next_round_index, rng,
+		campaign.difficulty_for_next_round())
 	if new_map == null:
 		return _reject("Não foi possível gerar o próximo mapa; a fase atual foi preservada.")
 	var is_new_day := next_day != campaign.day
@@ -108,6 +123,7 @@ func advance_to_district(chosen_district: StringName,
 		catastrophe_manager.expire_for_current_time()
 	if not gerencia.install_map(new_map):
 		return _reject("Não foi possível instalar o novo mapa.")
+	campaign.commit_pending_difficulty()
 	if is_new_day:
 		# Itens que a Praga de Lavas marcou continuam apodrecidos até aqui;
 		# a virada descarta as CÓPIAS, não altera os ItemData originais.
@@ -120,6 +136,8 @@ func advance_to_district(chosen_district: StringName,
 		return _reject("A nova Rodada foi gerada, mas a Exploração não pôde iniciar.")
 	_refresh_button()
 	round_advanced.emit(campaign.day, campaign.round_period, campaign.district, new_map)
+	if is_new_day:
+		new_day_started.emit(campaign.day)
 	return true
 
 
@@ -127,17 +145,12 @@ func _on_advance_button_pressed() -> void:
 	if not can_advance():
 		_reject("O avanço ainda não está disponível.")
 		return
-	if destination_dialog == null or district_options == null:
+	if destination_picker == null:
 		_reject("A janela de escolha de distrito ainda não está ligada à cena.")
 		return
-	district_options.clear()
 	var districts := available_districts()
-	for district in districts:
-		var label := _district_label(district)
-		district_options.add_item(label)
-		district_options.set_item_metadata(district_options.item_count - 1, district)
-	district_options.select(0)
-	destination_dialog.popup_centered(Vector2i(400, 180))
+	destination_picker.open_picker(districts, gerencia.campaign.district,
+		gerencia.campaign.requires_final_center_map())
 	destination_choice_opened.emit(districts)
 
 
@@ -146,12 +159,12 @@ func request_next_phase() -> void:
 	_on_advance_button_pressed()
 
 
-func _on_destination_confirmed() -> void:
-	if district_options == null or district_options.selected < 0:
-		_reject("Escolha um distrito antes de confirmar.")
-		return
-	var district := StringName(str(district_options.get_item_metadata(district_options.selected)))
+func _on_destination_confirmed(district: StringName) -> void:
 	advance_to_district(district)
+
+
+func is_destination_choice_open() -> bool:
+	return destination_picker != null and destination_picker.is_open()
 
 
 func _on_block_state_changed(_context: Dictionary) -> void:
@@ -159,8 +172,8 @@ func _on_block_state_changed(_context: Dictionary) -> void:
 
 
 func _on_map_entered(_new_map: HexGrid) -> void:
-	if destination_dialog != null:
-		destination_dialog.hide()
+	if destination_picker != null:
+		destination_picker.close_picker()
 	_refresh_button()
 
 
@@ -188,14 +201,6 @@ func _period_label(period: int) -> String:
 		PPPMapGenerator.RoundPeriod.AFTERNOON: return "Tarde"
 		PPPMapGenerator.RoundPeriod.NIGHT: return "Noite"
 	return "?"
-
-
-func _district_label(district: StringName) -> String:
-	match district:
-		&"suburbio": return "Subúrbio"
-		&"baixo_centro": return "Baixo-Centro"
-		&"centro": return "Centro"
-	return str(district)
 
 
 func _dependencies_ready() -> bool:

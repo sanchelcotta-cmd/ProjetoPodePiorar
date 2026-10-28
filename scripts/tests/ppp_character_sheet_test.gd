@@ -60,14 +60,13 @@ func _run() -> void:
 		and sheet.health_label.text == "VIDA: %d / %d" % [actor.current_health, actor.max_health],
 		"A ficha mostra nome, imagem e atributos do estado atual.")
 	await create_timer(0.22).timeout
-	var sheet_frame := sheet.get_node("Frame") as TextureRect
-	check(sheet_frame.texture.resource_path.ends_with("uielementx_00001.png") \
-		and sheet_frame.material is ShaderMaterial,
-		"A ficha usa a moldura rosa clara translúcida.")
+	check(not sheet.has_node("Frame") \
+		and (sheet.get_theme_stylebox("panel") as StyleBoxFlat).border_width_left == 2,
+		"A ficha usa borda rosa simples, sem a moldura decorativa.")
 	var sheet_margin := sheet.get_node("Margin") as MarginContainer
 	check(sheet.name_label.horizontal_alignment == HORIZONTAL_ALIGNMENT_CENTER
-		and sheet_margin.get_theme_constant("margin_left") >= 30
-		and sheet_margin.get_theme_constant("margin_right") >= 30,
+		and sheet_margin.get_theme_constant("margin_left") >= 18
+		and sheet_margin.get_theme_constant("margin_right") >= 18,
 		"Nome centralizado e textos afastados da borda da ficha.")
 	var press := InputEventMouseButton.new()
 	press.button_index = MOUSE_BUTTON_LEFT

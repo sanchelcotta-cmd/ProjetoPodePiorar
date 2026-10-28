@@ -100,8 +100,9 @@ func _run() -> void:
 			not weapon_line.contains("Se for") and not armor_line.contains("Se for"),
 			"A resposta do Artesão muda conforme o tipo selecionado sem mostrar instruções editoriais.")
 	var imaginary := load("res://resources/events/random_events/14-amigo_imaginario.tres") as EventData
-	_check(imaginary.outcomes[0].narrative_description.is_empty(),
-		"O aviso do Amigo Imaginário não antecipa a revelação.")
+	_check(imaginary.outcomes[0].narrative_description.contains(
+		"Este pequeno guia invisível revela todos os blocos de Encontro Indesejado"),
+		"O Outcome do Amigo Imaginário usa o texto narrativo aprovado.")
 	var encounter: EncounterData
 	for filename in DirAccess.get_files_at("res://resources/encounters"):
 		if filename.ends_with(".tres"):

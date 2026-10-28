@@ -15,6 +15,7 @@ tags_filter = Array[StringName]([&"informacao"])
 script = ExtResource("2_outcome")
 id = &"ev_00044_out_01"
 display_name = "Você acertou a moeda."
+narrative_description = "Você acertou a moeda. Ganhou uma informação."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_win")])
 
 [sub_resource type="Resource" id="Effect_lose"]
@@ -25,13 +26,14 @@ effect_type = 15
 script = ExtResource("2_outcome")
 id = &"ev_00044_out_02"
 display_name = "Você errou a moeda."
+narrative_description = "Você errou a moeda. Perdeu a última informação."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_lose")])
 
 [sub_resource type="Resource" id="Outcome_refuse"]
 script = ExtResource("2_outcome")
 id = &"ev_00044_out_03"
 display_name = "Você não joga."
-narrative_description = "Ele guarda a moeda e não diz mais nada."
+narrative_description = "Ele guarda a moeda e não diz mais nada.\nVocê não ganha nada, mas também não perde."
 
 [resource]
 script = ExtResource("1_event")

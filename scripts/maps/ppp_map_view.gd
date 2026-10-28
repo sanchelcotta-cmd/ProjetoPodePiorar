@@ -13,6 +13,7 @@ signal ground_pressed(screen_position: Vector2)
 ## apenas visuais: o caminho lógico ainda custa 1 Stamina por vizinho.
 const GROUND_TEXTURE = preload("res://sprites/map/ground.png")
 const HEX_TEXTURE = preload("res://sprites/map/hex-ref.png")
+const ORIENTATION_SCALE = preload("res://scripts/visuals/sprite_orientation_reference.gd")
 const PREVIEW_BACKGROUND = preload("res://sprites/background/cena_baixocentro_0001.png")
 const GLOW_RADIUS_FACTOR := 1.24
 const REFERENCE_VIEWPORT := Vector2(1152.0, 648.0)
@@ -25,7 +26,10 @@ const GROUND_REPEAT_STEP := 440.0 # média 439,05 entre os 3 centros do modelo
 const GROUND_BOTTOM_MARGIN := -2.0 # 2 px além da tela: nunca mostra a faixa cinza.
 const GROUND_BACKGROUND_OVERLAP := 2.0 # O asfalto cobre a base dos prédios por 2 px.
 const BACKGROUND_SCALE := Vector2(0.65061156, 0.61110663)
-const BACKGROUND_SIDE_BLEED := 32.0 # Fachadas começam/terminam fora da câmera.
+const BACKGROUND_SIDE_BLEED := 32.0 # A arte central preserva a escala original.
+const CAMERA_ZOOM_LEVELS := [0.85, 1.0, 1.15, 1.30]
+const CAMERA_PAN_STEP := 140.0
+const CAMERA_SAFE_HEX_MARGIN := 2.0
 
 @export_range(0, 999) var preview_stamina: int = 3
 @export var hex_palette: HexPalette
@@ -34,6 +38,7 @@ const BACKGROUND_SIDE_BLEED := 32.0 # Fachadas começam/terminam fora da câmera
 @onready var _parallax: PPPParallaxBackground = get_node_or_null("ParallaxBackground") as PPPParallaxBackground
 @onready var _map_root: Node2D = $MapRoot
 @onready var _background: Sprite2D = $MapRoot/Background
+@onready var _background_copies: Node2D = $MapRoot/BackgroundCopies
 @onready var _ground: Node2D = $MapRoot/Ground
 @onready var _start_zone: Node2D = $MapRoot/StartZone
 @onready var _hexes: Node2D = $MapRoot/Hexes
@@ -53,8 +58,24 @@ var _temporary_inspection_owner_id: StringName = &""
 var _future_vision_actor: EntityState
 var _emergency_destination := Vector2i(-999, -999)
 var _active_hex_pulse := 0.0
+var _enemy_link_glow: Sprite2D
+var _enemy_link_coord := EntityState.UNPLACED
 var _background_bottom_row_cache: Dictionary = {}
 var _background_horizontal_bounds_cache: Dictionary = {}
+var _gnome_reference_height := -1.0
+var _base_map_position := Vector2.ZERO
+var _camera_level := 1
+var _camera_pan_x := 0.0
+var _camera_pan_target_x := 0.0
+var _camera_dragging := false
+var _camera_drag_last_x := 0.0
+var _camera_layer: CanvasLayer
+var _camera_buttons: Dictionary = {}
+var _zoom_slider: HSlider
+var _zoom_frame: PanelContainer
+var _pending_initial_visuals := false
+var _initial_visuals_prepared := false
+var _visual_build_serial := 0
 # A regra de destino pertence à Exploração (inclusive Debuffs), não à arte.
 # Sem validador, a cena de prévia continua funcionando sozinha no editor.
 var destination_validator: Callable = Callable()
@@ -62,15 +83,127 @@ var selection_validator: Callable = Callable()
 
 
 func _ready() -> void:
-	if grid.cells.is_empty():
+	var profile_start := Time.get_ticks_msec()
+	var defer_preview := bool(get_meta("defer_preview_map", false))
+	if not defer_preview:
+		_ensure_debug_panel()
+	if grid.cells.is_empty() and not defer_preview:
 		grid.generate_ppp_exploration_map()
 	get_viewport().size_changed.connect(_rebuild_visuals)
-	_rebuild_visuals()
-	if _parallax != null:
+	var palette_service := get_node_or_null("/root/UIColorManager")
+	if palette_service != null:
+		palette_service.connect("palette_changed", _on_ui_palette_changed)
+	if not defer_preview:
+		_rebuild_visuals()
+	if ProjectSettings.get_setting("ppp/profile_startup", false):
+		print("PPP_DETAIL map visuals %d ms" % (Time.get_ticks_msec() - profile_start))
+	_build_camera_controls()
+	var exploration := get_node_or_null("ExplorationManager") as ExplorationManager
+	if exploration != null:
+		exploration.turn_started.connect(func(_actor: EntityState) -> void:
+			_ensure_active_visible.call_deferred())
+		exploration.actor_moved.connect(func(_actor: EntityState,
+				_path: Array[Vector2i], _spent: int) -> void:
+			_ensure_active_visible.call_deferred())
+		exploration.actor_teleported.connect(func(_actor: EntityState,
+				_destination: Vector2i) -> void:
+			_ensure_active_visible.call_deferred())
+	var combat := get_node_or_null("CombatManager") as CombatManager
+	if combat != null:
+		combat.turn_started.connect(func(_actor: EntityState, _cycle: int) -> void:
+			_ensure_active_visible.call_deferred())
+		combat.action_resolved.connect(func(_actor: EntityState, _action: StringName,
+				_result: Dictionary) -> void:
+			_ensure_active_visible.call_deferred())
+	if _parallax != null and not defer_preview:
 		_parallax.show_generated_map(grid)
+	if ProjectSettings.get_setting("ppp/profile_startup", false):
+		print("PPP_DETAIL map root total %d ms" % (Time.get_ticks_msec() - profile_start))
+
+
+func _ensure_debug_panel() -> void:
+	if get_node_or_null("CampaignDebugPanel") != null or not OS.has_feature("debug") \
+			or not bool(ProjectSettings.get_setting("ppp/debug/enabled", false)):
+		return
+	# A exportação pública exclui o script; não o pré-carregar.
+	var panel_script := load("res://scripts/ui/campaign_debug_panel.gd") as Script
+	if panel_script != null:
+		var debug_panel := panel_script.new() as CanvasLayer
+		debug_panel.name = "CampaignDebugPanel"
+		add_child(debug_panel)
+
+
+func prepare_initial_interface(progress: Callable = Callable()) -> bool:
+	var bar := get_node_or_null("CampaignTopBar") as CampaignTopBar
+	if bar == null:
+		return false
+	await bar.prepare_initial_ui(progress)
+	if not bar.is_initial_ui_ready():
+		return false
+	_ensure_debug_panel()
+	if progress.is_valid():
+		progress.call()
+	await get_tree().process_frame
+	return true
 
 
 func _rebuild_visuals() -> void:
+	_visual_build_serial += 1
+	_begin_visual_rebuild()
+	for coord in grid.cells:
+		_renderer.create_hex_visual(_hexes, coord, reference_hex_position(coord))
+	_finish_visual_rebuild()
+
+
+## Apenas na primeira entrada de uma campanha carregada: a lógica do mapa já
+## está instalada, mas os nós visuais são construídos em lotes. A barra recebe
+## um passo somente quando um lote terminou; não há timer simulando progresso.
+func prepare_initial_visuals(progress: Callable = Callable()) -> bool:
+	if _initial_visuals_prepared:
+		return true
+	if not _pending_initial_visuals or grid.cells.is_empty():
+		return false
+	_visual_build_serial += 1
+	var serial := _visual_build_serial
+	_begin_visual_rebuild()
+	if progress.is_valid():
+		progress.call()
+	await get_tree().process_frame
+	var created := 0
+	for coord in grid.cells:
+		if serial != _visual_build_serial:
+			return _initial_visuals_prepared
+		_renderer.create_hex_visual(_hexes, coord, reference_hex_position(coord))
+		created += 1
+		if created % 8 == 0:
+			if progress.is_valid():
+				progress.call()
+			await get_tree().process_frame
+	if created % 8 != 0:
+		if progress.is_valid():
+			progress.call()
+		await get_tree().process_frame
+	if serial != _visual_build_serial:
+		return _initial_visuals_prepared
+	_finish_visual_rebuild()
+	if progress.is_valid():
+		progress.call()
+	await get_tree().process_frame
+	if serial != _visual_build_serial:
+		return _initial_visuals_prepared
+	if _parallax != null:
+		_parallax.show_generated_map(grid)
+	_pending_initial_visuals = false
+	_initial_visuals_prepared = true
+	if progress.is_valid():
+		progress.call()
+	await get_tree().process_frame
+	return true
+
+
+func _begin_visual_rebuild() -> void:
+	_map_root.scale = Vector2.ONE
+	_clear_nodes(_background_copies)
 	_clear_nodes(_ground)
 	_clear_nodes(_start_zone)
 	_clear_nodes(_hexes)
@@ -88,12 +221,28 @@ func _rebuild_visuals() -> void:
 			(screen_size.x - bounds.size.x) * 0.5 - bounds.position.x,
 			screen_size.y - GROUND_BOTTOM_MARGIN - bounds.end.y + MAP_VERTICAL_NUDGE
 		)
+	_base_map_position = _map_root.position
 	_layout_background(screen_size)
+	_layout_background_copies()
 	_layout_ground(screen_size)
 	_renderer = HexRenderer.new(hex_palette if hex_palette != null else HexPalette.new())
+	var palette_service := get_node_or_null("/root/UIColorManager")
+	_renderer.set_ui_palette(str(palette_service.get("palette_id")) if palette_service != null \
+		else "padrao")
 	_renderer.cell_pressed.connect(_on_cell_pressed)
-	for coord in grid.cells:
-		_renderer.create_hex_visual(_hexes, coord, reference_hex_position(coord))
+
+
+func _finish_visual_rebuild() -> void:
+	_enemy_link_glow = Sprite2D.new()
+	_enemy_link_glow.name = "EnemyInitiativeGlow"
+	_enemy_link_glow.texture = HEX_TEXTURE
+	_enemy_link_glow.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	_enemy_link_glow.scale = HexRenderer.REFERENCE_SPRITE_SCALE * 1.26
+	var glow_material := CanvasItemMaterial.new()
+	glow_material.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	_enemy_link_glow.material = glow_material
+	_enemy_link_glow.visible = false
+	_hexes.add_child(_enemy_link_glow)
 	for start_coord in grid.get_ppp_start_positions():
 		if _retired_start_coords.has(start_coord):
 			continue
@@ -106,11 +255,24 @@ func _rebuild_visuals() -> void:
 		_start_zone.add_child(marker)
 	_refresh_feedback()
 	refresh_special_event_visuals()
+	_apply_camera_transform()
+	_refresh_camera_controls()
 
 
 func _process(delta: float) -> void:
+	if absf(_camera_pan_x - _camera_pan_target_x) > 0.25:
+		_camera_pan_x = lerpf(_camera_pan_x, _camera_pan_target_x,
+			1.0 - exp(-12.0 * delta))
+		_apply_camera_transform()
+		_refresh_camera_controls()
+	elif _camera_pan_x != _camera_pan_target_x:
+		_camera_pan_x = _camera_pan_target_x
+		_apply_camera_transform()
 	# Realce lento do chão sob o personagem ativo, sem apagar o hex.
 	_active_hex_pulse += delta
+	if _enemy_link_glow != null and _enemy_link_glow.visible:
+		_enemy_link_glow.modulate = Color(0.20, 0.93, 1.0,
+			0.32 + 0.22 * (0.5 + 0.5 * sin(_active_hex_pulse * 5.0)))
 	var brightness := (sin(_active_hex_pulse * 1.8) + 1.0) * 0.5
 	var color := Color(1.0, lerpf(0.85, 0.96, brightness),
 		lerpf(0.34, 0.59, brightness), 1.0)
@@ -126,6 +288,32 @@ func _process(delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT \
+			and not event.pressed:
+		_camera_dragging = false
+		get_node("/root/GameCursor").call("release_drag", self)
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT \
+			and event.pressed and event.double_click and _camera_level > 1:
+		var click := event as InputEventMouseButton
+		var hud := get_node_or_null("PartyStatusHUD") as PartyStatusHUD
+		var on_active_card := false
+		var actor := _active_camera_actor()
+		if hud != null and actor != null:
+			for card in hud.cards:
+				if card.state == actor and card.get_global_rect().has_point(click.position):
+					on_active_card = true
+					break
+		if not _camera_input_blocked() and (on_active_card or (click.position.y < get_ground_screen_top() \
+				and get_viewport().gui_get_hovered_control() == null)):
+			_reframe_active_actor()
+			if not on_active_card:
+				if hud != null:
+					hud.close_expandable_boxes()
+				var top := get_node_or_null("CampaignTopBar") as CampaignTopBar
+				if top != null:
+					top.close_expandable_boxes()
+			get_viewport().set_input_as_handled()
+			return
 	if not event is InputEventMouseButton or event.button_index != MOUSE_BUTTON_LEFT \
 			or not event.pressed or not event.double_click:
 		return
@@ -146,15 +334,51 @@ func _input(event: InputEvent) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _camera_input_blocked():
+		_camera_dragging = false
+		get_node("/root/GameCursor").call("release_drag", self)
+		return
+	if event is InputEventMouseButton:
+		var mouse := event as InputEventMouseButton
+		if mouse.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN] \
+				and mouse.pressed and get_viewport().gui_get_hovered_control() == null:
+			_set_camera_level(_camera_level + (1 if mouse.button_index \
+				== MOUSE_BUTTON_WHEEL_UP else -1))
+			get_viewport().set_input_as_handled()
+			return
+		if mouse.button_index == MOUSE_BUTTON_LEFT:
+			if not mouse.pressed:
+				_camera_dragging = false
+				get_node("/root/GameCursor").call("release_drag", self)
+				return
+			if _camera_level > 1 and mouse.position.y < get_ground_screen_top() \
+					and get_viewport().gui_get_hovered_control() == null \
+					and not _point_over_hex(mouse.position):
+				_camera_dragging = true
+				if cursor_can_pan_at(mouse.position):
+					get_node("/root/GameCursor").call("capture_drag", self,
+						"arrastar_horizontal")
+				_camera_drag_last_x = mouse.position.x
+				get_viewport().set_input_as_handled()
+				return
+	if event is InputEventMouseMotion and _camera_dragging:
+		_camera_pan_target_x += ((event as InputEventMouseMotion).position.x \
+			- _camera_drag_last_x) * 0.7
+		_camera_drag_last_x = (event as InputEventMouseMotion).position.x
+		_camera_pan_target_x = clampf(_camera_pan_target_x,
+			-_camera_pan_limit(), _camera_pan_limit())
+		get_viewport().set_input_as_handled()
+		return
 	if not event is InputEventMouseButton or event.button_index != MOUSE_BUTTON_LEFT \
 			or not event.pressed or event.double_click \
-			or grid.ppp_map_mode != HexGrid.PPPMapMode.EXPLORATION:
+			or grid.ppp_map_mode not in [HexGrid.PPPMapMode.EXPLORATION,
+				HexGrid.PPPMapMode.COMBAT]:
 		return
 	var point: Vector2 = (event as InputEventMouseButton).position
 	if get_viewport().gui_get_hovered_control() != null \
 			or point.y < get_ground_screen_top() or _point_over_hex(point):
 		return
-	# Entidades com Area2D (inclusive inimigos futuros) têm prioridade sobre o chão.
+	# Hexes, entidades e controles têm prioridade sobre o chão em ambos os modos.
 	var query := PhysicsPointQueryParameters2D.new()
 	query.position = get_viewport().get_canvas_transform().affine_inverse() * point
 	query.collide_with_areas = true
@@ -165,7 +389,251 @@ func _unhandled_input(event: InputEvent) -> void:
 	ground_pressed.emit(point)
 
 
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not event is InputEventKey or not event.pressed or event.echo \
+			or _camera_level <= 1 or _camera_input_blocked():
+		return
+	if event.keycode == KEY_LEFT or event.keycode == KEY_RIGHT:
+		_pan_camera(CAMERA_PAN_STEP * (-1.0 if event.keycode == KEY_RIGHT else 1.0))
+		get_viewport().set_input_as_handled()
+
+
+func _camera_input_blocked() -> bool:
+	if get_tree().paused:
+		return true
+	var activation := get_node_or_null("BlockActivationPopup")
+	if activation != null and activation.overlay.visible:
+		return true
+	var rounds := get_node_or_null("RoundManager") as RoundManager
+	if rounds != null and rounds.is_destination_choice_open():
+		return true
+	var bar := get_node_or_null("CampaignTopBar") as CampaignTopBar
+	return bar != null and bar.pause_menu != null and bar.pause_menu.is_open()
+
+
+func cursor_can_pan_at(point: Vector2) -> bool:
+	# Céu e fachadas aceitam o gesto lateral; ground e hexes não.
+	return _camera_level > 1 and not _camera_input_blocked() \
+		and point.y < get_ground_screen_top()
+
+
+func _camera_zoom() -> float:
+	return float(CAMERA_ZOOM_LEVELS[_camera_level])
+
+
+func _set_camera_level(level: int) -> void:
+	var next := clampi(level, 0, CAMERA_ZOOM_LEVELS.size() - 1)
+	if next == _camera_level:
+		return
+	_camera_level = next
+	_camera_dragging = false
+	get_node("/root/GameCursor").call("release_drag", self)
+	if _camera_level <= 1:
+		_camera_pan_x = 0.0
+		_camera_pan_target_x = 0.0
+	_apply_camera_transform()
+	_ensure_active_visible()
+	_refresh_camera_controls()
+
+
+func _pan_camera(delta_x: float) -> void:
+	if _camera_level <= 1:
+		return
+	_camera_pan_target_x = clampf(_camera_pan_target_x + delta_x,
+		-_camera_pan_limit(), _camera_pan_limit())
+	_refresh_camera_controls()
+
+
+func _camera_pan_limit() -> float:
+	if _camera_level <= 1:
+		return 0.0
+	return (_camera_zoom() - 1.0) * get_viewport_rect().size.x * 0.5 \
+		+ REFERENCE_COLUMN_STEP * 0.5
+
+
+func _apply_camera_transform() -> void:
+	if _map_root == null:
+		return
+	_camera_pan_x = clampf(_camera_pan_x, -_camera_pan_limit(), _camera_pan_limit())
+	_camera_pan_target_x = clampf(_camera_pan_target_x,
+		-_camera_pan_limit(), _camera_pan_limit())
+	var screen := get_viewport_rect().size
+	var pivot := Vector2(screen.x * 0.5, screen.y)
+	var zoom := _camera_zoom()
+	_map_root.scale = Vector2.ONE * zoom
+	_map_root.position = pivot + (_base_map_position - pivot) * zoom \
+		+ Vector2(_camera_pan_x, 0.0)
+
+
+func _active_camera_actor() -> EntityState:
+	if grid.ppp_map_mode == HexGrid.PPPMapMode.COMBAT:
+		var combat := get_node_or_null("CombatManager") as CombatManager
+		return combat.current_actor if combat != null else null
+	var exploration := get_node_or_null("ExplorationManager") as ExplorationManager
+	return exploration.current_actor if exploration != null else null
+
+
+func _ensure_active_visible() -> void:
+	if _camera_level <= 1:
+		return
+	var actor := _active_camera_actor()
+	if actor == null or actor.position == EntityState.UNPLACED:
+		return
+	var screen := get_viewport_rect().size
+	var hud_right := _camera_hud_right()
+	var margin := CAMERA_SAFE_HEX_MARGIN * REFERENCE_COLUMN_STEP * _camera_zoom()
+	var left := hud_right + margin
+	var right := screen.x - margin
+	if right <= left:
+		return
+	var current_x := _map_root.to_global(reference_hex_position(actor.position)).x
+	if current_x < left:
+		_camera_pan_target_x += left - current_x
+	elif current_x > right:
+		_camera_pan_target_x -= current_x - right
+	_camera_pan_target_x = clampf(_camera_pan_target_x,
+		-_camera_pan_limit(), _camera_pan_limit())
+	_refresh_camera_controls()
+
+
+func _reframe_active_actor() -> void:
+	var actor := _active_camera_actor()
+	if actor == null or actor.position == EntityState.UNPLACED:
+		return
+	var screen := get_viewport_rect().size
+	var center := (_camera_hud_right() + screen.x) * 0.5
+	var current_x := _map_root.to_global(reference_hex_position(actor.position)).x
+	_camera_pan_target_x = clampf(_camera_pan_x + center - current_x,
+		-_camera_pan_limit(), _camera_pan_limit())
+
+
+func _camera_hud_right() -> float:
+	var hud := get_node_or_null("PartyStatusHUD/Root") as Control
+	return hud.get_global_rect().end.x if hud != null else 0.0
+
+
+func _build_camera_controls() -> void:
+	_camera_layer = CanvasLayer.new()
+	_camera_layer.name = "MapCameraControls"
+	_camera_layer.layer = 49 # Abaixo dos menus e caixas do HUD (50+).
+	add_child(_camera_layer)
+	var overlay := Control.new()
+	_overlay_camera_full_rect(overlay)
+	_camera_layer.add_child(overlay)
+	var frame := PanelContainer.new()
+	frame.name = "ZoomLevels"
+	_zoom_frame = frame
+	frame.custom_minimum_size = Vector2(88.0, 36.0)
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.015, 0.035, 0.05, 0.94)
+	style.set_corner_radius_all(3)
+	style.set_content_margin_all(2.0)
+	frame.add_theme_stylebox_override("panel", style)
+	frame.mouse_filter = Control.MOUSE_FILTER_STOP
+	_overlay_camera_place(frame, overlay)
+	var contents := VBoxContainer.new()
+	contents.add_theme_constant_override("separation", 0)
+	frame.add_child(contents)
+	var track_slot := Control.new()
+	track_slot.custom_minimum_size = Vector2(76.0, 15.0)
+	track_slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	contents.add_child(track_slot)
+	var segments := HBoxContainer.new()
+	segments.position = Vector2(0.0, 3.0)
+	segments.add_theme_constant_override("separation", 0)
+	segments.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	track_slot.add_child(segments)
+	for number in 4:
+		var segment := Panel.new()
+		segment.name = "Level%d" % (number + 1)
+		segment.custom_minimum_size = Vector2(19.0, 9.0)
+		segment.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var segment_style := StyleBoxFlat.new()
+		segment_style.bg_color = Color(1.0, 1.0, 1.0, 0.06)
+		segment_style.border_color = Color.WHITE
+		segment_style.set_border_width_all(1)
+		segment.add_theme_stylebox_override("panel", segment_style)
+		segments.add_child(segment)
+	_zoom_slider = HSlider.new()
+	_zoom_slider.min_value = 0
+	_zoom_slider.max_value = 3
+	_zoom_slider.step = 1
+	_zoom_slider.tick_count = 4
+	_zoom_slider.ticks_on_borders = true
+	_zoom_slider.focus_mode = Control.FOCUS_NONE # Setas sempre deslocam o mapa.
+	_zoom_slider.value = _camera_level
+	_zoom_slider.custom_minimum_size = Vector2(76.0, 15.0)
+	_zoom_slider.tooltip_text = "Zoom da cena: 1 afasta, 2 padrão, 3 aproxima, 4 aproxima mais. Rolinhos do mouse também mudam o zoom."
+	var track := StyleBoxEmpty.new()
+	_zoom_slider.add_theme_stylebox_override("slider", track)
+	_zoom_slider.add_theme_stylebox_override("grabber_area", track)
+	_zoom_slider.add_theme_stylebox_override("grabber_area_highlight", track)
+	var handle_image := Image.create(11, 11, false, Image.FORMAT_RGBA8)
+	handle_image.fill(Color.TRANSPARENT)
+	for y in 11:
+		for x in 11:
+			if Vector2(x - 5, y - 5).length_squared() <= 23.0:
+				handle_image.set_pixel(x, y, Color("f4ca52"))
+	var handle := ImageTexture.create_from_image(handle_image)
+	_zoom_slider.add_theme_icon_override("grabber", handle)
+	_zoom_slider.add_theme_icon_override("grabber_highlight", handle)
+	track_slot.add_child(_zoom_slider)
+	_zoom_slider.value_changed.connect(func(value: float) -> void:
+		_set_camera_level(roundi(value)))
+	var caption := Label.new()
+	caption.text = "zoom"
+	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	caption.add_theme_font_size_override("font_size", 9)
+	caption.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.72))
+	contents.add_child(caption)
+	for side in [-1, 1]:
+		var button := Button.new()
+		button.text = "◀" if side < 0 else "▶"
+		button.name = "PanLeft" if side < 0 else "PanRight"
+		button.focus_mode = Control.FOCUS_NONE
+		button.custom_minimum_size = Vector2(28.0, 44.0)
+		button.tooltip_text = "Deslocar a cena para %s" % ("esquerda" if side < 0 else "direita")
+		button.pressed.connect(_pan_camera.bind(CAMERA_PAN_STEP * \
+			(1.0 if side < 0 else -1.0)))
+		_overlay_camera_place(button, overlay)
+		_camera_buttons[side] = button
+	_refresh_camera_controls()
+
+
+func _overlay_camera_full_rect(control: Control) -> void:
+	control.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	control.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+func _overlay_camera_place(control: Control, parent: Control) -> void:
+	parent.add_child(control)
+	control.mouse_filter = Control.MOUSE_FILTER_STOP
+
+
+func _refresh_camera_controls() -> void:
+	if _camera_layer == null or _zoom_slider == null:
+		return
+	_zoom_slider.set_value_no_signal(_camera_level)
+	var screen := get_viewport_rect().size
+	var bar := get_node_or_null("CampaignTopBar/Bar") as Control
+	var x := _camera_hud_right() + 8.0
+	var top_bar_left := bar.get_global_rect().position.x if bar != null else screen.x
+	_zoom_frame.position = Vector2(x, 7.0 if top_bar_left - x >= 96.0 else 55.0)
+	for side in [-1, 1]:
+		var button := _camera_buttons.get(side) as Button
+		button.visible = _camera_level > 1
+		button.position = Vector2(_camera_hud_right() + 6.0 if side < 0 \
+			else screen.x - 35.0, screen.y * 0.5 - 22.0)
+		button.disabled = _camera_pan_target_x >= _camera_pan_limit() - 1.0 \
+			if side < 0 else _camera_pan_target_x <= -_camera_pan_limit() + 1.0
+
+
 func get_ground_screen_top() -> float:
+	if _ground.get_child_count() > 0:
+		var tile := _ground.get_child(0) as Sprite2D
+		if tile != null:
+			return tile.to_global(Vector2(0.0,
+				-float(GROUND_TEXTURE.get_height()) * 0.5)).y
 	return get_viewport_rect().size.y - GROUND_BOTTOM_MARGIN \
 		- float(GROUND_TEXTURE.get_height()) * GROUND_SCALE.y
 
@@ -265,6 +733,22 @@ func _layout_background(screen_size: Vector2) -> void:
 		- _map_root.position.y - visible_bottom_from_center
 
 
+func _layout_background_copies() -> void:
+	if _background.texture == null:
+		return
+	var horizontal := _visible_facade_horizontal_bounds(_background.texture)
+	var step := float(horizontal.y - horizontal.x + 1) * _background.scale.x
+	for side in [-1, 1]:
+		for number in [1, 2]:
+			var copy := Sprite2D.new()
+			copy.name = "Facade_%d_%d" % [side, number]
+			copy.texture = _background.texture
+			copy.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+			copy.scale = _background.scale
+			copy.position = _background.position + Vector2(side * number * step, 0.0)
+			_background_copies.add_child(copy)
+
+
 func _visible_facade_horizontal_bounds(texture: Texture2D) -> Vector2i:
 	var key := texture.resource_path
 	if _background_horizontal_bounds_cache.has(key):
@@ -319,9 +803,10 @@ func _layout_ground(screen_size: Vector2) -> void:
 	var tile_width := float(GROUND_TEXTURE.get_width()) * GROUND_SCALE.x
 	var tile_height := float(GROUND_TEXTURE.get_height()) * GROUND_SCALE.y
 	var center_y := screen_size.y - GROUND_BOTTOM_MARGIN - tile_height * 0.5
-	var center_x := tile_width * 0.5
+	var center_x := tile_width * 0.5 - ceilf(screen_size.x / GROUND_REPEAT_STEP) \
+		* GROUND_REPEAT_STEP
 	var index := 0
-	while center_x - tile_width * 0.5 < screen_size.x:
+	while center_x - tile_width * 0.5 < screen_size.x * 2.0:
 		var tile := Sprite2D.new()
 		tile.name = "Ground_%d" % index
 		tile.texture = GROUND_TEXTURE
@@ -369,6 +854,12 @@ func _refresh_feedback() -> void:
 				else Color.WHITE
 
 
+func _on_ui_palette_changed(palette_id: String) -> void:
+	if _renderer != null:
+		_renderer.set_ui_palette(palette_id)
+		_refresh_feedback()
+
+
 ## Mesmo fluxo para clicar no hex ou no corpo visual do inimigo.
 func preview_combat_destination(coord: Vector2i) -> void:
 	if grid.ppp_map_mode != HexGrid.PPPMapMode.COMBAT or not grid.is_valid(coord) \
@@ -376,6 +867,22 @@ func preview_combat_destination(coord: Vector2i) -> void:
 		return
 	_selected_coord = coord
 	_refresh_feedback()
+
+
+func highlight_enemy_hex(coord: Vector2i) -> void:
+	if grid.ppp_map_mode != HexGrid.PPPMapMode.COMBAT or not grid.is_valid(coord):
+		return
+	_enemy_link_coord = coord
+	if _enemy_link_glow != null:
+		_enemy_link_glow.position = reference_hex_position(coord)
+		_enemy_link_glow.show()
+	preview_combat_destination(coord)
+
+
+func clear_enemy_hex_highlight() -> void:
+	_enemy_link_coord = EntityState.UNPLACED
+	if _enemy_link_glow != null:
+		_enemy_link_glow.hide()
 
 
 func request_combat_selection(coord: Vector2i) -> void:
@@ -439,15 +946,19 @@ func show_generated_map(new_grid: HexGrid) -> void:
 	if new_grid == null:
 		return
 	grid = new_grid
+	clear_enemy_hex_highlight()
 	_retired_start_coords.clear()
 	_temporary_inspection_coords.clear()
 	_temporary_inspection_owner_id = &""
 	_future_vision_actor = null
 	_selected_coord = Vector2i(-999, -999)
 	if is_node_ready():
-		_rebuild_visuals()
-		if _parallax != null:
-			_parallax.show_generated_map(new_grid)
+		if bool(get_meta("defer_preview_map", false)) and not _initial_visuals_prepared:
+			_pending_initial_visuals = true
+		else:
+			_rebuild_visuals()
+			if _parallax != null:
+				_parallax.show_generated_map(new_grid)
 
 
 func set_visual_effects(weather_event_id: StringName, infernal_portals_active: bool) -> void:
@@ -463,6 +974,7 @@ func set_active_actor(coord: Vector2i, stamina: int,
 	_unlimited_destinations = unlimited_destinations
 	_flying_destinations = flying_destinations
 	_selected_coord = Vector2i(-999, -999)
+	clear_enemy_hex_highlight()
 	_refresh_feedback()
 
 
@@ -578,7 +1090,16 @@ func refresh_special_event_visuals() -> void:
 		var sprite := AnimatedSprite2D.new()
 		sprite.sprite_frames = animation.create_sprite_frames()
 		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		sprite.position = Vector2(0.0, -float(animation.canvas_size.y) * 0.5)
+		var visual_scale := 1.0
+		if cell.map_visual_path.contains("duende_cor_"):
+			if _gnome_reference_height < 0.0:
+				_gnome_reference_height = ORIENTATION_SCALE.gnome_reference_height()
+			if _gnome_reference_height > 0.0:
+				visual_scale = _gnome_reference_height / float(animation.subject_height)
+		sprite.scale = Vector2.ONE * visual_scale
+		# Mantém os pés na linha do hex mesmo quando o Duende 1 cresce.
+		sprite.position = Vector2(0.0,
+			-float(animation.canvas_size.y) * 0.5 * visual_scale)
 		marker.add_child(sprite)
 		if sprite.sprite_frames.has_animation(&"idle"):
 			sprite.play(&"idle")

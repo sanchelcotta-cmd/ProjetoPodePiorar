@@ -1,12 +1,27 @@
 [gd_resource type="Resource" script_class="PlayableAnimationData" format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/entities/playable_animation_data.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://sprites/playable/p_cozinheiro/cozinheiro_idle_1x.png" id="2_idle"]
-[ext_resource type="Texture2D" path="res://sprites/playable/p_cozinheiro/cozinheiro_walk_1x.png" id="3_walk"]
-[ext_resource type="Texture2D" path="res://sprites/playable/p_cozinheiro/cozinheiro_hurt_1x.png" id="4_hurt"]
+[ext_resource type="Texture2D" path="res://sprites/playable/v2/cozinheiro/cozinheiro_idle_1x.png" id="2_idle"]
+[ext_resource type="Texture2D" path="res://sprites/playable/v2/cozinheiro/cozinheiro_walk_1x.png" id="3_walk"]
+[ext_resource type="Texture2D" path="res://sprites/playable/v2/cozinheiro/cozinheiro_hurt_1x.png" id="4_hurt"]
+[ext_resource type="Texture2D" path="res://sprites/playable/v2/cozinheiro/cozinheiro_blade_1x.png" id="5_blade"]
+[ext_resource type="Texture2D" path="res://sprites/playable/v2/cozinheiro/cozinheiro_impacto_1x.png" id="6_impact"]
+[ext_resource type="Texture2D" path="res://sprites/playable/v2/cozinheiro/cozinheiro_distancia_1x.png" id="7_ranged"]
 
 [resource]
 script = ExtResource("1_script")
+sling_rear_hand_frame3 = Vector2i(23, 48)
 idle_sheet = ExtResource("2_idle")
 walk_sheet = ExtResource("3_walk")
 hurt_sheet = ExtResource("4_hurt")
+blade_attack_sheet = ExtResource("5_blade")
+impact_attack_sheet = ExtResource("6_impact")
+ranged_attack_sheet = ExtResource("7_ranged")
+hand_roots = {
+	&"idle": PackedVector2Array(48, 61, 47, 60, 47, 60, 47, 60, 47, 60, 49, 62, 49, 62, 48, 61, 47, 61, 48, 61, 49, 62, 48, 62),
+	&"walk": PackedVector2Array(46, 59, 43, 60, 41, 65, 44, 63, 45, 60, 47, 59, 41, 65, 47, 60),
+	&"hurt": PackedVector2Array(48, 64, 46, 59, 46, 57, 46, 57, 46, 57, 50, 65),
+	&"attack_blade": PackedVector2Array(43, 64, 48, 48, 60, 35, 61, 36, 50, 47),
+	&"attack_impact": PackedVector2Array(53, 49, 54, 22, 60, 35, 50, 50, 46, 64),
+	&"attack_ranged": PackedVector2Array(46, 64, 53, 49, 57, 36, 46, 58, 43, 64),
+}

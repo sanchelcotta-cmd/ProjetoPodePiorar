@@ -18,7 +18,7 @@ expiration_mode = 2
 script = ExtResource("2_outcome")
 id = &"ev_00051_out_01"
 display_name = "Você vira uma galinha."
-narrative_description = "Por enquanto, o mundo verá uma galinha azulada onde você estava. Até o fim desta Rodada, sua aparência muda, mas Vida, Ataque, Estamina, itens, Maestrias e habilidades permanecem intactos."
+narrative_description = "Por enquanto, você é uma galinha. Sua aparência muda, mas Vida, Ataque, Estamina, itens, Maestrias e habilidades permanecem intactos.\nParece que isso irá durar toda a [nome_rodada]"
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

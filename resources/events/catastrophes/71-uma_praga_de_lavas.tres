@@ -23,6 +23,7 @@ script = ExtResource("2_outcome")
 id = &"ev_00071_out_01"
 id = &"ev_00071_out_01"
 display_name = "A comida apodreceu."
+narrative_description = "A comida apodreceu.\nPelo restante do Dia, todo Consumível encontrado também estará apodrecido."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

@@ -16,6 +16,7 @@ math_operation = 1
 script = ExtResource("2_outcome")
 id = &"ev_00039_out_01"
 display_name = "Metade da sua força desaparece."
+narrative_description = "Metade da sua força desaparece, e isso não é nada bom!\nE você perde metade do valor de sua Vida atual."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

@@ -43,9 +43,19 @@ func _run() -> void:
 	_check(hud.ally_drawer.size.y <=
 		hud.ally_drawer.get_combined_minimum_size().y + 2.0,
 		"Ficha do aliado encolhe até caber seu conteúdo, sem faixa vazia.")
-	_check(hud.ally_drawer.visible and hud._ally_summary.text == cook.display_name
-		and not hud._ally_summary.text.contains("ALIADO HUMANO"),
-		"Nome do aliado aparece sozinho sob o retrato.")
+	var roster_row := hud._ally_roster.get_child(0) as HBoxContainer
+	_check(hud.ally_drawer.visible and hud._ally_roster.visible
+		and (roster_row.get_child(0) as Button).text == cook.display_name.to_upper()
+		and not hud._ally_info.visible,
+		"Exploração mostra nome e ⓘ do aliado na lista simples.")
+	(roster_row.get_child(1) as Button).pressed.emit()
+	_check(hud.character_sheet.visible and hud.character_sheet.actor == ally,
+		"ⓘ da lista abre a ficha do aliado.")
+	hud.character_sheet.close_sheet()
+	# A vista completa e seus equipamentos pertencem ao Combate; validar seus
+	# componentes separadamente sem exigir que apareçam na Exploração.
+	hud._set_ally_drawer_exploration_mode(false)
+	hud._refresh_ally_info([ally])
 	_check(hud._ally_equipment.visible and hud._ally_equipment.get_child_count() == 3,
 		"Três slots equipados aparecem abaixo das Ativas.")
 	for slot in hud._ally_equipment.get_children():
@@ -69,8 +79,9 @@ func _run() -> void:
 	var output_dir := "res://docs/ally_hud_preview"
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output_dir))
 	await process_frame
-	_check(root.get_texture().get_image().save_png("%s/aliado.png" % output_dir) == OK,
-		"Captura do HUD do aliado gerada.")
+	if DisplayServer.get_name() != "headless":
+		_check(root.get_texture().get_image().save_png("%s/aliado.png" % output_dir) == OK,
+			"Captura do HUD do aliado gerada.")
 	var unequip := _find_button(hud.item_menu.rows, "Desequipar")
 	var old_weapon := ally.primary_equipped(ItemData.EquipmentSlot.WEAPON)
 	_check(unequip != null and not unequip.disabled, "Desequipar está disponível.")
@@ -84,10 +95,12 @@ func _run() -> void:
 		EntityState.UNPLACED)
 	_check(campaign.register_companion(owner, tamed, rng, skills),
 		"Criatura adestrada vira aliada.")
-	hud._on_ally_selected(1)
+	hud._refresh_ally_info([ally, tamed])
+	hud._ally_selected_index = 1
+	hud._refresh_ally_info([ally, tamed])
 	_check(hud._ally_summary.text == cultist.display_name
 		and not hud._ally_equipment.visible,
-		"Criatura usa seu próprio nome, não o do Encontro; não equipa.")
+		"Em Combate, criatura usa seu nome e não oferece equipamento.")
 	owner.position = Vector2i(3, 2)
 	var encounter := load("res://resources/encounters/enc_homens_de_preto_suburbio.tres") as EncounterData
 	campaign.obtained_information_ids[&"ally_hud_test_info"] = true
@@ -132,8 +145,9 @@ func _run() -> void:
 				<= minf(hit.get_global_rect().position.y, root.size.y * 0.62),
 			"Caixa fica acima do corpo, abaixo da UI e fora do chão.")
 		await process_frame
-		_check(root.get_texture().get_image().save_png("%s/combate.png" % output_dir) == OK,
-			"Captura das ações de Combate gerada.")
+		if DisplayServer.get_name() != "headless":
+			_check(root.get_texture().get_image().save_png("%s/combate.png" % output_dir) == OK,
+				"Captura das ações de Combate gerada.")
 		var click := InputEventMouseButton.new()
 		click.button_index = MOUSE_BUTTON_LEFT
 		click.pressed = true
@@ -146,8 +160,13 @@ func _run() -> void:
 
 func _find_button(container: Node, caption: String) -> Button:
 	for child in container.get_children():
-		if child is Button and (child as Button).text == caption:
-			return child as Button
+		if child is Button:
+			if (child as Button).text == caption:
+				return child as Button
+			# Habilidades limitadas exibem o nome e o contador em Labels internos.
+			for label in child.find_children("*", "Label", true, false):
+				if (label as Label).text == caption:
+					return child as Button
 	return null
 
 

@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/ui/character_inventory_panel.gd" id="1_inventory"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inventory"]
-bg_color = Color(0.027, 0.044, 0.058, 0.8)
+bg_color = Color(0.027, 0.044, 0.058, 0.96)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1

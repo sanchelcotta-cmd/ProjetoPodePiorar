@@ -1,12 +1,27 @@
 [gd_resource type="Resource" script_class="PlayableAnimationData" format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/entities/playable_animation_data.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://sprites/playable/p_pedreiro/pedreiro_idle_1x.png" id="2_idle"]
-[ext_resource type="Texture2D" path="res://sprites/playable/p_pedreiro/pedreiro_walk_1x.png" id="3_walk"]
-[ext_resource type="Texture2D" path="res://sprites/playable/p_pedreiro/pedreiro_hurt_1x.png" id="4_hurt"]
+[ext_resource type="Texture2D" path="res://sprites/playable/v2/pedreiro/pedreiro_idle_1x.png" id="2_idle"]
+[ext_resource type="Texture2D" path="res://sprites/playable/v2/pedreiro/pedreiro_walk_1x.png" id="3_walk"]
+[ext_resource type="Texture2D" path="res://sprites/playable/v2/pedreiro/pedreiro_hurt_1x.png" id="4_hurt"]
+[ext_resource type="Texture2D" path="res://sprites/playable/v2/pedreiro/pedreiro_lamina_1x.png" id="5_blade"]
+[ext_resource type="Texture2D" path="res://sprites/playable/v2/pedreiro/pedreiro_impacto_1x.png" id="6_impact"]
+[ext_resource type="Texture2D" path="res://sprites/playable/v2/pedreiro/pedreiro_distancia_1x.png" id="7_ranged"]
 
 [resource]
 script = ExtResource("1_script")
+sling_rear_hand_frame3 = Vector2i(30, 44)
 idle_sheet = ExtResource("2_idle")
 walk_sheet = ExtResource("3_walk")
 hurt_sheet = ExtResource("4_hurt")
+blade_attack_sheet = ExtResource("5_blade")
+impact_attack_sheet = ExtResource("6_impact")
+ranged_attack_sheet = ExtResource("7_ranged")
+hand_roots = {
+	&"idle": PackedVector2Array(50, 53, 51, 54, 51, 54, 51, 54, 52, 53, 52, 53, 52, 53, 52, 53, 52, 53, 51, 54, 52, 53, 52, 53),
+	&"walk": PackedVector2Array(49, 55, 49, 59, 41, 66, 48, 70, 46, 65, 50, 63, 44, 65, 51, 72),
+	&"hurt": PackedVector2Array(56, 57, 54, 55, 50, 54, 50, 55, 52, 55, 52, 53),
+	&"attack_blade": PackedVector2Array(44, 54, 48, 56, 50, 52, 56, 42, 46, 59),
+	&"attack_impact": PackedVector2Array(45, 58, 61, 36, 58, 44, 48, 56, 44, 54),
+	&"attack_ranged": PackedVector2Array(44, 54, 57, 45, 57, 43, 50, 52, 48, 56),
+}

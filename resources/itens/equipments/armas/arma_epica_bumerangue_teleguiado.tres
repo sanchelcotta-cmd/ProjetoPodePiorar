@@ -4,13 +4,13 @@
 [ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_f1q4j"]
 [ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_nv1mw"]
 [ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="4_0k7tg"]
-[ext_resource type="Resource" uid="uid://t5c1hs7mlm6q" path="res://resources/skills/passives/esquiva_60.tres" id="4_f1q4j"]
+[ext_resource type="Resource" path="res://resources/skills/passives/interceptacao_bumerangue.tres" id="4_f1q4j"]
 
-[ext_resource type="Texture2D" path="res://sprites/itens_icons/armas_epicas_1.png" id="ppp_icon_sheet"]
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armas_epicas_2_transparent.png" id="ppp_icon_sheet"]
 
 [sub_resource type="AtlasTexture" id="ppp_item_icon"]
 atlas = ExtResource("ppp_icon_sheet")
-region = Rect2(33, 138, 47, 83)
+region = Rect2(254, 606, 234, 332)
 
 [resource]
 script = ExtResource("1_lnile")

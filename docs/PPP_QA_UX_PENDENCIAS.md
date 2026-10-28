@@ -22,3 +22,24 @@ devem ser tratados como funcionalidades já implementadas.
 
 Qualidade das animações foi excluída desta revisão a pedido do usuário; apenas
 o funcionamento e a ordem movimento → ataque foram verificados.
+
+## Câmera do mapa — 24/10/2026
+
+Foi acrescentado zoom discreto em quatro passos (85%, 100%, 115% e 130%) pelo
+rolinho ou pela barra segmentada no canto superior. A barra usa divisões brancas,
+marcador amarelo e legenda pequena “zoom”. HUD, menus e céu em paralaxe não
+escalam junto com o mapa. A câmera ancora a base do Ground e repete a fachada
+para os lados, evitando expor bordas no afastamento. Em zoom aproximado, arrastar
+na área de cenário/céu, as setas do teclado ou os botões laterais deslocam só
+horizontalmente, com sensibilidade moderada e suavização. O deslocamento manual
+não obriga o personagem ativo a permanecer visível; duplo clique no cenário/céu
+ou no cartão do ativo o reenquadra. Novo turno também traz o ator da vez para
+a faixa visível quando necessário. O zoom retorna a 100% e ao pan central ao
+selecionar o nível 2.
+
+A implementação de câmera **não** equivale à navegação integral por teclado:
+seleção de hexes, alvos e ações continua pendente de mapeamento próprio.
+Teste automatizado: `scripts/tests/ppp_map_camera_test.gd` cobre quatro escalas,
+limites laterais, repetição da fachada e base do Ground. Ainda cabe revisão
+visual/interativa em F5 para sensibilidade de arrasto e composição em resoluções
+reais de monitor.

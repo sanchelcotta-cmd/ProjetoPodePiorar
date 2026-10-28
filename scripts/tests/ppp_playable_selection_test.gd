@@ -16,9 +16,9 @@ func _run_test() -> void:
 	await process_frame
 	await process_frame
 	check(selection.cards.size() == 7, "A seleção mostra os sete personagens.")
-	var grid := selection.get_node("Content/Stack/CardsScroll/CardsCenter/CardsGrid") \
+	var grid := selection.get_node("Content/Stack/BodyScroll/Body/Carousel/CardsCenter/CardsGrid") \
 		as GridContainer
-	check(grid.columns == 7, "Na tela de referência, os sete cabem lado a lado.")
+	check(grid.columns == 7, "Os sete aparecem juntos sem navegação lateral.")
 	for card in selection.cards:
 		check(card.get_global_rect().position.x >= 0.0 \
 			and card.get_global_rect().end.x <= selection.get_viewport_rect().size.x,
@@ -36,12 +36,12 @@ func _run_test() -> void:
 		check(card.character_visual.animated_sprite.animation == &"idle",
 			"%s aparece animado em idle na seleção." % card.character.display_name)
 		if card.character.display_name == "Professora do Primário":
-			check(animation.hurt_columns == 4,
-				"Hurt da Professora usa quatro colunas e apenas seis quadros.")
+			check(animation.hurt_columns == 3,
+				"Hurt atualizado da Professora usa três colunas e seis quadros.")
 			var fifth := frames.get_frame_texture(&"hurt", 4) as AtlasTexture
 			var sixth := frames.get_frame_texture(&"hurt", 5) as AtlasTexture
-			check(fifth.region.position == Vector2(0, 96) \
-				and sixth.region.position == Vector2(64, 96),
+			check(fifth.region.position == Vector2(64, 96) \
+				and sixth.region.position == Vector2(128, 96),
 				"Os dois últimos quadros da Professora vêm da segunda linha.")
 	selection.cards[0].pressed.emit()
 	var one_pick := selection._complete_party()
@@ -49,7 +49,7 @@ func _run_test() -> void:
 		and one_pick[0] != one_pick[1] and one_pick[1] != one_pick[2] \
 		and one_pick[0] != one_pick[2],
 		"Uma escolha mantém a primeira vaga e sorteia duas diferentes.")
-	check(not selection.get_node("Content/Stack/ConfirmSelection").disabled,
+	check(not selection.get_node("Content/Stack/Footer/FooterMargin/FooterRow/ConfirmSelection").disabled,
 		"Uma escolha já habilita confirmar.")
 	selection.cards[1].pressed.emit()
 	var two_picks := selection._complete_party()
@@ -59,7 +59,7 @@ func _run_test() -> void:
 		"Duas escolhas mantêm a ordem e sorteiam a terceira.")
 	selection.cards[2].pressed.emit()
 	check(selection.selected.size() == 3 \
-		and not selection.get_node("Content/Stack/ConfirmSelection").disabled,
+		and not selection.get_node("Content/Stack/Footer/FooterMargin/FooterRow/ConfirmSelection").disabled,
 		"Três escolhas distintas também habilitam confirmação.")
 	check(selection._complete_party() == selection.selected,
 		"Com três escolhas, não há sorteio adicional.")
@@ -69,11 +69,24 @@ func _run_test() -> void:
 	selection.cards[2].pressed.emit()
 	var chosen_manually := selection.selected[0]
 	selection._confirm_selection()
-	await process_frame
-	check((selection.get_node("PreGameSummary") as ColorRect).visible,
-		"Antes do primeiro mapa, o jogador revisa a campanha.")
-	(selection.get_node("PreGameSummary/Center/Details/Actions/Start") as Button).pressed.emit()
-	await process_frame
+	for _frame in 40:
+		if current_scene is CampaignPreGameSummary:
+			break
+		await process_frame
+	var pregame := current_scene as Control
+	check(pregame != null and
+		(pregame.get_node("BlackBackground") as ColorRect).color == Color.BLACK,
+		"Antes do primeiro mapa, uma cena própria revisa a campanha.")
+	var early_game := false
+	for child in root.get_children():
+		early_game = early_game or child is PPPMapView
+	check(not early_game, "A confirmação não instancia o mapa por trás da tela preta.")
+	if pregame != null:
+		(pregame.get_node("Center/Summary/Start") as Button).pressed.emit()
+	for _frame in 40:
+		if current_scene is PPPMapView:
+			break
+		await process_frame
 	var game := current_scene as PPPMapView
 	check(game != null, "Confirmar abre a cena do mapa.")
 	if game != null:
@@ -124,8 +137,14 @@ func _run_test() -> void:
 		check(first_actor.animated_sprite.animation == &"walk",
 			"Movimento dispara Walk.")
 		var information_popup := game.get_node("BlockActivationPopup") as BlockActivationPopup
-		check(information_popup.overlay.visible and exploration.current_actor == first,
-			"A Informação aguarda o jogador ler e confirmar sua caixa de texto.")
+		check(not information_popup.overlay.visible and exploration.current_actor == first,
+			"A caixa da Informação espera a chegada visual ao hex.")
+		await first_actor.walk_finished
+		check(not information_popup.overlay.visible,
+			"A caixa ainda aguarda a pausa breve após a caminhada.")
+		await create_timer(0.55).timeout
+		check(information_popup.overlay.visible,
+			"Após a chegada e a pausa, a Informação aguarda confirmação.")
 		information_popup._confirm_information()
 		check(exploration.current_actor.playable_slot_id == &"Playable_2",
 			"A Informação resolvida encerra o turno e sugere a vaga seguinte.")

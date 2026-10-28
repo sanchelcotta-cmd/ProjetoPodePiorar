@@ -23,6 +23,8 @@ var activated_combat_id: StringName = &""
 var applied_stat_contributions: Dictionary = {}
 var on_granted_applied: bool = false
 var bound_source: Resource
+# Melhorias da cópia absorvida; bound_source continua sendo o Resource do catálogo.
+var bound_item_improvements: Dictionary = {}
 var copied_passive_source_ids: Array[StringName] = []
 var last_passive_turn_serial: int = -1
 var last_passive_turn_key: StringName = &""

@@ -121,7 +121,7 @@ func _run_test() -> void:
 	owner.current_health = owner.max_health - 3
 	var chance_result := inventory.use_consumable(owner, chance_copy, manager, campaign)
 	check(chance_result.get("success", false) and owner.current_health == owner.max_health - 1 \
-		and chance_result.get("chance_results", []).has("Não foi dessa vez..."),
+		and chance_result.get("chance_results", []).has("Não foi dessa vez."),
 		"Consumível informa falha percentual sem perder seu efeito garantido.")
 	var faro := load("res://resources/skills/actives/playables/jornalista/faro_jornalistico.tres") as ActiveSkillData
 	var faro_grant := manager.grant_skill(owner, faro, &"event", &"journalist")

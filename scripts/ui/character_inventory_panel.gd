@@ -89,6 +89,7 @@ func _ready() -> void:
 	_resize_handle.text = "◢"
 	_resize_handle.tooltip_text = "Arraste para ampliar até 20%; proporção fixa"
 	_resize_handle.custom_minimum_size = Vector2(24, 18)
+	_resize_handle.set_meta("ppp_cursor_context", "diagonal_nwse")
 	_resize_handle.gui_input.connect(_on_resize_handle_input)
 	resize_row.add_child(_resize_handle)
 
@@ -106,12 +107,14 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT \
 			and not event.pressed:
 		_resizing = false
+		get_node("/root/GameCursor").call("release_drag", self)
 
 
 func _on_resize_handle_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT \
 			and event.pressed:
 		_resizing = true
+		get_node("/root/GameCursor").call("capture_drag", self, "diagonal_nwse")
 		_resize_start_mouse = get_viewport().get_mouse_position()
 		_resize_start_scale = scale.x
 		get_viewport().set_input_as_handled()

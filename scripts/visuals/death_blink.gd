@@ -9,6 +9,12 @@ static func start(visual: CanvasItem) -> Tween:
 	visual.show()
 	visual.modulate.a = 1.0
 	var tween := visual.create_tween()
+	var comfort := visual.get_node_or_null("/root/VisualComfort")
+	if comfort != null and bool(comfort.get("enabled")):
+		# Morte continua visível, mas sem alternância rápida de opacidade.
+		tween.tween_property(visual, "modulate:a", 0.0, 0.65)
+		tween.tween_callback(visual.hide)
+		return tween
 	for blink in 3:
 		# Três piscadas de 0,5 s, com 0,5 s entre elas: 2,5 s no total.
 		tween.tween_property(visual, "modulate:a", 0.10, 0.25)

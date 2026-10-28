@@ -16,7 +16,7 @@ math_operation = 0
 script = ExtResource("3_effect")
 effect_type = 29
 target = 3
-status_ids = Array[StringName]([&"db_00009"])
+status_ids = Array[StringName]([&"db_00009", &"db_00010"])
 has_duration = true
 expiration_mode = 1
 
@@ -24,14 +24,14 @@ expiration_mode = 1
 script = ExtResource("2_outcome")
 id = &"ev_00053_out_01"
 display_name = "O grupo recupera a alegria."
-narrative_description = "Entre luzes e risadas, todos recuperam completamente a Vida. O Terror não pode afetá-los até o fim do Dia."
+narrative_description = "Entre luzes e risadas, todos recuperam completamente a Vida. Tristeza nem Terror podem afetá-los até o fim do Dia."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_heal"), SubResource("Effect_terror_immunity")])
 
 [resource]
 script = ExtResource("1_event")
 id = &"ev_00053"
 display_name = "Carreta da Alegria"
-description = "Todos recuperam completamente a Vida e ficam imunes a Terror até o fim do Dia."
+description = "Todos recuperam completamente a Vida e ficam imunes a Terror e Tristeza até o fim do Dia."
 narrative_description = "Luzes coloridas iluminam a rua. Um grave ensurdecedor invade o bairro. Quatro figuras fantasiadas dançam como se o fim do mundo fosse só mais uma sexta-feira. Sem perceber, vocês já estão batendo palma, rindo e acompanhando a música. Por alguns minutos, parece impossível sentir medo."
 valence = 0
 outcomes = Array[ExtResource("2_outcome")]([SubResource("Outcome")])

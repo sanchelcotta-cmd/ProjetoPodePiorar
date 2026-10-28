@@ -15,6 +15,7 @@ randomize_equal_distance = true
 script = ExtResource("2_outcome")
 id = &"ev_00080_out_01"
 display_name = "O alarme chama atenção."
+narrative_description = "O alarme chama atenção.\nEnfrente um encontro Indesejado!"
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_alarm")])
 
 [resource]

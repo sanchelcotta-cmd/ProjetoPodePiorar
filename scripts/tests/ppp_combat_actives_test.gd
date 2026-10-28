@@ -57,9 +57,29 @@ func _run_test() -> void:
 		gerencia.campaign, combat, enemy)
 	check(silence_result.get("success", false) and enemy.attack < old_attack,
 		"A Ativa inata reduz o Ataque do alvo.")
-	check(not skill_manager.can_use_combat_active(professora, silencio,
+	var silence_button_holder := VBoxContainer.new()
+	hud._add_skill_button(silence_button_holder, professora, silencio)
+	check((silence_button_holder.get_child(0) as Button).get_meta(
+		"combat_uses_text", "") == "1 de 3 gastos",
+		"O botão de Silêncio mostra o primeiro uso gasto abaixo do nome.")
+	silence_button_holder.free()
+	check(skill_manager.can_use_combat_active(professora, silencio,
 		gerencia.campaign, combat, enemy),
-		"O limite de um uso por combate é respeitado.")
+		"Silêncio continua disponível depois do primeiro uso.")
+	var silence_second := skill_manager.use_combat_active(professora, silencio,
+		gerencia.campaign, combat, enemy)
+	var silence_third := skill_manager.use_combat_active(professora, silencio,
+		gerencia.campaign, combat, enemy)
+	check(silence_second.get("success", false) and silence_third.get("success", false)
+		and silencio.uses_in_last_combat == 3 and not skill_manager.can_use_combat_active(
+			professora, silencio, gerencia.campaign, combat, enemy),
+		"Silêncio aceita três usos por combate e bloqueia o quarto.")
+	var silence_exhausted_holder := VBoxContainer.new()
+	hud._add_skill_button(silence_exhausted_holder, professora, silencio)
+	check((silence_exhausted_holder.get_child(0) as Button).get_meta(
+		"combat_uses_text", "") == "3 de 3 gastos",
+		"O botão de Silêncio mostra o limite esgotado.")
+	silence_exhausted_holder.free()
 	combat.current_actor = pedreiro
 	combat._combat_turns_by_id[pedreiro.instance_id] = 1
 	var muro := skill_manager.get_active_grants(pedreiro)[0]
@@ -79,10 +99,27 @@ func _run_test() -> void:
 	check(combat._damage_guards.get(professora.instance_id) == pedreiro \
 		and is_equal_approx(float(combat._guard_reductions.get(pedreiro.instance_id, 1.0)), 0.75),
 		"Muro de Tijolo redireciona dano e reduz 25% enquanto protege.")
+	var wall_button_holder := VBoxContainer.new()
+	hud._add_skill_button(wall_button_holder, pedreiro, muro)
+	check((wall_button_holder.get_child(0) as Button).get_meta(
+		"combat_uses_text", "") == "1 de 3 gastos",
+		"O botão de Muro de Tijolo mostra o primeiro uso gasto.")
+	wall_button_holder.free()
 	hud._on_map_actor_pressed(0)
 	check(hud.hex_choice.visible and hud.hex_choice_buttons.get_child_count() == 1 \
-		and (hud.hex_choice_buttons.get_child(0) as Button).disabled,
-		"Clicar na aliada mostra Muro de Tijolo cinza após o uso.")
+		and not (hud.hex_choice_buttons.get_child(0) as Button).disabled,
+		"Clicar na aliada mantém Muro de Tijolo disponível após o primeiro uso.")
+	var wall_second := skill_manager.use_combat_active(pedreiro, muro,
+		gerencia.campaign, combat, professora)
+	var wall_third := skill_manager.use_combat_active(pedreiro, muro,
+		gerencia.campaign, combat, professora)
+	check(wall_second.get("success", false) and wall_third.get("success", false)
+		and muro.uses_in_last_combat == 3 and not skill_manager.can_use_combat_active(
+			pedreiro, muro, gerencia.campaign, combat, professora),
+		"Muro de Tijolo aceita três usos por combate e bloqueia o quarto.")
+	hud._on_map_actor_pressed(0)
+	check(hud.hex_choice.visible and (hud.hex_choice_buttons.get_child(0) as Button).disabled,
+		"Muro de Tijolo fica cinza quando os três usos terminam.")
 	check(combat._can_select_hex(companion.position),
 		"O hex ocupado por aliado recrutado pode abrir suas Ativas direcionadas.")
 	hud._on_combat_hex_choice(companion.position)
@@ -162,8 +199,8 @@ func _run_test() -> void:
 	combat.enemies.append(dama)
 	var before_summon := combat.enemies.size()
 	combat._run_automatic_actives(dama, ActiveSkillData.AutomaticTrigger.ON_COMBAT_START)
-	check(combat.enemies.size() > before_summon,
-		"Invocação de abertura da Dama Elemental gera inimigos reais no mapa.")
+	check(combat.enemies.size() in [before_summon, before_summon + 1],
+		"Dama Elemental tem 50% de chance de gerar no máximo uma entidade.")
 	var aranha_data := load("res://resources/entities/entities_general/aranha_interdimensional.tres") as EntityData
 	var aranha := EntityState.from_encounter_member(aranha_data, encounter.id, 3,
 		Vector2i(4, 2))
@@ -185,12 +222,35 @@ func _run_test() -> void:
 	check(skill_manager.debuff_manager.apply_by_id(professora, &"db_00010")
 		.get("success", false), "Tristeza antecede o Sacrifício Divino.")
 	professora.current_health = 0
-	combat._offer_revive_for(professora)
-	check(not combat._pending_revive.is_empty(),
-		"A morte de aliado oferece Sacrifício Divino antes do desfecho.")
-	var revive_result := combat.confirm_revive_choice(true)
-	check(revive_result.get("success", false) and professora.current_health == professora.max_health,
-		"Aceitar a escolha ressuscita o aliado com Vida máxima.")
+	check((amulet.granted_active_skills[0] as ActiveSkillData).automatic_triggers.is_empty(),
+		"A morte não abre escolha automática: Sacrifício Divino é manual.")
+	var amulet_grant: SkillGrantState = null
+	for candidate in skill_manager.get_active_grants(pedreiro):
+		if candidate.skill != null and candidate.skill.id == &"item_active_002":
+			amulet_grant = candidate
+	combat.current_actor = pedreiro
+	check(amulet_grant != null and skill_manager.can_use_combat_active(pedreiro,
+		amulet_grant, gerencia.campaign, combat, professora),
+		"A Ativa manual aceita jogável morto como alvo.")
+	hud._on_skill_pressed(pedreiro, amulet_grant)
+	check(hud.hex_choice.visible and hud.hex_choice_title.text ==
+		"ESCOLHA QUEM RESSUSCITAR" and
+		hud.hex_choice_buttons.get_child_count() > 0,
+		"Clicar na Ativa abre a seleção de mortos, sem consumir o item.")
+	(hud.hex_choice_buttons.get_child(0) as Button).pressed.emit()
+	check(hud._revive_dialog.visible and professora.current_health == 0
+		and not pedreiro.equipped_accessories.is_empty()
+		and "será consumido" in hud._revive_dialog.dialog_text,
+		"Selecionar abre confirmação com aviso explícito de destruição.")
+	hud._revive_dialog.hide()
+	hud._cancel_amulet_revive()
+	check(professora.current_health == 0 and not pedreiro.equipped_accessories.is_empty(),
+		"Cancelar a confirmação não consome o Amuleto nem ressuscita.")
+	(hud.hex_choice_buttons.get_child(0) as Button).pressed.emit()
+	hud._revive_dialog.hide()
+	hud._confirm_amulet_revive()
+	check(professora.current_health == professora.max_health,
+		"Confirmar ressuscita o aliado com Vida máxima.")
 	for id in [&"db_00003", &"db_00004", &"db_00005", &"db_00009", &"db_00010"]:
 		check(id in professora.permanent_status_immunities \
 			and skill_manager.debuff_manager.get_debuff(professora, id) == null,
@@ -198,6 +258,52 @@ func _run_test() -> void:
 	check(pedreiro.equipped_accessories.is_empty() and
 		gerencia.campaign.consumed_uncraftable_item_ids.has(amulet.id),
 		"O Amuleto é destruído e não pode ser fabricado novamente na campanha.")
+	var recruited_enemy := EntityState.from_encounter_member(other_type,
+		&"recruited_amulet_target", 1, Vector2i(5, 3))
+	check(gerencia.campaign.register_companion(pedreiro, recruited_enemy),
+		"Uma entidade de origem hostil pode integrar o lado aliado.")
+	check(skill_manager.inventory_manager.add_item(pedreiro, amulet),
+		"Uma segunda cópia existente do Amuleto pode ser usada por outro aliado.")
+	var second_amulet := pedreiro.inventory_items[-1]
+	check(EquipmentManager.new().equip(pedreiro, second_amulet,
+		skill_manager, gerencia.campaign),
+		"O portador equipa a segunda cópia do Amuleto.")
+	recruited_enemy.current_health = 0
+	var second_grant: SkillGrantState = null
+	for candidate in skill_manager.get_active_grants(pedreiro):
+		if candidate.skill != null and candidate.skill.id == &"item_active_002":
+			second_grant = candidate
+	var companion_revive := skill_manager.use_combat_active(pedreiro, second_grant,
+		gerencia.campaign, combat, recruited_enemy)
+	check(companion_revive.get("success", false)
+		and recruited_enemy.current_health == recruited_enemy.max_health
+		and pedreiro.equipped_accessories.is_empty(),
+		"A entidade recrutada revive e a segunda cópia é consumida.")
+	var historical_data := load(
+		"res://resources/entities/entities_playable/jornalista.tres") as EntityData
+	var historical_dead := EntityState.from_playable_selection(historical_data,
+		&"former_playable_amulet_test", Vector2i(3, 3))
+	historical_dead.current_health = 0
+	gerencia.campaign.dead_playable_states.append(historical_dead)
+	check(skill_manager.inventory_manager.add_item(pedreiro, amulet),
+		"Terceira cópia preexistente do Amuleto entra no inventário.")
+	var third_amulet := pedreiro.inventory_items[-1]
+	check(EquipmentManager.new().equip(pedreiro, third_amulet,
+		skill_manager, gerencia.campaign),
+		"O portador equipa a terceira cópia.")
+	var third_grant: SkillGrantState = null
+	for candidate in skill_manager.get_active_grants(pedreiro):
+		if candidate.skill != null and candidate.skill.id == &"item_active_002":
+			third_grant = candidate
+	var historical_result := skill_manager.use_combat_active(pedreiro,
+		third_grant, gerencia.campaign, combat, historical_dead)
+	check(historical_result.get("success", false)
+		and historical_dead in gerencia.campaign.companion_states
+		and historical_dead.current_health == historical_dead.max_health
+		and combat.initiative_order.any(func(initiative: Dictionary) -> bool:
+			return initiative.get("entity") == historical_dead)
+		and pedreiro.equipped_accessories.is_empty(),
+		"Morto de encontro anterior ressuscita durante Combate e entra na iniciativa.")
 	print("PPP combat actives: %d falhas" % failures)
 	quit(0 if failures == 0 else 1)
 

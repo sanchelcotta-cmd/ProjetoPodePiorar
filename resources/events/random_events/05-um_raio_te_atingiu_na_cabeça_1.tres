@@ -30,7 +30,7 @@ script = ExtResource("1_0pou7")
 id = &"ev_00005_out_01"
 id = &"ev_00005_out_01"
 display_name = "Força!"
-narrative_description = "Você ganhou super-força."
+narrative_description = "Depois que o raio te atingiu... Você ganhou super-força.\n• Força: dobra o Ataque e a Vida atual."
 weight = 30
 effects = Array[ExtResource("2_njjuo")]([SubResource("Resource_dqu3g"), SubResource("Resource_8r8f7")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
@@ -59,7 +59,7 @@ script = ExtResource("1_0pou7")
 id = &"ev_00005_out_02"
 id = &"ev_00005_out_02"
 display_name = "Super-Agilidade!"
-narrative_description = "Você é super-ágil agora."
+narrative_description = "Depois que o raio te atingiu... Você é super-ágil agora.\n• Super-agilidade: ganha +2 de estamina e, em combate, 60% de chance de desviar de ataques."
 weight = 30
 effects = Array[ExtResource("2_njjuo")]([SubResource("Resource_7yvei"), SubResource("Resource_cr4im")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
@@ -81,7 +81,7 @@ script = ExtResource("1_0pou7")
 id = &"ev_00005_out_03"
 id = &"ev_00005_out_03"
 display_name = "Voar!"
-narrative_description = "Pode voar pelo mapa."
+narrative_description = "Depois que o raio te atingiu... Pode voar!\n• Voar: ganha habilidade de voar."
 weight = 30
 effects = Array[ExtResource("2_njjuo")]([SubResource("Resource_4hl55"), SubResource("Resource_5i6wn")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
@@ -91,10 +91,10 @@ script = ExtResource("1_0pou7")
 id = &"ev_00005_out_04"
 id = &"ev_00005_out_04"
 display_name = "Todos os poderes!"
-narrative_description = "Força: dobra o Ataque e a Vida atual.
-Voar: ganha habilidade de voar.
-Super-agilidade: ganha +2 de estamina e, em combate, 60% de chance de desviar de ataques.
-"
+narrative_description = "Depois que o raio te atingiu... Você ganhou superpoderes!
+• Força: dobra o Ataque e a Vida atual.
+• Voar: ganha habilidade de voar.
+• Super-agilidade: ganha +2 de estamina e, em combate, 60% de chance de desviar de ataques."
 weight = 10
 effects = Array[ExtResource("2_njjuo")]([SubResource("Resource_dqu3g"), SubResource("Resource_8r8f7"), SubResource("Resource_4hl55"), SubResource("Resource_5i6wn"), SubResource("Resource_7yvei"), SubResource("Resource_cr4im")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"

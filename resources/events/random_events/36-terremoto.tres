@@ -34,6 +34,7 @@ required_shared_roll_value = 6
 script = ExtResource("2_outcome")
 id = &"ev_00036_out_01"
 display_name = "O mapa inteiro é revelado."
+narrative_description = "Vocês sentem o impacto! E o mapa inteiro é revelado."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_reveal"), SubResource("Effect_damage"), SubResource("Effect_stun_on_six")])
 
 [resource]

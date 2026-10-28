@@ -22,7 +22,7 @@ script = ExtResource("1_refv0")
 id = &"ev_00008_out_01"
 id = &"ev_00008_out_01"
 display_name = "Revelação serelepe"
-narrative_description = "Eles estão em algum lugar... Por que?"
+narrative_description = "Eles estão em algum lugar... Por que?\nOs gnomos aparecem dançando descontraídos. Um deles carrega uma informação. Os outros, bem... É melhor não saber sobre os outros."
 effects = Array[ExtResource("2_y3fhi")]([SubResource("Resource_xpajy")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 

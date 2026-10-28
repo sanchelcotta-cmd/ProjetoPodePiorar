@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ActiveSkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/skills/active_skill_data.gd" id="1_active"]
+
+[resource]
+script = ExtResource("1_active")
+id = &"item_active_003"
+display_name = "Sintonizar Amuleto"
+description = "Vincula esta cópia do Amuleto Divino a você de forma irreversível. Cada amuleto só pode ser sintonizado uma única vez, por um único personagem. A sintonização não destrói o item: as imunidades a Doença, Tristeza, Terror e Maldições valem apenas para quem o sintonizou e somente enquanto o equipa. Se você o desequipar e reequipar, a proteção volta sem nova sintonização; outro personagem nunca poderá sintonizar esta cópia. Ao sintonizar, os debuffs protegidos já ativos são removidos."
+use_context = 2
+target_mode = 1
+requires_player_confirmation = true
+tags = Array[StringName]([&"amuleto_divino", &"sintonizacao"])

@@ -10,6 +10,12 @@ func _initialize() -> void:
 
 func _run_test() -> void:
 	root.size = Vector2i(1440, 810)
+	var palette := root.get_node("UIColorManager")
+	var scale_service := root.get_node("UniversalFontScale")
+	var old_palette := str(palette.get("palette_id"))
+	var old_scale := float(scale_service.get("ui_factor"))
+	palette.call("set_palette", "padrao", false)
+	scale_service.call("set_ui_scale", 1.0, false)
 	var scene := load("res://teste.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
@@ -67,14 +73,11 @@ func _run_test() -> void:
 		and (first.portrait.texture as AtlasTexture).region.position == Vector2.ZERO,
 		"O retrato mostra o primeiro quadro do Idle.")
 	var portrait_frame := first.get_node("Margin/Content/TopRow/PortraitFrame/FrameArt") as TextureRect
-	var card_trace := first.get_node("CardTrace") as TextureRect
 	check(portrait_frame.texture.resource_path.ends_with("uielementx_00004.png") \
 		and first.portrait.custom_minimum_size.y >= 74.0 \
 		and is_equal_approx(portrait_frame.modulate.a, 0.1) \
-		and card_trace.texture.resource_path.ends_with("uielementx_00008.png") \
-		and is_equal_approx(card_trace.modulate.a, 0.1) \
-		and card_trace.mouse_filter == Control.MOUSE_FILTER_IGNORE,
-		"Retrato maior usa sua moldura; circuito discreto não intercepta cliques.")
+		and not first.has_node("CardTrace"),
+		"Retrato mantém sua moldura, sem circuito de canto no HUD.")
 	check((first.portrait.texture as AtlasTexture).region.size.y \
 		== choices[0].playable_animation.frame_size.y / 2.0,
 		"O retrato enquadra só a metade superior do personagem.")
@@ -136,7 +139,8 @@ func _run_test() -> void:
 		"Debuffs ficam separados dos equipamentos e o retrato fica centralizado.")
 	(first.debuff_row.get_child(0) as Control).mouse_entered.emit()
 	check(hud.debuff_popup.visible \
-		and hud.debuff_popup.get_node("Frame").texture.resource_path.ends_with("uielementx_00002.png") \
+		and not hud.debuff_popup.has_node("Frame") \
+		and (hud.debuff_popup.get_theme_stylebox("panel") as StyleBoxFlat).border_width_left == 2 \
 		and (hud.debuff_popup.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.a > 0.79,
 		"Debuff mostra ficha cinza translúcida com moldura vermelha ao passar o mouse.")
 	var duration_label := hud.debuff_popup.get("duration_label") as Label
@@ -154,11 +158,11 @@ func _run_test() -> void:
 	for label in popup_labels:
 		var label_rect := label.get_global_rect()
 		check(label.horizontal_alignment == HORIZONTAL_ALIGNMENT_CENTER \
-			and label_rect.position.x >= popup_rect.position.x + 24.0 \
-			and label_rect.end.x <= popup_rect.end.x - 24.0 \
-			and label_rect.position.y >= popup_rect.position.y + 16.0 \
-			and label_rect.end.y <= popup_rect.end.y - 16.0,
-			"Texto do Debuff centralizado e longe da moldura.")
+			and label_rect.position.x >= popup_rect.position.x + 14.0 \
+			and label_rect.end.x <= popup_rect.end.x - 14.0 \
+			and label_rect.position.y >= popup_rect.position.y + 10.0 \
+			and label_rect.end.y <= popup_rect.end.y - 10.0,
+			"Texto do Debuff centralizado dentro da nova margem simples.")
 	applied.remaining_turns = 2
 	await process_frame
 	check(duration_label.text == "Turnos restantes: 2",
@@ -298,11 +302,12 @@ func _run_test() -> void:
 		"A caixa de ações cabe verticalmente na tela.")
 	check(hud.action_drawer.visible and first.action_button.text == "◀",
 		"A seta abre a caixa de ações do personagem correspondente.")
-	check(hud.action_drawer.size.x >= 292.0 and hud.action_drawer.size.x <= 310.0 \
-		and is_equal_approx((hud.action_drawer.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.a, 0.8),
-		"A caixa de ações tem folga horizontal e mantém fundo com 80% de opacidade.")
-	check(hud.walk_button.get_theme_font_size("font_size") == roundi(10.0 * 4.0 / 3.0),
-		"Botões de ação usam a mesma fonte compacta das Ativas longas.")
+	check(hud.action_drawer.size.x >= 292.0 and hud.action_drawer.size.x <= 330.0 \
+		and (hud.action_drawer.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.a >= 0.8,
+		"A caixa de ações tem folga horizontal e contraste de no mínimo 80%.")
+	check(hud.walk_button.get_theme_font_size("font_size") >= 10 \
+		and hud.walk_button.get_theme_font_size("font_size") <= 13,
+		"Botões de ação mantêm fonte compacta e legível.")
 	check(hud.action_link.visible and hud.action_link.points.size() == 6 \
 		and hud.action_link.default_color.is_equal_approx(Color(0, 0.972549, 0.909804)),
 		"Uma linha azul intensa em degrau liga a ficha à caixa de ações.")
@@ -340,29 +345,29 @@ func _run_test() -> void:
 	check(gerencia.campaign.register_companion(owner_for_ally, cat),
 		"O Gatinho pode ser vinculado ao personagem.")
 	hud._process(0.2)
-	check(hud.ally_button.visible and hud.ally_skill_buttons.get_child_count() > 0,
-		"A caixa do dono ganha Aliado e a Ativa do Gatinho.")
+	check(hud.ally_button.visible,
+		"A caixa do dono mostra acesso à lista de aliados.")
 	hud.ally_button.emit_signal("pressed")
-	check(hud.ally_drawer.visible \
-		and "SEXTO-SENTIDO" in (hud.ally_skill_buttons.get_child(0) as Button).text,
-		"O botão Aliado abre a caixa-filha das Ativas do companheiro.")
+	check(hud.ally_drawer.visible and hud._ally_roster.visible \
+		and hud._ally_roster.get_child_count() == 1,
+		"Na Exploração, Aliado abre somente a lista de companheiros e fichas.")
+	var ally_row := hud._ally_roster.get_child(0) as HBoxContainer
+	check(ally_row.get_child_count() == 2 \
+		and (ally_row.get_child(0) as Button).text.to_lower() == cat.visible_name().to_lower() \
+		and "Abrir ficha" in (ally_row.get_child(1) as Button).tooltip_text,
+		"Cada aliado tem botão de nome e botão de ficha.")
+	(ally_row.get_child(0) as Button).pressed.emit()
+	check(hud.character_sheet.visible and hud.character_sheet.actor == cat,
+		"O nome do aliado abre sua ficha detalhada.")
+	hud.character_sheet.close_sheet()
 	var skill_manager := scene.get_node("SkillManager") as SkillManager
 	var cat_skill := load("res://resources/skills/actives/companions/gatinho_vira_lata/sexto_sentido.tres") as ActiveSkillData
-	var cat_extra_sources: Array[StringName] = []
-	for index in 6:
-		var source_id := StringName("ally_scroll_%d" % index)
-		cat_extra_sources.append(source_id)
-		skill_manager.grant_skill(cat, cat_skill, &"test", source_id)
-	hud._process(0.2)
-	await process_frame
-	check(hud.ally_skill_buttons.get_child_count() == 7 \
-		and hud.ally_scroll_arrows.visible and hud.ally_scroll.get_v_scroll_bar().visible,
-		"A caixa-filha do Aliado também limita a seis ações visíveis.")
-	hud.ally_scroll_down_button.emit_signal("pressed")
-	check(hud._ally_scroll_first_index == 1,
-		"A seta do Aliado avança uma habilidade por clique.")
-	for source_id in cat_extra_sources:
-		skill_manager.remove_source(cat, &"test", source_id)
+	check(cat_skill != null and not hud._companion_exploration_actives(cat).is_empty(),
+		"A Ativa do Gatinho continua independente da lista do dono.")
+	hud._show_companion_exploration_actions(cat, Rect2(350, 350, 40, 70))
+	check(hud.hex_choice.visible and hud.hex_choice_buttons.get_child_count() >= 2,
+		"Clicar no aliado oferece ficha e ação própria na Exploração.")
+	hud._hide_hex_choice()
 	gerencia.campaign.companion_states.erase(cat)
 	hud._process(0.2)
 	check(not hud.ally_button.visible and not hud.ally_drawer.visible,
@@ -486,8 +491,8 @@ func _run_test() -> void:
 	check(inventory.visible and inventory.grid.get_child_count() == 12,
 		"O inventário abre em outra caixa com 12 espaços iniciais.")
 	check(inventory.size.x <= 340.0 and inventory.grid.columns == 3 \
-		and is_equal_approx((inventory.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.a, 0.8),
-		"O inventário acomoda os itens e a fonte maior, com fundo translúcido.")
+		and (inventory.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.a >= 0.8,
+		"O inventário acomoda os itens e mantém fundo de alto contraste.")
 	await create_timer(0.23).timeout
 	check(inventory.get_global_rect().position.x \
 		>= hud.action_drawer.get_global_rect().end.x + 10.0,
@@ -515,18 +520,17 @@ func _run_test() -> void:
 	check(details.get_global_rect().position.y >= 56.0 \
 		and details.get_global_rect().end.y <= viewport_size.y,
 		"Os detalhes preservam a faixa superior e não saem da tela.")
-	check(is_equal_approx((details.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.a, 0.8) \
+	check((details.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.a >= 0.8 \
 		and (details.get_theme_stylebox("panel") as StyleBoxFlat).border_color.r > 0.9,
-		"Detalhes têm fundo a 80% e borda rosa.")
+		"Detalhes têm fundo de alto contraste e borda rosa.")
 	check(details.name_label.text == backpack.display_name \
 		and details.name_label.get_theme_font("font") == ItemDetailsPanel.BOLD_FONT \
 		and details.name_label.get_theme_color("font_color") == Color.WHITE \
 		and backpack.description in details.effect_label.text,
 		"Nome completo aparece em negrito branco, com a descrição abaixo.")
-	var details_frame := details.get_node("Frame") as TextureRect
-	check(details_frame.texture.resource_path.ends_with("uielementx_00001.png") \
-		and details_frame.material is ShaderMaterial,
-		"Os detalhes do item usam a moldura rosa clara translúcida.")
+	check(not details.has_node("Frame") \
+		and (details.get_theme_stylebox("panel") as StyleBoxFlat).border_width_left == 2,
+		"Os detalhes do item usam margem rosa simples.")
 	check(details.visible and details.get_global_rect().end.y <= viewport_size.y,
 		"Os detalhes permanecem dentro da área visível.")
 	hud._process(0.2)
@@ -611,6 +615,8 @@ func _run_test() -> void:
 		root.get_texture().get_image().save_png(preview_path)
 		print("HUD_PREVIEW=" + ProjectSettings.globalize_path(preview_path))
 	print("PPP party HUD: %d falhas" % failures)
+	scale_service.call("set_ui_scale", old_scale, false)
+	palette.call("set_palette", old_palette, false)
 	quit(0 if failures == 0 else 1)
 
 

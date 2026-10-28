@@ -22,14 +22,14 @@ tags_filter = Array[StringName]([&"epica"])
 script = ExtResource("2_outcome")
 id = &"ev_00025_out_01"
 display_name = "Você aceita o pacto."
-narrative_description = "O gnomo sorri, pega a faquinha e entrega o item prometido."
+narrative_description = "O gnomo sorri, pega a faquinha e entrega o item prometido.\nVocê perde um pouco de vida, mas garante um item."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_max_hp"), SubResource("Effect_epic_item")])
 
 [sub_resource type="Resource" id="Outcome_refuse"]
 script = ExtResource("2_outcome")
 id = &"ev_00025_out_02"
 display_name = "Você recusa o pacto."
-narrative_description = "O gnomo guarda a faquinha e o item, depois desaparece sem deixar rastros."
+narrative_description = "O gnomo guarda a faquinha e o item, depois desaparece sem deixar rastros.\nVocê não perde nada, mas também não ganha nada."
 
 [resource]
 script = ExtResource("1_event")

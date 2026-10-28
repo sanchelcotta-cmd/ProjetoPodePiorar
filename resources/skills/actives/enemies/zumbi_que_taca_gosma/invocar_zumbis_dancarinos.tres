@@ -7,19 +7,19 @@
 script = ExtResource("1_effect")
 effect_type = 12
 entity_id = &"en_00033"
-minimum_amount = 2
-maximum_amount = 6
+amount = 2
 metadata/_custom_type_script = "res://scripts/resources/skills/skill_effect_data.gd"
 
 [resource]
 script = ExtResource("2_active")
 id = &"enemy_active_013"
 display_name = "Chamar Zumbis Dançarinos"
-description = "No início do terceiro turno do Encontro, se ao menos um Zumbi que Taca Gosma tiver sobrevivido aos dois primeiros turnos, invoca de 2 a 6 Zumbis Dançarinos."
+description = "No início do terceiro turno do Encontro, se ao menos um Zumbi que Taca Gosma tiver sobrevivido aos dois primeiros turnos, a horda invoca uma única leva de 2 Zumbis Dançarinos no total."
 target_mode = 1
 automatic_triggers = Array[int]([2])
 first_activation_turn = 3
 activate_only_once = true
+activate_once_per_encounter = true
 minimum_owner_survived_combat_turns = 2
 effects = Array[ExtResource("1_effect")]([SubResource("Effect_summon")])
 tags = Array[StringName]([&"zumbi_que_taca_gosma", &"invocacao"])

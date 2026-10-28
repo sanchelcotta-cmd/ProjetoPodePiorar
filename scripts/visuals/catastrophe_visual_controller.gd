@@ -22,6 +22,9 @@ func _ready() -> void:
 	add_child(_filter)
 	resized_filter()
 	get_viewport().size_changed.connect(resized_filter)
+	var comfort := get_node_or_null("/root/VisualComfort")
+	if comfort != null:
+		comfort.changed.connect(_on_comfort_changed)
 	if catastrophe_manager != null:
 		catastrophe_manager.catastrophe_started.connect(_on_started)
 		catastrophe_manager.catastrophe_ended.connect(_on_ended)
@@ -29,6 +32,15 @@ func _ready() -> void:
 			catastrophe_manager.gerencia.map_generated.connect(_on_map_generated)
 			for record in catastrophe_manager.gerencia.campaign.active_catastrophes:
 				_on_started(record["event_id"])
+
+
+func _on_comfort_changed(_enabled: bool) -> void:
+	for event_id in _instances:
+		var instance := _instances[event_id] as Node
+		var profile := _profile(event_id)
+		if instance != null and profile != null:
+			_play_animations(instance, profile.animation_name)
+	_refresh_filter()
 
 
 func resized_filter() -> void:
@@ -87,12 +99,27 @@ func _refresh_filter() -> void:
 		var infernal := _profile(CampaignState.PORTAIS_INFERNAIS_EVENT_ID)
 		if infernal != null and infernal.filter_color.a > 0.0:
 			_filter.color = infernal.filter_color
+	var comfort := get_node_or_null("/root/VisualComfort")
+	if comfort != null and bool(comfort.get("enabled")):
+		_filter.color.a = minf(_filter.color.a, 0.22)
 
 
 func _play_animations(root: Node, animation_name: StringName) -> void:
+	var comfort := get_node_or_null("/root/VisualComfort")
+	var reduced := comfort != null and bool(comfort.get("enabled"))
 	if root is AnimatedSprite2D:
-		(root as AnimatedSprite2D).play(animation_name)
+		var sprite := root as AnimatedSprite2D
+		if reduced:
+			sprite.stop()
+			if sprite.sprite_frames != null and sprite.sprite_frames.has_animation(animation_name):
+				sprite.animation = animation_name
+				sprite.frame = 0
+		else:
+			sprite.play(animation_name)
 	if root is AnimationPlayer:
-		(root as AnimationPlayer).play(animation_name)
+		if reduced:
+			(root as AnimationPlayer).stop()
+		else:
+			(root as AnimationPlayer).play(animation_name)
 	for child in root.get_children():
 		_play_animations(child, animation_name)

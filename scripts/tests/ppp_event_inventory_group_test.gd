@@ -39,6 +39,9 @@ func _run() -> void:
 	check(popup.narrative_label.text == "Aff - Dia de sorte, hm?!",
 		"Ladrão solitário sem item mostra a fala exigida.")
 	popup._execute_prepared_event()
+	check(popup.narrative_label.text.contains(actor.visible_name()),
+		"Ladrão mostra o resultado individual mesmo sem item elegível.")
+	popup._show_next_theft_outcome()
 	check(not block.is_busy(), "Ladrão sem item conclui sem retirar nada.")
 	var thieves_group := _event(13)
 	check(_activate(game, block, actor, thieves_group, Vector2i(2, 1)),
@@ -47,6 +50,11 @@ func _run() -> void:
 	check(popup.narrative_label.text == "Aff - Dia de sorte, hm?!",
 		"Ladrões do grupo sem itens mostram a fala exigida.")
 	popup._execute_prepared_event()
+	check(popup.narrative_label.text.contains(game.campaign.active_entity_states[0].visible_name())
+		and popup._theft_outcome_pages.size() == game.campaign.active_entity_states.size() - 1,
+		"Ladrões preparam uma caixa por alvo com nome próprio.")
+	for _index in game.campaign.active_entity_states.size():
+		popup._show_next_theft_outcome()
 	check(not block.is_busy(), "Roubo coletivo sem item conclui.")
 	var artisan := _event(16)
 	check(_activate(game, block, actor, artisan, Vector2i(3, 1)),

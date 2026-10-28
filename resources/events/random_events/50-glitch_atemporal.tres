@@ -17,6 +17,7 @@ duration_amount = 1
 script = ExtResource("2_outcome")
 id = &"ev_00050_out_01"
 display_name = "O mundo fica pixelado."
+narrative_description = "O mundo fica pixelado durante um turno inteiro.\nÉ esquisito tudo ainda mais quadrado."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

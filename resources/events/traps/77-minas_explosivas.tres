@@ -29,6 +29,7 @@ status_initial_tick_damage_from_value = true
 script = ExtResource("2_outcome")
 id = &"ev_00077_out_01"
 display_name = "A mina explode."
+narrative_description = "A mina explode.\nVocê e quem está próximo sofre com [resultado_dado] de queimadura!"
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_explosion_damage"), SubResource("Effect_burn")])
 
 [resource]

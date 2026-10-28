@@ -5,6 +5,8 @@ extends Node
 ## Não decide movimentos, resolve eventos ou executa combates.
 
 signal map_generated(new_map: HexGrid)
+signal information_granted(information: Informacao, result: Dictionary)
+signal final_center_map_entered
 
 const INFORMATION_DIRECTORY := "res://resources/informacoes"
 
@@ -17,15 +19,33 @@ const INFORMATION_DIRECTORY := "res://resources/informacoes"
 
 var campaign: CampaignState = CampaignState.new()
 var _map_generator: PPPMapGenerator = PPPMapGenerator.new()
+var save_repository: CampaignSaveRepository = CampaignSaveRepository.new()
+
+
+func list_saved_campaigns() -> Array[Dictionary]:
+	return save_repository.list_campaigns()
+
+
+func save_manual_slot(slot_number: int, overwrite_confirmed: bool = false) -> Dictionary:
+	var controller := get_parent().get_node_or_null("CampaignAutosaveController")
+	if controller != null and controller.get("enabled"):
+		return controller.call("request_manual_slot", slot_number, overwrite_confirmed)
+	return save_repository.save_campaign(campaign, slot_number, get_parent(),
+		overwrite_confirmed)
+
+
+func load_manual_slot(campaign_id: String, slot_number: int) -> Dictionary:
+	return save_repository.load_campaign(campaign_id, slot_number, get_parent())
 
 
 ## A tela de seleção chama isto com três EntityData, na ordem das vagas.
 ## Não gera o mapa ainda: essa é uma transição separada do início da campanha.
 func start_new_game(selected: Array[EntityData],
 		mode: int = EventCampaignEligibility.Mode.COMPLETE,
-		ending_ids: Array[StringName] = []) -> bool:
+		ending_ids: Array[StringName] = [],
+		difficulty: int = GameDifficulty.Mode.STANDARD) -> bool:
 	return campaign.start_new_game(selected, initial_inventory_capacity, null,
-		mode, ending_ids)
+		mode, ending_ids, difficulty)
 
 
 ## O futuro controlador de Exploração fornece Informações elegíveis pelas
@@ -35,9 +55,17 @@ func generate_map(
 		eligible_information: Array[Resource],
 		rng: RandomNumberGenerator = null,
 ) -> bool:
-	var new_map := prepare_map(eligible_information, campaign.district,
+	var destination := resolve_next_map_district(campaign.district)
+	var new_map := prepare_map(eligible_information, destination,
 		campaign.round_period, campaign.get_round_index(), rng)
+	if new_map == null:
+		return false
+	campaign.district = destination
 	return install_map(new_map)
+
+
+func resolve_next_map_district(requested: StringName) -> StringName:
+	return &"centro" if campaign.requires_final_center_map() else requested
 
 
 ## Prepara o próximo mapa sem trocar Dia/Rodada nem tocar no mapa atual.
@@ -48,31 +76,48 @@ func prepare_map(
 		target_period: PPPMapGenerator.RoundPeriod,
 		target_round_index: int,
 		rng: RandomNumberGenerator = null,
+		difficulty_override: int = -1,
 ) -> HexGrid:
+	if campaign.is_terminal():
+		return null
 	var remaining := campaign.filter_uncollected_information(eligible_information)
+	target_district = resolve_next_map_district(target_district)
+	var target_difficulty := difficulty_override if GameDifficulty.is_available(difficulty_override) \
+		else campaign.difficulty
+	var target_day := floori(float(target_round_index) / 3.0) + 1
+	var suppress_hazards := target_difficulty == GameDifficulty.Mode.SUGAR \
+		and (campaign.has_carried_curse() \
+		or campaign.has_catastrophe_at(target_day, target_round_index))
 	return _map_generator.generate_new_map(
 		remaining,
 		target_district,
 		target_period,
 		campaign.event_campaign_counts.duplicate(),
 		campaign.occurred_unique_encounter_ids.duplicate(),
-		rng,
+		rng if rng != null else campaign.world_rng,
 		campaign.get_events_on_standby(target_round_index),
-		floori(float(target_round_index) / 3.0) + 1,
+		target_day,
 		not campaign.last_encounter_entity_types.is_empty(),
 		campaign.obtained_information_ids.size(),
 		campaign.generated_map_count > 0,
 		campaign.needs_replacement_ally(),
 		campaign.campaign_mode,
+		campaign.allows_free_information_on_next_map(),
+		target_difficulty,
+		suppress_hazards,
 	)
 
 
 ## Só instala um mapa COMPLETO. O controlador temporal chama isto depois de
 ## confirmar a nova Rodada; Portal também pode usar generate_map() normalmente.
 func install_map(new_map: HexGrid) -> bool:
-	if new_map == null:
+	if new_map == null or campaign.is_terminal():
 		return false
 	campaign.record_generated_map(new_map)
+	if campaign.requires_final_center_map() and campaign.district == &"centro" \
+			and not campaign.final_center_intro_seen:
+		campaign.final_center_intro_pending = true
+		final_center_map_entered.emit()
 	if map_view != null:
 		map_view.show_generated_map(new_map)
 		map_view.set_visual_effects(campaign.get_active_visual_weather(),
@@ -101,9 +146,38 @@ func _load_information_folder(folder: String) -> Array[Resource]:
 	return result
 
 
-## São pontos de entrada para o futuro BlockManager. Revelar não chama isto.
+## Ponto de entrada comum para todas as fontes reais ou futuras. Revelar não
+## chama isto: só obter conta. O resultado explica recusa sem rerrolar.
+func grant_information(information: Informacao,
+		source_id: StringName = &"", force_debug: bool = false) -> Dictionary:
+	var result := campaign.grant_information(information, source_id, force_debug)
+	if result.get("success", false):
+		information_granted.emit(information, result)
+		if result.get("victory", false):
+			# A última Informação só entra no livro depois do sinal acima.
+			# O registro terminal é separado dos três slots e nunca os altera.
+			campaign.append_journal_entry(&"campaign_terminal", [
+				{"text": "A campanha terminou em ", "tone": "text"},
+				{"text": "vitória", "tone": "positive"},
+				{"text": ".", "tone": "text"},
+			])
+			result["terminal_record"] = request_terminal_record()
+	return result
+
+
+func request_terminal_record() -> Dictionary:
+	if campaign == null or not campaign.is_terminal():
+		return {"success": false, "reason": "A campanha ainda não terminou."}
+	var controller := get_parent().get_node_or_null("CampaignAutosaveController")
+	if controller != null and controller.get("enabled"):
+		controller.call("request_terminal_record")
+		return {"success": true, "queued": true}
+	return save_repository.record_terminal_line(campaign)
+
+
+## Compatibilidade com chamadas que só esperavam um booleano.
 func record_information_obtained(information: Informacao) -> bool:
-	return campaign.record_information_obtained(information)
+	return grant_information(information).get("success", false)
 
 
 func record_encounter_occurred(encounter: EncounterData) -> bool:

@@ -14,6 +14,7 @@ custom_rule = &"add_wooden_doll_companion"
 script = ExtResource("2_outcome")
 id = &"ev_00043_out_01"
 display_name = "O boneco passa a acompanhá-lo."
+narrative_description = "O boneco gostou de você, e passa a acompanhá-lo. Ele irá impedir a primeira armadilha ou catástrofe ruim que acontecer com vocês."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

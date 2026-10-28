@@ -22,6 +22,7 @@ script = ExtResource("2_outcome")
 id = &"ev_00060_out_01"
 id = &"ev_00060_out_01"
 display_name = "Uma proteção milagrosa aparece."
+narrative_description = "Uma proteção milagrosa aparece:\nA partir de agora: Concede imunidade a Doença, Tristeza, Terror e Maldições."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect"), SubResource("Effect_grant_passive")])
 
 [resource]

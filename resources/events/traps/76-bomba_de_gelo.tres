@@ -19,6 +19,7 @@ duration_source = 1
 script = ExtResource("2_outcome")
 id = &"ev_00076_out_01"
 display_name = "O gelo fecha sobre você."
+narrative_description = "O gelo fecha sobre você.\nVocê ficará congelado por [resultado_dado] turnos."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_stun")])
 
 [resource]

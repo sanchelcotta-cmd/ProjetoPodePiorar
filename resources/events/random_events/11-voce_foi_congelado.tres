@@ -19,7 +19,7 @@ metadata/_custom_type_script = "uid://bknff8de8c2u0"
 script = ExtResource("1_wa7oj")
 id = &"ev_00011_out_01"
 display_name = "Congelado"
-narrative_description = "Você não pode fazer nada kkkk"
+narrative_description = "Você virou um picolé.\nVocê não pode fazer nada..."
 effects = Array[ExtResource("2_03veg")]([SubResource("Resource_ktxeq")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 

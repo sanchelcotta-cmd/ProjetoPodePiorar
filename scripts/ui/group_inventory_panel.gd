@@ -1,6 +1,8 @@
 class_name GroupInventoryPanel
 extends Control
 
+signal death_cleanup_completed
+
 ## Janela de consulta dos três inventários reais da campanha. Não duplica
 ## itens: cada célula lê InventoryItemState do seu Playable_1/2/3.
 ## Equipados vêm de espaços separados no EntityState; não contam nos 12.
@@ -9,9 +11,6 @@ const BASE_SLOTS := 12
 const GRID_COLUMNS := 3
 const SLOT_SIZE := Vector2(58, 52)
 const SLOT_FRAME := preload("res://sprites/ui/uielementx_00002.png")
-const CHARACTER_FRAME := preload("res://sprites/ui/uielementx_00001.png")
-const TRACE_CORNER := preload("res://sprites/ui/uielementx_00008.png")
-const LIGHT_FRAME_SHADER := preload("res://shaders/ui_light_pink_frame.gdshader")
 const DETAILS_SCENE := preload("res://scenes/ui/item_details_panel.tscn")
 const ITEM_MENU_SCRIPT := preload("res://scripts/ui/inventory_item_menu.gd")
 const INACTIVE_SHADER := preload("res://shaders/ui_inactive_grayscale.gdshader")
@@ -31,11 +30,12 @@ var combat_manager: CombatManager
 var exploration: ExplorationManager
 var window: PanelContainer
 var columns: Array[Dictionary] = []
-var expanded_by_slot := [false, false, false]
+var _death_column: Dictionary = {}
+var expanded_by_slot := [false, false, false, false]
 var details: ItemDetailsPanel
 var details_link: Line2D
 var item_menu: InventoryItemMenu
-var _chance_result_dialog: AcceptDialog
+var _chance_result_dialog: Control
 var _refresh_elapsed := 0.0
 var _window_dragging := false
 var _window_user_positioned := false
@@ -49,6 +49,7 @@ var _death_queue: Array[EntityState] = []
 var _death_backdrop: ColorRect
 var _exchange_item: ItemData
 var _exchange_selected: Array[InventoryItemState] = []
+var _exchange_inventory_snapshot: Array[Dictionary] = []
 var _exchange_confirm_action: Callable
 var _exchange_decline_action: Callable
 var _exchange_allow_decline := true
@@ -57,9 +58,11 @@ var _exchange_message: Label
 var _exchange_status: Label
 var _exchange_accept_button: Button
 var _exchange_decline_button: Button
+var _exchange_cancel_button: Button
 var _exchange_confirmation: Control
 var _exchange_question: Label
 var _close_button: Button
+var _title_label: Label
 var _equipment_manager := EquipmentManager.new()
 var craft_panel: EpicCraftPanel
 var craft_hint: CraftHintPopup
@@ -111,8 +114,8 @@ func _on_craft_closed() -> void:
 		window.show()
 
 
-## Recebimento pendente: os três inventários continuam visíveis, mas a
-## seleção da troca pertence só ao dono que precisa liberar espaço.
+## Recebimento pendente: transferências entre jogáveis são provisórias até
+## confirmar; Voltar/Esc restaura os inventários e conserva o item pendente.
 func begin_exchange(owner: EntityState, incoming: ItemData,
 		on_confirm: Callable, on_decline: Callable, allow_decline: bool = true) -> bool:
 	if owner == null or incoming == null or not on_confirm.is_valid() \
@@ -122,11 +125,16 @@ func begin_exchange(owner: EntityState, incoming: ItemData,
 	_exchange_owner = owner
 	_exchange_item = incoming
 	_exchange_selected.clear()
+	_snapshot_exchange_inventories()
 	_exchange_confirm_action = on_confirm
 	_exchange_decline_action = on_decline
 	_exchange_allow_decline = allow_decline and on_decline.is_valid()
-	_close_button.visible = _exchange_allow_decline
+	_close_button.show()
+	_close_button.text = "← VOLTAR"
+	_close_button.custom_minimum_size.x = 100
+	_close_button.tooltip_text = "Cancelar esta tentativa de troca e voltar ao item (Esc)"
 	_exchange_bar.show()
+	_exchange_cancel_button.show()
 	_exchange_confirmation.hide()
 	item_menu.close()
 	open()
@@ -136,8 +144,10 @@ func begin_exchange(owner: EntityState, incoming: ItemData,
 
 func begin_death_cleanup(owner: EntityState) -> void:
 	if owner == null or gerencia == null or gerencia.campaign == null \
-			or owner not in gerencia.campaign.dead_playable_states \
-			or owner.inventory_items.is_empty():
+			or owner not in gerencia.campaign.dead_playable_states:
+		return
+	var replacement := gerencia.campaign.get_playable_slot(owner.playable_slot_id)
+	if owner.inventory_items.is_empty() and (replacement == null or replacement == owner):
 		return
 	if _death_owner != null or _exchange_owner != null:
 		if owner not in _death_queue:
@@ -145,15 +155,20 @@ func begin_death_cleanup(owner: EntityState) -> void:
 		return
 	_death_owner = owner
 	_death_backdrop.show()
+	if owner not in gerencia.campaign.active_entity_states:
+		columns.append(_death_column)
+		(_death_column["card"] as Control).show()
+	_title_label.text = "REDISTRIBUA OS ITENS"
 	for index in columns.size():
 		if _actor_for_slot(index) == owner:
 			expanded_by_slot[index] = true
 	_close_button.hide()
 	_exchange_bar.show()
 	_exchange_confirmation.hide()
-	_exchange_accept_button.text = "CONFIRMAR DESCARTE"
+	_exchange_accept_button.text = "OK"
 	_exchange_decline_button.text = "AINDA NÃO"
 	_exchange_decline_button.show()
+	_exchange_cancel_button.hide()
 	item_menu.close()
 	open()
 	_update_death_ui()
@@ -167,25 +182,33 @@ func close(force: bool = false) -> void:
 		if _exchange_confirmation.visible:
 			_exchange_confirmation.hide()
 		return
-	if _exchange_owner != null and not _exchange_allow_decline and not force:
-		if _exchange_confirmation.visible:
-			_exchange_confirmation.hide()
-		return
+	if _exchange_owner != null and not force:
+		_restore_exchange_inventories()
+		refresh()
 	_window_dragging = false
 	_window_resizing = false
 	details.hide()
 	details_link.hide()
 	item_menu.close()
 	_exchange_owner = null
+	_exchange_inventory_snapshot.clear()
 	_death_owner = null
 	_death_backdrop.hide()
+	if columns.size() > 3:
+		columns.pop_back()
+	(_death_column["card"] as Control).hide()
+	_title_label.text = "▣ INVENTÁRIO DO GRUPO"
 	_exchange_item = null
 	_exchange_selected.clear()
 	_exchange_confirm_action = Callable()
 	_exchange_decline_action = Callable()
 	_exchange_bar.hide()
 	_exchange_confirmation.hide()
+	_exchange_cancel_button.hide()
 	_close_button.show()
+	_close_button.text = "X"
+	_close_button.custom_minimum_size.x = 31
+	_close_button.tooltip_text = "Fechar inventário (Esc)"
 	_exchange_accept_button.text = "ACEITAR TROCA"
 	_exchange_decline_button.text = "RECUSAR TROCA"
 	hide()
@@ -210,8 +233,51 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 
 
+func _snapshot_exchange_inventories() -> void:
+	_exchange_inventory_snapshot.clear()
+	for actor in gerencia.campaign.active_entity_states:
+		if actor == null:
+			continue
+		var slots := {}
+		for entry in actor.inventory_items:
+			if entry != null:
+				slots[entry.get_instance_id()] = entry.inventory_slot_index
+		_exchange_inventory_snapshot.append({"actor": actor,
+			"items": actor.inventory_items.duplicate(), "slots": slots})
+
+
+func _restore_exchange_inventories() -> void:
+	for record in _exchange_inventory_snapshot:
+		var actor := record.get("actor") as EntityState
+		if actor == null:
+			continue
+		actor.inventory_items.clear()
+		var slots: Dictionary = record.get("slots", {})
+		for entry in record.get("items", []):
+			if entry is InventoryItemState:
+				(entry as InventoryItemState).inventory_slot_index = int(slots.get(
+					entry.get_instance_id(), -1))
+				actor.inventory_items.append(entry)
+	_exchange_selected.clear()
+
+
 func _input(event: InputEvent) -> void:
 	if not visible:
+		return
+	if event is InputEventKey and event.pressed and not event.echo \
+			and event.keycode == KEY_ESCAPE:
+		if craft_panel != null and craft_panel.visible:
+			craft_panel.close()
+		elif _exchange_owner != null:
+			close()
+		elif _exchange_confirmation.visible:
+			_exchange_confirmation.hide()
+		elif details.visible:
+			details.hide()
+			details_link.hide()
+		else:
+			close()
+		get_viewport().set_input_as_handled()
 		return
 	if _window_resizing:
 		if event is InputEventMouseMotion:
@@ -229,6 +295,7 @@ func _input(event: InputEvent) -> void:
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT \
 				and not event.pressed:
 			_window_resizing = false
+			get_node("/root/GameCursor").call("release_drag", self)
 		return
 	if not _window_dragging:
 		return
@@ -267,6 +334,7 @@ func _on_resize_handle_input(event: InputEvent) -> void:
 			and event.pressed:
 		_window_dragging = false
 		_window_resizing = true
+		get_node("/root/GameCursor").call("capture_drag", self, "diagonal_nwse")
 		_resize_start_mouse = get_viewport().get_mouse_position()
 		_resize_start_factor = _window_scale_factor
 		item_menu.close()
@@ -313,14 +381,15 @@ func _layout_window() -> void:
 		window.position if _window_user_positioned else centered)
 	if details != null and details.visible:
 		_position_details()
-	if _exchange_confirmation != null:
-		var dialog := _exchange_confirmation.get_node("Dialog") as Control
-		dialog.position = (viewport_size - dialog.size) * 0.5
+	# A confirmação usa CenterContainer para nunca crescer além da tela.
 
 
 func _base_window_size() -> Vector2:
 	var viewport_size := get_viewport_rect().size
-	return Vector2(minf(viewport_size.x * 0.56, 1020.0),
+	var four_columns := _death_owner != null \
+		and _death_owner not in gerencia.campaign.active_entity_states
+	return Vector2(minf(viewport_size.x * (0.87 if four_columns else 0.56),
+		1400.0 if four_columns else 1020.0),
 		minf(viewport_size.y * (0.91 if _exchange_owner != null else 0.81),
 			690.0 if _exchange_owner != null else 570.0))
 
@@ -351,6 +420,7 @@ func _build_interface() -> void:
 	header.gui_input.connect(_on_header_gui_input)
 	content.add_child(header)
 	var title := _label("▣ INVENTÁRIO DO GRUPO", 18, BLUE)
+	_title_label = title
 	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
@@ -395,6 +465,12 @@ func _build_interface() -> void:
 	_exchange_decline_button.custom_minimum_size = Vector2(140, 34)
 	_exchange_decline_button.pressed.connect(_decline_exchange)
 	exchange_actions.add_child(_exchange_decline_button)
+	_exchange_cancel_button = Button.new()
+	_exchange_cancel_button.text = "← VOLTAR / CANCELAR TROCA"
+	_exchange_cancel_button.custom_minimum_size = Vector2(210, 34)
+	_exchange_cancel_button.tooltip_text = "Desfaz o remanejamento e volta ao item pendente (Esc)"
+	_exchange_cancel_button.pressed.connect(func() -> void: close())
+	exchange_actions.add_child(_exchange_cancel_button)
 	_exchange_bar.hide()
 	var body := HBoxContainer.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -402,6 +478,8 @@ func _build_interface() -> void:
 	content.add_child(body)
 	for index in 3:
 		columns.append(_create_character_column(body, index))
+	_death_column = _create_character_column(body, 3)
+	(_death_column["card"] as Control).hide()
 	var resize_row := HBoxContainer.new()
 	resize_row.alignment = BoxContainer.ALIGNMENT_END
 	content.add_child(resize_row)
@@ -410,6 +488,7 @@ func _build_interface() -> void:
 	resize_handle.text = "◢"
 	resize_handle.tooltip_text = "Arraste para ampliar até 20%; proporção fixa"
 	resize_handle.custom_minimum_size = Vector2(26, 18)
+	resize_handle.set_meta("ppp_cursor_context", "diagonal_nwse")
 	resize_handle.gui_input.connect(_on_resize_handle_input)
 	resize_row.add_child(resize_handle)
 	details = DETAILS_SCENE.instantiate() as ItemDetailsPanel
@@ -427,13 +506,13 @@ func _build_interface() -> void:
 	item_menu.name = "ItemMenu"
 	add_child(item_menu)
 	item_menu.combat_manager = combat_manager
+	item_menu.craft_exploration = exploration
 	item_menu.linked_details_panel = details
 	item_menu.details_requested.connect(_show_item_details)
 	item_menu.inventory_changed.connect(refresh)
 	item_menu.chance_result_requested.connect(_show_chance_result)
-	_chance_result_dialog = AcceptDialog.new()
-	_chance_result_dialog.title = "Resultado da tentativa"
-	_chance_result_dialog.ok_button_text = "PROSSEGUIR"
+	item_menu.craft_requested.connect(open_craft_for)
+	_chance_result_dialog = preload("res://scripts/ui/item_chance_result_popup.gd").new()
 	add_child(_chance_result_dialog)
 	_exchange_confirmation = Control.new()
 	_exchange_confirmation.name = "ExchangeConfirmation"
@@ -445,13 +524,19 @@ func _build_interface() -> void:
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	_exchange_confirmation.add_child(dim)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var center := CenterContainer.new()
+	center.name = "ConfirmationCenter"
+	center.mouse_filter = Control.MOUSE_FILTER_STOP
+	_exchange_confirmation.add_child(center)
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var dialog := PanelContainer.new()
 	dialog.name = "Dialog"
 	dialog.custom_minimum_size = Vector2(440, 175)
-	dialog.size = dialog.custom_minimum_size
+	dialog.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	dialog.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	dialog.add_theme_stylebox_override("panel",
 		_box(Color(0.075, 0.075, 0.085, 0.98), PINK, 2))
-	_exchange_confirmation.add_child(dialog)
+	center.add_child(dialog)
 	var confirm_margin := MarginContainer.new()
 	for side in ["left", "right", "top", "bottom"]:
 		confirm_margin.add_theme_constant_override("margin_%s" % side, 16)
@@ -482,6 +567,7 @@ func _build_interface() -> void:
 	not_yet_button.pressed.connect(func() -> void: _exchange_confirmation.hide())
 	confirm_actions.add_child(not_yet_button)
 	_exchange_confirmation.hide()
+	_exchange_cancel_button.hide()
 
 
 func _create_character_column(parent: HBoxContainer, index: int) -> Dictionary:
@@ -500,28 +586,10 @@ func _create_character_column(parent: HBoxContainer, index: int) -> Dictionary:
 	fill.offset_top = 6.0
 	fill.offset_right = -8.0
 	fill.offset_bottom = -6.0
-	var free_space_trace := TextureRect.new()
-	free_space_trace.name = "FreeSpaceTrace"
-	free_space_trace.texture = TRACE_CORNER
-	free_space_trace.modulate.a = 0.18
-	free_space_trace.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	free_space_trace.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	free_space_trace.stretch_mode = TextureRect.STRETCH_SCALE
-	free_space_trace.size = Vector2(74.0, 58.0)
-	card.add_child(free_space_trace)
-	card.resized.connect(func() -> void:
-		free_space_trace.visible = card.size.y >= 430.0 \
-			and not expanded_by_slot[index]
-		free_space_trace.position = card.size - free_space_trace.size - Vector2(13.0, 15.0))
-	var frame := TextureRect.new()
+	var frame := Panel.new()
 	frame.name = "BlockActivationFrame"
-	frame.texture = CHARACTER_FRAME
-	var frame_material := ShaderMaterial.new()
-	frame_material.shader = LIGHT_FRAME_SHADER
-	frame.material = frame_material
-	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	frame.stretch_mode = TextureRect.STRETCH_SCALE
-	frame.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	frame.add_theme_stylebox_override("panel",
+		_box(Color.TRANSPARENT, PINK, 2))
 	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	card.add_child(frame)
 	frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -606,7 +674,7 @@ func _create_character_column(parent: HBoxContainer, index: int) -> Dictionary:
 	stack.add_child(craft_button)
 	return {"card": card, "name": name, "capacity": capacity,
 		"equipment_views": equipment_views,
-		"expand": expand, "grid": grid, "trace": free_space_trace,
+		"expand": expand, "grid": grid,
 		"craft_button": craft_button,
 		"signature": ""}
 
@@ -636,13 +704,13 @@ func can_drop_inventory_entry(source: EntityState, recipient: EntityState,
 		entry: InventoryItemState) -> bool:
 	if source == null or recipient == null or entry == null or entry.data == null \
 			or gerencia == null or gerencia.campaign == null \
-			or _exchange_owner != null or entry not in source.inventory_items:
+			or entry not in source.inventory_items:
 		return false
 	if source == recipient:
 		return true
 	if recipient.current_health <= 0:
 		return false
-	return source in gerencia.campaign.active_entity_states \
+	return (source in gerencia.campaign.active_entity_states or source == _death_owner) \
 		and recipient in gerencia.campaign.active_entity_states \
 		and entry.data.item_type != ItemData.ItemType.CURSED \
 		and skill_manager != null \
@@ -657,12 +725,15 @@ func drop_inventory_entry(source: EntityState, recipient: EntityState,
 		reorder_inventory_entry(recipient, entry, slot_index)
 		return
 	if skill_manager.inventory_manager.transfer_item(source, recipient, entry,
-			gerencia.campaign):
+			gerencia.campaign, source == _death_owner):
 		InventoryManager.reorder_item_to_slot(recipient, entry, slot_index)
+		if _exchange_owner != null:
+			_exchange_selected.erase(entry)
 		item_menu.close()
 		details.hide()
 		details_link.hide()
 		refresh()
+		_update_exchange_ui()
 
 
 func can_drop_equipment_entry(source: EntityState, recipient: EntityState,
@@ -696,6 +767,7 @@ func drop_equipment_entry(source: EntityState, recipient: EntityState,
 		_equipment_manager.equip_playable_from_playable(source, recipient,
 			entry, skill_manager, gerencia.campaign)
 	if equipped:
+		get_node("/root/UISFX").call("play", &"equip")
 		item_menu.close()
 		details.hide()
 		details_link.hide()
@@ -745,9 +817,9 @@ func _refresh_column(index: int) -> void:
 	if capacity <= BASE_SLOTS:
 		expanded_by_slot[index] = false
 	var visible_slots := capacity if expanded_by_slot[index] else mini(BASE_SLOTS, capacity)
-	var layout := InventoryManager.inventory_layout(actor) if actor != null else []
-	(parts["trace"] as TextureRect).visible = (parts["card"] as Control).size.y >= 430.0 \
-		and visible_slots <= BASE_SLOTS
+	var layout: Array[Dictionary] = []
+	if actor != null:
+		layout = InventoryManager.inventory_layout(actor)
 	var signature := "%s|%d|%d|%s" % [actor.instance_id if actor != null else "empty",
 		capacity, visible_slots, actor.visible_name() if actor != null else ""]
 	if actor != null:
@@ -813,7 +885,8 @@ func _refresh_column(index: int) -> void:
 	expand.tooltip_text = "Recolher espaços extras" if expanded_by_slot[index] \
 		else "Mostrar espaços extras da mochila ou de outro bônus"
 	var grid := parts["grid"] as GridContainer
-	(parts["craft_button"] as Button).visible = actor != null and not \
+	(parts["craft_button"] as Button).visible = actor != null and actor != _death_owner \
+		and _exchange_owner == null and not \
 		CraftAvailability.options_for(actor, skill_manager.inventory_manager,
 			exploration).is_empty()
 	for child in grid.get_children():
@@ -833,7 +906,7 @@ func _inventory_slot(record: Dictionary, owner_index: int, slot_index: int) -> B
 	cell.set("owner_actor", _actor_for_slot(owner_index))
 	cell.set("entry", entry if first else null)
 	cell.set("slot_index", slot_index)
-	cell.set("can_drag", _exchange_owner == null)
+	cell.set("can_drag", true)
 	cell.custom_minimum_size = SLOT_SIZE
 	cell.tooltip_text = "%s\n%s" % [item.display_name, item.description] \
 		if item != null else "Espaço vazio"
@@ -955,6 +1028,8 @@ func _on_carried_clicked(owner_index: int, selected: InventoryItemState,
 
 func _on_inventory_cell_input(event: InputEvent, owner_index: int,
 		selected: InventoryItemState, cell: Button) -> void:
+	if _exchange_owner != null:
+		return
 	if not event is InputEventMouseButton \
 			or event.button_index != MOUSE_BUTTON_RIGHT or not event.pressed:
 		return
@@ -982,10 +1057,14 @@ func _update_exchange_ui() -> void:
 	var freed := 0
 	for entry in _exchange_selected:
 		freed += maxi(1, entry.data.inventory_space)
-	_exchange_message.text = "Seu inventário está cheio. Selecione um item para descartar e substituir por %s:" % \
-		_exchange_item.display_name
+	_exchange_message.text = ("Há espaço para %s após remanejar os itens. Confirme para guardar." \
+		% _exchange_item.display_name) if needed == 0 else \
+		("Arraste itens entre personagens para liberar espaço ou selecione o que descartar para guardar %s." \
+		% _exchange_item.display_name)
 	_exchange_status.text = "%s • espaço a liberar: %d • selecionado: %d" % [
 		_exchange_owner.data.display_name, needed, freed]
+	_exchange_accept_button.text = "GUARDAR ITEM" if _exchange_selected.is_empty() \
+		else "ACEITAR TROCA"
 	_exchange_accept_button.disabled = not skill_manager.inventory_manager.can_exchange_items(
 		_exchange_owner, _exchange_selected, _exchange_item)
 	_exchange_decline_button.visible = _exchange_allow_decline
@@ -997,8 +1076,13 @@ func _update_death_ui() -> void:
 	if _death_owner == null:
 		return
 	var count := _death_owner.inventory_items.size()
-	_exchange_message.text = "%s morreu. Arraste os itens restantes para os inventários dos sobreviventes. O que ficar será descartado somente após sua confirmação." % \
-		_death_owner.data.display_name
+	var replacement := gerencia.campaign.get_playable_slot(_death_owner.playable_slot_id)
+	var introduction := "%s morreu. %s agora ocupa a vaga jogável. " % [
+		_death_owner.data.display_name, replacement.visible_name()] \
+		if replacement != null and replacement != _death_owner else \
+		"%s morreu. " % _death_owner.data.display_name
+	_exchange_message.text = introduction + \
+		"Redistribua os itens restantes entre os jogáveis. O que ficar no espólio só será descartado após confirmação."
 	_exchange_status.text = "Itens restantes no espólio: %d" % count
 	_exchange_accept_button.disabled = false
 	_exchange_decline_button.visible = true
@@ -1006,6 +1090,9 @@ func _update_death_ui() -> void:
 
 func _ask_exchange_confirmation() -> void:
 	if _death_owner != null:
+		if _death_owner.inventory_items.is_empty():
+			_confirm_exchange()
+			return
 		var names: Array[String] = []
 		for entry in _death_owner.inventory_items:
 			if entry != null and entry.data != null:
@@ -1015,13 +1102,17 @@ func _ask_exchange_confirmation() -> void:
 		_exchange_confirmation.show()
 		_layout_window()
 		return
-	if _exchange_accept_button.disabled or _exchange_selected.is_empty():
+	if _exchange_accept_button.disabled:
 		return
 	var outgoing_names: Array[String] = []
 	for entry in _exchange_selected:
 		outgoing_names.append(entry.data.display_name)
-	_exchange_question.text = "Você troca %s por %s?" % [
-		", ".join(outgoing_names), _exchange_item.display_name]
+	_exchange_question.text = "Guardar %s com %s? Os itens remanejados ficarão com seus novos donos." % [
+		_exchange_item.display_name, _exchange_owner.visible_name()] \
+		if outgoing_names.is_empty() else \
+		"Descartar %s e guardar %s com %s? Os itens remanejados ficarão com seus novos donos." % [
+			", ".join(outgoing_names), _exchange_item.display_name,
+			_exchange_owner.visible_name()]
 	_exchange_confirmation.show()
 	_layout_window()
 
@@ -1030,6 +1121,8 @@ func _confirm_exchange() -> void:
 	if _death_owner != null:
 		if gerencia.campaign.confirm_dead_inventory_discard(_death_owner):
 			close(true)
+			if _death_queue.is_empty():
+				death_cleanup_completed.emit()
 		return
 	if _exchange_owner == null or _exchange_item == null \
 			or not _exchange_confirm_action.is_valid():
@@ -1059,18 +1152,14 @@ func _decline_exchange() -> void:
 
 
 func _on_equipped_clicked(owner_index: int, slot_index: int) -> void:
+	if _exchange_owner != null:
+		return
 	var owner := _actor_for_slot(owner_index)
 	if owner == null:
 		return
 	var slots := [ItemData.EquipmentSlot.WEAPON, ItemData.EquipmentSlot.ARMOR,
 		ItemData.EquipmentSlot.ACCESSORY]
 	var equipped_items := owner.equipped_in_slot(slots[slot_index])
-	var equipped := owner.primary_equipped(slots[slot_index])
-	if equipped != null and equipped.data != null and \
-			CraftAvailability.status_for(owner, equipped.data, gerencia.campaign,
-				skill_manager.inventory_manager, exploration) != CraftAvailability.Status.NONE:
-		open_craft_for(owner, equipped.data)
-		return
 	if equipped_items.is_empty():
 		return
 	details.hide()
@@ -1098,6 +1187,10 @@ func _toggle_expansion(index: int) -> void:
 func _actor_for_slot(index: int) -> EntityState:
 	if gerencia == null or gerencia.campaign == null:
 		return null
+	if index == 3:
+		return _death_owner
+	if index < 0 or index >= CampaignState.PLAYABLE_SLOTS.size():
+		return null
 	var slot_id: StringName = CampaignState.PLAYABLE_SLOTS[index]
 	for actor in gerencia.campaign.active_entity_states:
 		if actor != null and actor.playable_slot_id == slot_id:
@@ -1119,8 +1212,7 @@ func _absorbed_weapon(actor: EntityState) -> ItemData:
 func _show_chance_result(message: String) -> void:
 	if _chance_result_dialog == null or message.is_empty():
 		return
-	_chance_result_dialog.dialog_text = message
-	_chance_result_dialog.popup_centered(Vector2i(480, 170))
+	_chance_result_dialog.call("show_message", message)
 
 
 func _show_item_details(entry: InventoryItemState) -> void:
@@ -1188,7 +1280,7 @@ func _update_details_link() -> void:
 
 
 func _entry_still_owned(entry: InventoryItemState) -> bool:
-	for index in 3:
+	for index in columns.size():
 		var actor := _actor_for_slot(index)
 		if actor != null and (entry in actor.inventory_items
 				or entry in actor.equipped_weapons or entry in actor.equipped_armors

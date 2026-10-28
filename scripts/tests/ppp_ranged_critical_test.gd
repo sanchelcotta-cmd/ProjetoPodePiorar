@@ -59,6 +59,10 @@ func _run() -> void:
 	var hit := combat._resolve_attack(journalist, enemy)
 	_check(int(hit.get("raw_damage", -1)) == expected,
 		"Dano real não dobra e mantém o custo dos hexes percorridos.")
+	var attack_entry: Dictionary = campaign.journal_entries.back()
+	_check(str(attack_entry.get("text", "")).contains("CRITOU!") \
+		and bool((attack_entry.get("references", {}) as Dictionary).get("critical", false)),
+		"Crítico real chega ao livro com complemento dourado e dado estruturado.")
 	enemy.current_health = 1000
 	enemy.ignore_ranged_critical_bonus = true
 	combat._turn_die = 6

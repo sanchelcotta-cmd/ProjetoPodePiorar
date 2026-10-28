@@ -23,6 +23,7 @@ script = ExtResource("2_outcome")
 id = &"ev_00074_out_01"
 id = &"ev_00074_out_01"
 display_name = "Portais se abrem pelo mapa."
+narrative_description = "Portais se abrem pelo mapa.\nDurante a Rodada, ao chegar ao bloco de destino do movimento, você poderá sofrer dano por queimadura!"
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

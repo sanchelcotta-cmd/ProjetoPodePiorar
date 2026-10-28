@@ -18,6 +18,7 @@ script = ExtResource("2_outcome")
 id = &"ev_00061_out_01"
 id = &"ev_00061_out_01"
 display_name = "Características absorvidas."
+narrative_description = "Características absorvidas.\nA partir de agora: o personagem ganha os valores da vida e ataque do último inimigo encontrado, além de receber suas Maestrias e Passivas."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_choose_enemy_and_grant_passive")])
 
 [resource]

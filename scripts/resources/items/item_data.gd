@@ -71,6 +71,8 @@ var acquisition_sources: int = AcquisitionSource.NONE
 @export var consumed_on_use: bool = true
 
 @export_category("Craft")
-@export var craft_result: Array[ItemData] = []
+# Resource evita referência circular do script ItemData ao próprio tipo no cache do Godot.
+# Os elementos continuam sendo ItemData; validar/castar ao consumi-los.
+@export var craft_result: Array[Resource] = []
 # Para artefatos consumidos ou destruídos cuja criação não pode ser repetida na campanha.
 @export var cannot_craft_after_consumed: bool = false

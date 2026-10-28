@@ -25,6 +25,7 @@ report_each_tag = true
 script = ExtResource("2_outcome")
 id = &"ev_00042_out_01"
 display_name = "A cartomante mostra o futuro."
+narrative_description = "A cartomante mostra o futuro.\nA cartomante te mostra o futuro, e três destinos aleatórios são revelados."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_reveal"), SubResource("Effect_warning")])
 
 [resource]

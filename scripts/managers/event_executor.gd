@@ -28,6 +28,7 @@ var _inventory_manager := InventoryManager.new()
 var _narrative_key := ""
 var _narrative_bindings: Dictionary = {}
 var _queued_world_transition: Dictionary = {}
+var _final_center_arrival: Dictionary = {}
 var _queued_day_advance := 0
 
 
@@ -41,6 +42,14 @@ func resolve_narrative(event: EventData, story: String, context: Dictionary) -> 
 	if actor != null and actor.data != null:
 		story = story.replace("[Personagem_ativo]", actor.visible_name())
 		story = story.replace("[personagem_ativo]", actor.visible_name())
+		story = story.replace("[nome_personagem]", actor.visible_name())
+	if story.contains("[nome_rodada]") and gerencia != null \
+			and gerencia.campaign != null:
+		var period_name := "Manhã"
+		match gerencia.campaign.round_period:
+			PPPMapGenerator.RoundPeriod.AFTERNOON: period_name = "Tarde"
+			PPPMapGenerator.RoundPeriod.NIGHT: period_name = "Noite"
+		story = story.replace("[nome_rodada]", period_name)
 	if story.contains("[fala_miss_fortuna]"):
 		if not bindings.has("miss_fortuna_line"):
 			var lines := [
@@ -57,6 +66,10 @@ func resolve_narrative(event: EventData, story: String, context: Dictionary) -> 
 		var ally := _chosen_playable_ally(bindings)
 		if ally != null:
 			story = story.replace("[um{a} Personagem]", ally.display_name)
+	if story.contains("[nome_do_aliado]"):
+		var ally := _chosen_playable_ally(bindings)
+		if ally != null:
+			story = story.replace("[nome_do_aliado]", ally.display_name)
 	if story.contains("[criatura_sorteada]"):
 		var creature := _chosen_district_enemy(bindings)
 		if creature != null:
@@ -146,9 +159,15 @@ func acknowledge_result() -> bool:
 	var finished := block_manager.finish_event_resolution(details)
 	if finished and not transition.is_empty():
 		_queued_world_transition.clear()
-		finished = _perform_world_transition(transition)
+		# A última Informação pode concluir a campanha no próprio Outcome.
+		# Nesse caso não instalar um mapa de Portal/Abdução já preparado.
+		if gerencia == null or gerencia.campaign == null \
+				or not gerencia.campaign.is_terminal():
+			finished = _perform_world_transition(transition)
 	if finished and gerencia != null and gerencia.campaign != null:
 		gerencia.campaign.finalize_dead_playables(skill_manager, _rng)
+		if gerencia.campaign.is_terminal():
+			gerencia.request_terminal_record()
 	return finished
 
 
@@ -555,7 +574,9 @@ func _information_candidates(effect: Event_EffectData) -> Array[Informacao]:
 		return result
 	for resource in gerencia.get_information_catalog():
 		var info := resource as Informacao
-		if info == null or gerencia.campaign.obtained_information_ids.has(info.id):
+		if info == null or not gerencia.campaign.is_information_eligible(
+				info.id, info.tipo) \
+				or gerencia.campaign.obtained_information_ids.has(info.id):
 			continue
 		if effect.information_id != &"" and info.id != effect.information_id:
 			continue
@@ -568,6 +589,23 @@ func _information_candidates(effect: Event_EffectData) -> Array[Informacao]:
 				continue
 		result.append(info)
 	return result
+
+
+func _information_unavailable_reason(effect: Event_EffectData) -> String:
+	if gerencia == null or gerencia.campaign == null:
+		return "A campanha não está disponível."
+	if effect.information_id != &"":
+		for resource in gerencia.get_information_catalog():
+			var info := resource as Informacao
+			if info == null or info.id != effect.information_id:
+				continue
+			if not gerencia.campaign.is_information_eligible(info.id, info.tipo):
+				return "Esta Informação não pertence aos desfechos ativos da campanha."
+			if gerencia.campaign.obtained_information_ids.has(info.id):
+				return "Esta Informação já foi obtida."
+			return "Esta Informação não atende ao filtro deste Evento."
+		return "A Informação fixa deste Evento não existe no catálogo."
+	return "Nenhuma Informação nova do desfecho ativo está disponível."
 
 
 ## Armadilhas acionadas durante um Encontro usam a mesma execução de Effects,
@@ -810,6 +848,10 @@ func apply_prepared_result() -> bool:
 				if effect.max_applications_per_entity_per_campaign > 0:
 					gerencia.campaign.event_effects_applied_by_actor[usage_key] = \
 						int(gerencia.campaign.event_effects_applied_by_actor.get(usage_key, 0)) + 1
+	if event.id == &"ev_00032":
+		gerencia.campaign.sacred_temple_blessing_day = gerencia.campaign.day
+	if resolved_story.contains("[resultado_dado]") and not _recent_dice_results.is_empty():
+		resolved_story = resolved_story.replace("[resultado_dado]", str(_recent_dice_results[0]))
 	var result := {
 		"event_id": event.id,
 		"outcome_id": outcome.id if outcome != null else &"",
@@ -1013,8 +1055,12 @@ func _on_event_requested(context: Dictionary) -> void:
 	var event := context.get("resource") as EventData
 	if event == null or block_manager == null or gerencia == null or skill_manager == null:
 		return
+	_inventory_manager.campaign = gerencia.campaign
 	# Também impede ativações programáticas fora do sorteio normal.
-	if not EventCampaignEligibility.allows_event(event, gerencia.campaign.campaign_mode):
+	var debug_force := bool(context.get("debug_force", false)) \
+		and OS.has_feature("debug") \
+		and bool(ProjectSettings.get_setting("ppp/debug/enabled", false))
+	if not debug_force and not EventCampaignEligibility.allows_event(event, gerencia.campaign.campaign_mode):
 		resolution_blocked.emit(context, "Este Evento não está disponível.")
 		return
 	# Este caso já tem seu próprio controlador de geração de duendes.
@@ -1022,13 +1068,15 @@ func _on_event_requested(context: Dictionary) -> void:
 		return
 	context = context.duplicate()
 	context["narrative_bindings"] = _bindings_for(event, context)
-	var selected := _select_outcome(event, context.get("decision", {}))
+	var selected := _select_outcome(event, context.get("decision", {}), debug_force)
 	if not selected.get("success", false):
 		resolution_blocked.emit(context, str(selected.get("reason", "Resultado indisponível.")))
 		return
 	var outcome := selected.get("outcome") as EventOutcomeData
+	var actor := context.get("actor") as EntityState
 	var resolved_story := resolve_narrative(event,
-		outcome.narrative_description if outcome != null else "", context)
+		outcome.narrative_description if outcome != null else \
+		event.refusal_narrative_description if not selected.get("accepted", true) else "", context)
 	var effects: Array[Event_EffectData] = []
 	var unsupported_reason := ""
 	var selected_choice: EventEffectChoiceData
@@ -1061,6 +1109,19 @@ func _on_event_requested(context: Dictionary) -> void:
 	if event.id == &"ev_00016" and context.get("decision", {}).get("no_item", false):
 		effects = []
 		resolved_story = "Sem melhorias hoje... Quem sabe depois, né?!"
+	if event.id == &"ev_00052" and actor != null and gerencia.campaign != null:
+		var witness_key := "%s:%s" % [event.id, actor.instance_id]
+		if int(gerencia.campaign.event_effects_applied_by_actor.get(witness_key, 0)) > 0:
+			resolved_story = "Tá, é esquisito... mas... Nada de novo.\nPor mais estranho que seja, assustador nem é mais. Pelo menos não tanto quanto antes."
+	if event.id == &"ev_00042":
+		for effect in effects:
+			if effect == null or effect.effect_type != Event_EffectData.EffectType.REPORT_MAP_PRESENCE:
+				continue
+			var report := _apply_map_effect(effect, context)
+			var presence := report.get("presence", {}) as Dictionary
+			if presence.values().has(true):
+				resolved_story += "\n\nHá coisas perigosas por aqui. Cuidado com catástrofes, armadilhas e maldições!"
+			break
 	var theft_plan: Array[Dictionary] = []
 	if event.id in [&"ev_00012", &"ev_00013"]:
 		theft_plan = _prepare_theft_plan(event, outcome, context)
@@ -1107,7 +1168,9 @@ func _on_event_requested(context: Dictionary) -> void:
 				requires_die_roll = true
 				break
 	outcome_prepared.emit(context, {"outcome_name": selected_choice.display_name if selected_choice != null \
-		else outcome.display_name if outcome != null else "",
+		else outcome.display_name if outcome != null else \
+		"RECUSA" if not selected.get("accepted", true) \
+			and not event.refusal_narrative_description.is_empty() else "",
 		"narrative": resolved_story,
 		"accepted": selected.get("accepted", true),
 		"guess": selected.get("guess", &""),
@@ -1115,11 +1178,19 @@ func _on_event_requested(context: Dictionary) -> void:
 		"coin_side": selected.get("coin_side", -1),
 		"guessed": selected.get("guessed", false),
 		"requires_die_roll": requires_die_roll,
-		"requires_second_ack": selected.get("accepted", true) and outcome != null \
-			and not context.get("decision", {}).get("forfeit_catalog_reward", false)})
+		"requires_second_ack": (selected.get("accepted", true) and outcome != null \
+			and not context.get("decision", {}).get("forfeit_catalog_reward", false)) \
+			or (not selected.get("accepted", true) \
+				and not event.refusal_narrative_description.is_empty())})
 
 
-func _select_outcome(event: EventData, decision: Dictionary) -> Dictionary:
+func _select_outcome(event: EventData, decision: Dictionary,
+		debug_force: bool = false) -> Dictionary:
+	if debug_force and decision.get("outcome_id", &"") != &"":
+		for candidate in event.outcomes:
+			if candidate != null and candidate.id == decision["outcome_id"]:
+				return {"success": true, "outcome": candidate, "accepted": true}
+		return {"success": false, "reason": "Outcome não pertence a este Evento."}
 	if (event.custom_rule != &"" \
 			and event.custom_rule not in [&"gnome_3_start_other_district_encounter",
 				&"start_crazy_old_man_combat_scaled_to_group",
@@ -1133,7 +1204,7 @@ func _select_outcome(event: EventData, decision: Dictionary) -> Dictionary:
 	if event.resolution_mode == EventData.ResolutionMode.CONDITIONAL_OUTCOME:
 		var fallback: EventOutcomeData
 		for outcome in event.outcomes:
-			if not _outcome_is_campaign_eligible(outcome):
+			if not _outcome_is_campaign_eligible(outcome, debug_force):
 				continue
 			if outcome.condition == null:
 				fallback = outcome
@@ -1143,7 +1214,7 @@ func _select_outcome(event: EventData, decision: Dictionary) -> Dictionary:
 			{"success": false, "reason": "Nenhum resultado corresponde à condição atual."}
 	for outcome in event.outcomes:
 		if outcome != null and outcome.condition == null \
-				and _outcome_is_campaign_eligible(outcome):
+				and _outcome_is_campaign_eligible(outcome, debug_force):
 			eligible.append(outcome)
 	match event.resolution_mode:
 		EventData.ResolutionMode.AUTOMATIC, EventData.ResolutionMode.RANDOM_OUTCOME:
@@ -1183,7 +1254,10 @@ func _select_outcome(event: EventData, decision: Dictionary) -> Dictionary:
 		"reason": "A seleção condicional ou por palpite deste evento ainda não está executável."}
 
 
-func _outcome_is_campaign_eligible(outcome: EventOutcomeData) -> bool:
+func _outcome_is_campaign_eligible(outcome: EventOutcomeData,
+		debug_force: bool = false) -> bool:
+	if debug_force:
+		return outcome != null
 	if not EventCampaignEligibility.allows_outcome(outcome,
 			gerencia.campaign.campaign_mode):
 		return false
@@ -1255,8 +1329,9 @@ func _prepare_theft_plan(event: EventData, selected_outcome: EventOutcomeData,
 		if chosen == null or chosen.effects.is_empty():
 			continue
 		var candidates := _theft_candidates(target, chosen.effects[0].item_filter)
-		plan.append({"target": target, "entry": candidates.pick_random() \
-			if not candidates.is_empty() else null})
+		plan.append({"target": target, "outcome": chosen,
+			"entry": candidates[_rng.randi_range(0, candidates.size() - 1)] \
+				if not candidates.is_empty() else null})
 	return plan
 
 
@@ -1310,17 +1385,36 @@ func _matching_item_copies(target: EntityState,
 func _apply_theft(theft: Dictionary) -> Dictionary:
 	var target := theft.get("target") as EntityState
 	var entry := theft.get("entry") as InventoryItemState
+	var outcome := theft.get("outcome") as EventOutcomeData
 	if target == null:
 		return {"success": false, "reason": "Alvo do roubo indisponível."}
+	var target_name := target.visible_name()
+	var item_type := "item do inventário"
+	if outcome != null and not outcome.effects.is_empty():
+		var filters := outcome.effects[0].item_filter
+		if &"arma" in filters:
+			item_type = "arma"
+		elif &"armadura" in filters:
+			item_type = "armadura"
+		elif &"acessorio" in filters:
+			item_type = "acessório"
+	var story := outcome.narrative_description.replace("[nome_do_personagem]", target_name) \
+		if outcome != null else ""
 	if entry == null:
-		return {"success": true, "target": target.instance_id, "stolen": false}
+		return {"success": true, "target": target.instance_id,
+			"target_name": target_name, "item_type": item_type, "stolen": false,
+			"theft_narrative": "%s não tinha %s para perder." % [target_name,
+				"um " + item_type if item_type == "acessório" else "uma " + item_type \
+					if item_type != "item do inventário" else "um item no inventário"]}
 	if entry in target.inventory_items:
 		target.inventory_items.erase(entry)
 	else:
 		if not _equipment_manager.consume_equipped_item(target, entry, skill_manager):
 			return {"success": false, "reason": "O equipamento sorteado não está mais disponível."}
-	return {"success": true, "target": target.instance_id, "stolen": true,
-		"item_name": entry.data.display_name, "item": entry.data}
+	return {"success": true, "target": target.instance_id,
+		"target_name": target_name, "item_type": item_type, "stolen": true,
+		"item_name": entry.data.display_name, "item": entry.data,
+		"theft_narrative": story}
 
 
 func _unsupported_reason(effect: Event_EffectData, context: Dictionary) -> String:
@@ -1440,10 +1534,10 @@ func _unsupported_reason(effect: Event_EffectData, context: Dictionary) -> Strin
 			return "Esta revelação futura ainda não possui ativa associada."
 		return ""
 	if effect.effect_type == Event_EffectData.EffectType.GRANT_INFORMATION:
-		if narrative_event != null and narrative_event.id == &"ev_00044":
-			return ""
-		return "" if not _information_candidates(effect).is_empty() else \
-			"Nenhuma Informação elegível permanece no catálogo."
+		# Falta de parte elegível cancela somente esta recompensa, não o Outcome
+		# inteiro: status, dano ou outros efeitos independentes continuam.
+		return "" if gerencia != null and gerencia.campaign != null else \
+			"A campanha não está disponível."
 	if effect.effect_type == Event_EffectData.EffectType.FORGET_LAST_INFORMATION:
 		return "" if gerencia != null and gerencia.campaign != null else \
 			"A campanha não está disponível para esquecer Informação."
@@ -1752,10 +1846,14 @@ func _prepare_world_effect(effect: Event_EffectData,
 			var districts: Array[StringName] = RoundManager.DISTRICT_ORDER.duplicate()
 			var district := districts[_rng.randi_range(0, districts.size() - 1)]
 			var campaign := gerencia.campaign
+			district = gerencia.resolve_next_map_district(district)
 			var next_day: int = campaign.day + _queued_day_advance
 			var target_round: int = (next_day - 1) * 3 + campaign.round_period
+			var target_difficulty := campaign.difficulty_for_next_round() \
+				if target_round != campaign.get_round_index() else campaign.difficulty
 			var new_map := gerencia.prepare_map(gerencia.get_information_catalog(),
-				district, campaign.round_period, target_round, _rng)
+				district, campaign.round_period, target_round, _rng,
+				target_difficulty)
 			if new_map == null:
 				return {"success": false, "reason":
 					"Não foi possível gerar o mapa de destino; o grupo permanece aqui."}
@@ -1780,14 +1878,30 @@ func _perform_world_transition(transition: Dictionary) -> bool:
 	var new_map := transition.get("map") as HexGrid
 	if new_map == null:
 		return false
+	var target_day := int(transition.get("next_day", campaign.day))
+	var target_round := (target_day - 1) * 3 + campaign.round_period
+	var advances_clock := target_round != campaign.get_round_index()
+	# O mesmo Outcome pode conceder a 19ª Informação DEPOIS de preparar um
+	# Portal/abdução. Resolver novamente no instante da troca impede escapar
+	# para outro distrito por causa da ordem dos efeitos no Resource.
+	var destination := gerencia.resolve_next_map_district(
+		transition.get("district", campaign.district))
+	if destination != transition.get("district", campaign.district):
+		new_map = gerencia.prepare_map(gerencia.get_information_catalog(),
+			destination, campaign.round_period, target_round, _rng,
+			campaign.difficulty_for_next_round() if advances_clock else campaign.difficulty)
+		if new_map == null:
+			return false
 	var new_day := int(transition.get("next_day", campaign.day)) > campaign.day
 	campaign.day = int(transition.get("next_day", campaign.day))
-	campaign.district = transition.get("district", campaign.district)
+	campaign.district = destination
 	campaign.expire_temporary_events_for_clock()
 	if catastrophe_manager != null:
 		catastrophe_manager.expire_for_current_time()
 	if not gerencia.install_map(new_map):
 		return false
+	if advances_clock:
+		campaign.commit_pending_difficulty()
 	if new_day:
 		var external: Array[EntityState] = []
 		if catastrophe_manager != null:
@@ -1797,7 +1911,16 @@ func _perform_world_transition(transition: Dictionary) -> bool:
 		skill_manager.on_round_started(campaign, _rng)
 	if not exploration.enter_map(new_day, actor if new_day else null):
 		return false
+	if new_day:
+		var rounds := get_parent().get_node_or_null("RoundManager") as RoundManager
+		if rounds != null:
+			# A abdução pode virar o Dia sem passar pelo avanço regular.
+			# A UI coordena esta tela com a introdução do Centro.
+			rounds.new_day_started.emit(campaign.day)
 	if not transition.get("activate_arrival", false):
+		if campaign.final_center_intro_pending:
+			_final_center_arrival = {"kind": &"pass_turn"}
+			return true
 		return exploration.pass_turn()
 	var arrival: Array[Vector2i] = []
 	for coord in new_map.cells:
@@ -1806,8 +1929,24 @@ func _perform_world_transition(transition: Dictionary) -> bool:
 			arrival.append(coord)
 	if arrival.is_empty():
 		return false
-	return exploration.arrive_from_event(
-		arrival[_rng.randi_range(0, arrival.size() - 1)], actor)
+	var destination_coord := arrival[_rng.randi_range(0, arrival.size() - 1)]
+	if campaign.final_center_intro_pending:
+		_final_center_arrival = {"kind": &"activate", "actor": actor,
+			"coord": destination_coord}
+		return true
+	return exploration.arrive_from_event(destination_coord, actor)
+
+
+func resume_final_center_arrival() -> bool:
+	if _final_center_arrival.is_empty() or gerencia == null \
+			or gerencia.campaign.final_center_intro_pending:
+		return false
+	var pending := _final_center_arrival.duplicate()
+	_final_center_arrival.clear()
+	if pending.get("kind") == &"pass_turn":
+		return exploration.pass_turn()
+	return exploration.arrive_from_event(pending["coord"],
+		pending["actor"] as EntityState)
 
 
 func _replace_map_row(effect: Event_EffectData, context: Dictionary,
@@ -1945,7 +2084,8 @@ func _targets(effect: Event_EffectData, context: Dictionary) -> Array[EntityStat
 func _has_epic_evolution(item: ItemData) -> bool:
 	if item == null:
 		return false
-	for candidate in item.craft_result:
+	for raw_candidate in item.craft_result:
+		var candidate := raw_candidate as ItemData
 		if candidate != null and candidate.rarity == ItemData.Rarity.EPIC:
 			return true
 	return false
@@ -1972,13 +2112,21 @@ func _apply_effect(effect: Event_EffectData, target: EntityState, event: EventDa
 				if event.id == &"ev_00044":
 					return {"success": true, "effect": effect.effect_type,
 						"no_eligible_information": true}
-				return {"success": false, "reason": "Nenhuma Informação nova está disponível."}
+				return {"success": true, "effect": effect.effect_type,
+					"information_not_granted": true,
+					"reason": _information_unavailable_reason(effect)}
 			var info := choices[_rng.randi_range(0, choices.size() - 1)] \
 				if effect.selection_mode == Event_EffectData.SelectionMode.RANDOM_FROM_CATALOG \
 				else choices[0]
-			if not gerencia.record_information_obtained(info):
-				return {"success": false, "reason": "A Informação não pôde ser registrada."}
-			skill_manager.on_information_obtained(gerencia.campaign)
+			var grant := gerencia.grant_information(info, event.id)
+			if not grant.get("success", false):
+				# Outro efeito do mesmo outcome pode ter concluído a campanha
+				# antes desta concessão. A recusa não desfaz o restante.
+				return {"success": true, "effect": effect.effect_type,
+					"information_not_granted": true,
+					"reason": grant.get("reason",
+						"A Informação não pôde ser registrada."),
+					"code": grant.get("code", &"unknown")}
 			return {"success": true, "effect": effect.effect_type,
 				"target": target.instance_id, "information": info,
 				"information_id": info.id, "information_title": info.titulo}
@@ -2056,15 +2204,21 @@ func _apply_effect(effect: Event_EffectData, target: EntityState, event: EventDa
 						return {"success": false,
 							"reason": "Libere espaço no inventário para receber o item."}
 					item = choices[_rng.randi_range(0, choices.size() - 1)]
+			var nullified := item != null and gerencia.campaign.has_sacred_temple_blessing() \
+				and CampaignState.is_cursed_item(item)
 			if not _inventory_manager.add_item(target, item):
 				return {"success": false,
 					"reason": "Libere espaço no inventário para receber o item."}
+			if nullified:
+				return {"success": true, "effect": effect.effect_type,
+					"target": target.instance_id, "item": item,
+					"temple_blessing_nullified": true}
 			return {"success": true, "effect": effect.effect_type,
 				"target": target.instance_id, "item": item, "item_name": item.display_name}
 		Event_EffectData.EffectType.REMOVE_ITEM:
 			var matching := _matching_item_copies(target, effect.item_filter)
 			if not effect.remove_all_matching_items and not matching.is_empty():
-				matching = [matching.pick_random()]
+				matching = [matching[_rng.randi_range(0, matching.size() - 1)]]
 			var lost: Array[String] = []
 			for copy in matching:
 				if copy in target.inventory_items:
@@ -2157,10 +2311,12 @@ func _apply_effect(effect: Event_EffectData, target: EntityState, event: EventDa
 				skill = context.get("decision", {}).get("selected_passive") as PassiveSkillData
 			var bound_item := context.get("decision", {}).get("selected_item") as InventoryItemState
 			var bound_source: Resource = bound_item.data if bound_item != null else null
+			var bound_item_improvements: Dictionary = {}
 			if event.id == &"ev_00058" and bound_item != null \
 					and bound_item.data.rarity != ItemData.Rarity.EPIC:
 				var evolutions: Array[ItemData] = []
-				for candidate in bound_item.data.craft_result:
+				for raw_candidate in bound_item.data.craft_result:
+					var candidate := raw_candidate as ItemData
 					if candidate != null and candidate.rarity == ItemData.Rarity.EPIC:
 						evolutions.append(candidate)
 				if evolutions.is_empty():
@@ -2168,20 +2324,18 @@ func _apply_effect(effect: Event_EffectData, target: EntityState, event: EventDa
 				bound_source = evolutions[_rng.randi_range(0, evolutions.size() - 1)]
 			if event.id == &"ev_00058" and bound_item != null \
 					and bound_source is ItemData:
-				# A Simbiose lê atributos de um Resource. Copiamos a receita antes
-				# de somar melhorias da instância, sem alterar o catálogo global.
-				var evolved := (bound_source as ItemData).duplicate(true) as ItemData
-				evolved.bonus_attack += bound_item.improvement_attack
-				evolved.bonus_life += bound_item.improvement_life
-				evolved.bonus_stamina += bound_item.improvement_stamina
-				bound_source = evolved
+				# Mantém o Resource Épico original, com caminho serializável.
+				# As melhorias pertencem à cópia consumida e são aplicadas à concessão.
+				bound_item_improvements = {"attack": bound_item.improvement_attack,
+					"life": bound_item.improvement_life,
+					"stamina": bound_item.improvement_stamina}
 			if effect.grant_binding_source == Event_EffectData.GrantBindingSource.SELECTED_ENEMY_FROM_LAST_ENCOUNTER:
 				bound_source = context.get("decision", {}).get("selected_enemy") as EntityData
 			var serial := gerencia.campaign.next_event_grant_serial
 			gerencia.campaign.next_event_grant_serial += 1
 			var source_id := StringName("%s:%d" % [event.id, serial])
 			var grant := skill_manager.grant_skill(target, skill, &"event", source_id,
-				gerencia.campaign, bound_source)
+				gerencia.campaign, bound_source, bound_item_improvements)
 			if grant == null:
 				return {"success": false, "reason": "A habilidade concedida não pôde ser aplicada."}
 			if effect.remove_bound_item_on_grant and bound_item != null:
@@ -2314,6 +2468,12 @@ func _apply_effect(effect: Event_EffectData, target: EntityState, event: EventDa
 		Event_EffectData.EffectType.APPLY_STATUS:
 			var applied := skill_manager.apply_event_status(effect, target, null,
 				gerencia.campaign, value, event.id, int(rolled.get("source_die", 0)))
+			if applied.get("success", false) and not applied.get("immune", false) \
+					and context.get("origin_mode", -1) == HexGrid.PPPMapMode.EXPLORATION \
+					and int(DebuffData.ControlEffect.LOSE_TURN) in effect.debuff.control_effects:
+				var applied_instance := applied.get("instance") as DebuffInstanceState
+				if applied_instance != null:
+					applied_instance.exploration_event_control = true
 			if not applied.get("success", false) and not applied.get("immune", false) \
 					and target.current_health > 0:
 				return {"success": false, "reason": applied.get("reason", "Debuff não aplicado.")}
@@ -2333,6 +2493,7 @@ func _apply_effect(effect: Event_EffectData, target: EntityState, event: EventDa
 	var after := _stat_after(effect, target)
 	return {"success": true, "effect": effect.effect_type,
 		"target": target.instance_id, "before": before, "after": after,
+		"statistic": effect.statistic,
 		"roll": int(rolled.get("roll", 0))}
 
 

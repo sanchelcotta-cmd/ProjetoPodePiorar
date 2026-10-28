@@ -1,9 +1,14 @@
 class_name CompanionPartyView
 extends Node2D
 
+signal companion_visual_movement_started(actor: EntityState, duration: float)
+signal companion_visual_movement_stopped(actor: EntityState)
+signal attack_contact_frame(actor: EntityState, target: EntityState)
+
 ## Instancia o visual dos companheiros sem colocá-los nas vagas Playable_1/2/3.
 const ACTOR_SCENE := preload("res://scenes/visuals/companion_actor_visual.tscn")
 const DOLL_SCRIPT := preload("res://scripts/visuals/wooden_doll_visual.gd")
+const SILHOUETTE_SCRIPT := preload("res://scripts/visuals/enemy_silhouette_visual.gd")
 
 @export var gerencia: GerenciaJogo
 @export var exploration: ExplorationManager
@@ -11,6 +16,7 @@ const DOLL_SCRIPT := preload("res://scripts/visuals/wooden_doll_visual.gd")
 @export var combat_manager: CombatManager
 
 var visuals_by_id: Dictionary = {}
+var ground_silhouettes_by_id: Dictionary = {}
 var doll_visuals_by_owner_id: Dictionary = {}
 
 
@@ -28,26 +34,29 @@ func _ready() -> void:
 		skill_manager.delayed_skill_effect_resolved.connect(_on_delayed_effect_resolved)
 	if combat_manager != null:
 		combat_manager.action_resolved.connect(_on_combat_action_resolved)
+		combat_manager.combat_prepared.connect(func(_encounter: EncounterData,
+			_enemies: Array[EntityState], _initiative: Array[Dictionary]) -> void:
+			_refresh())
+		combat_manager.combat_finished.connect(func(_result: Dictionary) -> void:
+			_refresh.call_deferred())
 	_refresh()
 
 
 func _on_temporary_event_changed() -> void:
-	for companion in gerencia.campaign.companion_states:
-		var visual := visuals_by_id.get(companion.instance_id) as CompanionActorVisual
-		if visual == null:
-			continue
-		if companion.temporarily_absent_from_map:
-			visual.hide()
-		else:
-			_show_companion(companion)
+	_refresh()
 
 
 func _on_combat_action_resolved(actor: EntityState, action: StringName,
 		details: Dictionary) -> void:
-	if action != &"move" or actor == null:
+	if actor == null:
 		return
 	var visual := visuals_by_id.get(actor.instance_id) as CompanionActorVisual
 	if visual == null:
+		return
+	if action in [&"attack", &"counterattack", &"attack_missed_reach", &"ricochet"]:
+		visual.play_attack(details.get("target") as EntityState)
+		return
+	if action != &"move":
 		return
 	var path: Array[Vector2i] = []
 	for coord in details.get("path", []):
@@ -85,15 +94,22 @@ func _on_exploration_actor_teleported(actor: EntityState, _destination: Vector2i
 
 func _on_companion_registered(companion: EntityState) -> void:
 	if gerencia != null and gerencia.campaign.current_map != null:
-		_show_companion(companion)
+		_refresh()
 
 
 func _on_active_skill_used(actor: EntityState, grant: SkillGrantState,
-		_result: Dictionary) -> void:
+		result: Dictionary) -> void:
+	# Um ataque da ativa sem alcance não emite "attack"; ainda houve tentativa.
+	var visual := visuals_by_id.get(actor.instance_id) as CompanionActorVisual \
+		if actor != null else null
+	if visual != null:
+		for effect in result.get("effects", []):
+			if effect is Dictionary and effect.get("missed_reach", false):
+				visual.play_attack()
+				break
 	if actor == null or grant == null or grant.skill == null \
 			or grant.skill.id != &"companion_active_002":
 		return
-	var visual := visuals_by_id.get(actor.instance_id) as CompanionActorVisual
 	if visual != null:
 		visual.start_fetching()
 
@@ -111,6 +127,7 @@ func _refresh() -> void:
 	for companion in gerencia.campaign.companion_states:
 		still_present[companion.instance_id] = true
 		_show_companion(companion)
+	_refresh_ground_silhouettes(still_present)
 	for id in visuals_by_id.keys():
 		if not still_present.has(id):
 			var old := visuals_by_id[id] as CompanionActorVisual
@@ -146,10 +163,11 @@ func _refresh_dolls() -> void:
 func _show_companion(companion: EntityState) -> void:
 	if companion == null or companion.current_health <= 0:
 		return
-	# Humanos aliados participam da party, mas na Exploração não ocupam nem
-	# desenham um hex. Só Gatinho e Doguinho passeiam sobre o ground.
-	if companion.data == null or (not companion.data.tags.has(&"gatinho_vira_lata")
-			and not companion.data.tags.has(&"doguinho_caramelo")):
+	if companion.data == null:
+		return
+	var mobile := _is_mobile_companion(companion)
+	if not mobile and companion.get_animation_variant() == null \
+			and companion.data.playable_animation == null:
 		return
 	var owner := gerencia.campaign.get_playable_slot(companion.owner_instance_id)
 	if owner == null:
@@ -159,7 +177,70 @@ func _show_companion(companion: EntityState) -> void:
 		visual = ACTOR_SCENE.instantiate() as CompanionActorVisual
 		visual.name = String(companion.instance_id)
 		add_child(visual)
+		visual.attack_contact_frame.connect(func(attacker: EntityState,
+				target: EntityState) -> void:
+			attack_contact_frame.emit(attacker, target))
+		visual.visual_movement_started.connect(func(actor: EntityState,
+				duration: float) -> void:
+			companion_visual_movement_started.emit(actor, duration))
+		visual.visual_movement_stopped.connect(func(actor: EntityState) -> void:
+			companion_visual_movement_stopped.emit(actor))
 		visuals_by_id[companion.instance_id] = visual
-	visual.bind_companion(companion, owner, gerencia.campaign.current_map)
+	var ground_position := Vector2.INF if mobile else \
+		_ground_position_for(companion)
+	visual.bind_companion(companion, owner, gerencia.campaign.current_map,
+		ground_position)
+	visual.visible = gerencia.campaign.current_map.ppp_map_mode == \
+		HexGrid.PPPMapMode.EXPLORATION if not mobile else visual.visible
 	if companion.temporarily_absent_from_map:
 		visual.hide()
+
+
+func _is_mobile_companion(companion: EntityState) -> bool:
+	return companion.data != null and (companion.data.tags.has(&"gatinho_vira_lata") \
+		or companion.data.tags.has(&"doguinho_caramelo"))
+
+
+func _ground_position_for(companion: EntityState) -> Vector2:
+	var index := 0
+	for candidate in gerencia.campaign.companion_states:
+		if candidate == companion:
+			break
+		if candidate != null and candidate.current_health > 0 \
+				and not _is_mobile_companion(candidate):
+			index += 1
+	# Faixa livre à esquerda da primeira coluna de hexes, apenas visual.
+	return Vector2(-150.0 + float(index % 2) * 76.0,
+		PPPMapView.reference_hex_position(Vector2i(0, 4)).y + 24.0 \
+		- float(index / 2) * 132.0)
+
+
+func _refresh_ground_silhouettes(still_present: Dictionary) -> void:
+	var exploration_mode := gerencia.campaign.current_map.ppp_map_mode == \
+		HexGrid.PPPMapMode.EXPLORATION
+	for companion in gerencia.campaign.companion_states:
+		if companion == null or companion.current_health <= 0 or companion.data == null \
+				or _is_mobile_companion(companion) \
+				or companion.get_animation_variant() != null \
+				or companion.data.playable_animation != null:
+			continue
+		var visual := ground_silhouettes_by_id.get(companion.instance_id) \
+			as EnemySilhouetteVisual
+		if visual == null:
+			visual = SILHOUETTE_SCRIPT.new() as EnemySilhouetteVisual
+			visual.name = "GroundAlly_%s" % companion.instance_id
+			add_child(visual)
+			ground_silhouettes_by_id[companion.instance_id] = visual
+		visual.bind_state(companion, true)
+		visual.position = _ground_position_for(companion)
+		visual.visible = exploration_mode and not companion.temporarily_absent_from_map
+	for id in ground_silhouettes_by_id.keys():
+		var old := ground_silhouettes_by_id[id] as EnemySilhouetteVisual
+		if not still_present.has(id):
+			ground_silhouettes_by_id.erase(id)
+			if old != null:
+				old.queue_free()
+		elif old != null:
+			var actor := old.state as EntityState
+			if actor == null or actor.current_health <= 0:
+				old.hide()

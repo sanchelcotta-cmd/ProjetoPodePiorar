@@ -1,6 +1,10 @@
 class_name CompanionActorVisual
 extends Node2D
 
+signal visual_movement_started(actor: EntityState, duration: float)
+signal visual_movement_stopped(actor: EntityState)
+signal attack_contact_frame(actor: EntityState, target: EntityState)
+
 ## O Resource diz COMO desenhar; EntityState decide QUAL cor esta instância
 ## recebeu. O Gatinho solto passeia só visualmente e não ocupa hex lógico.
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -13,20 +17,23 @@ var state: EntityState
 var owner_state: EntityState
 var grid: HexGrid
 var _animation: SpriteSheetAnimationData
+var _ground_position := Vector2.INF
+var _jump_ground_position := Vector2.INF
 var _motion: Tween
 var _roam_timer: Timer
 var _landing_timer: Timer
 var _rng := RandomNumberGenerator.new()
 var _is_cat: bool = false
 var _is_dog: bool = false
-var _carrying_cat: bool = false
-var _carry_target: Vector2
 var _mouse_carried := false
 var _carry_preview := false
 var _carry_origin := Vector2.ZERO
 var _previous_z_index := 0
 var _death_tween: Tween
 var _dying := false
+var _combat_hit_held := false
+var _attack_target: EntityState
+var _attack_contact_sent := false
 
 
 func _ready() -> void:
@@ -37,6 +44,7 @@ func _ready() -> void:
 	_rng.randomize()
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	sprite.animation_finished.connect(_on_animation_finished)
+	sprite.frame_changed.connect(_on_attack_frame_changed)
 	_roam_timer = Timer.new()
 	_roam_timer.one_shot = true
 	_roam_timer.timeout.connect(_roam)
@@ -48,7 +56,7 @@ func _ready() -> void:
 
 
 func bind_companion(companion: EntityState, companion_owner: EntityState,
-		current_grid: HexGrid) -> void:
+		current_grid: HexGrid, ground_position: Vector2 = Vector2.INF) -> void:
 	if state != null and state.position_changed.is_connected(_on_companion_position_changed):
 		state.position_changed.disconnect(_on_companion_position_changed)
 	if state != null and state.health_changed.is_connected(_on_health_changed):
@@ -57,26 +65,33 @@ func bind_companion(companion: EntityState, companion_owner: EntityState,
 		owner_state.position_changed.disconnect(_on_owner_position_changed)
 	state = companion
 	_dying = false
+	_combat_hit_held = false
 	if _death_tween != null and _death_tween.is_running():
 		_death_tween.kill()
 	modulate.a = 1.0
 	debuff_marker.call("bind_actor", companion)
 	owner_state = companion_owner
 	grid = current_grid
+	_ground_position = ground_position
 	_animation = state.get_animation_variant() if state != null else null
 	_is_cat = state != null and state.data != null \
 		and &"gatinho_vira_lata" in state.data.tags
 	_is_dog = state != null and state.data != null \
 		and &"doguinho_caramelo" in state.data.tags
-	if _animation == null:
+	var playable_animation := state.data.playable_animation if state != null \
+		and state.data != null else null
+	if _animation == null and playable_animation == null:
 		push_warning("CompanionActorVisual: companheiro sem aparência sorteada.")
 		visible = false
 		return
 	visible = true
-	sprite.sprite_frames = _animation.create_sprite_frames()
+	sprite.sprite_frames = _animation.create_sprite_frames() if _animation != null \
+		else playable_animation.create_sprite_frames()
+	var height := _animation.canvas_size.y if _animation != null \
+		else playable_animation.frame_size.y
 	sprite.scale = Vector2.ONE * 1.25
-	sprite.position = Vector2(0.0, -float(_animation.canvas_size.y) * 0.5 * 1.25)
-	debuff_marker.position = Vector2(0.0, -float(_animation.canvas_size.y) * 1.25 - 13.0)
+	sprite.position = Vector2(0.0, -float(height) * 0.5 * 1.25)
+	debuff_marker.position = Vector2(0.0, -float(height) * 1.25 - 13.0)
 	state.position_changed.connect(_on_companion_position_changed)
 	state.health_changed.connect(_on_health_changed)
 	if owner_state != null:
@@ -163,12 +178,33 @@ func cancel_mouse_drop() -> void:
 		_schedule_roam()
 
 
-func play_attack() -> void:
+func play_attack(target: EntityState = null) -> void:
+	_attack_target = target
+	_attack_contact_sent = false
 	_play_once(&"attack")
+
+
+func _on_attack_frame_changed() -> void:
+	if _attack_contact_sent or sprite.animation != &"attack" or sprite.frame != 2:
+		return
+	_attack_contact_sent = true
+	if state != null and _attack_target != null:
+		attack_contact_frame.emit(state, _attack_target)
 
 
 func play_jump() -> void:
 	_play_once(&"jump")
+
+
+func suppress_ground_shadow() -> bool:
+	return _is_cat and _mouse_carried
+
+
+func jump_ground_shadow_position() -> Vector2:
+	if not _is_cat or _jump_ground_position == Vector2.INF \
+			or not get_parent() is Node2D:
+		return Vector2.INF
+	return (get_parent() as Node2D).to_global(_jump_ground_position)
 
 
 func animate_combat_path(origin: Vector2i, path: Array[Vector2i]) -> void:
@@ -201,6 +237,7 @@ func return_walking() -> void:
 		sprite.flip_h = true
 		sprite.play(&"walk")
 	_motion = create_tween()
+	visual_movement_started.emit(state, 1.25)
 	_motion.tween_property(self, "position", destination, 1.25)
 	_motion.finished.connect(play_idle)
 
@@ -221,9 +258,8 @@ func _on_companion_position_changed(_old: Vector2i, current: Vector2i) -> void:
 		if grid.ppp_map_mode == HexGrid.PPPMapMode.COMBAT:
 			position = target
 			play_idle()
-		elif _is_cat and sprite.sprite_frames != null \
-				and sprite.sprite_frames.has_animation(&"carrying_pickup"):
-			_start_carry_to(target)
+		elif _is_cat:
+			_walk_to(target, false)
 		else:
 			position = target
 			play_jump()
@@ -235,13 +271,16 @@ func _on_companion_position_changed(_old: Vector2i, current: Vector2i) -> void:
 
 
 func _on_owner_position_changed(_old: Vector2i, _current: Vector2i) -> void:
-	if state == null or state.position != EntityState.UNPLACED or _is_cat or not visible:
+	if state == null or state.position != EntityState.UNPLACED or _is_cat \
+			or _ground_position != Vector2.INF or not visible:
 		return
 	_stop_motion()
 	_walk_to(_owner_visual_position(), true)
 
 
 func _owner_visual_position() -> Vector2:
+	if _ground_position != Vector2.INF:
+		return _ground_position
 	if owner_state == null:
 		return Vector2.ZERO
 	return PPPMapView.reference_hex_position(owner_state.position) + Vector2(34.0, 25.0)
@@ -276,16 +315,20 @@ func _roam() -> void:
 
 func _jump_to(target: Vector2) -> void:
 	var origin := position
+	_jump_ground_position = origin
 	var duration := clampf(origin.distance_to(target) / 140.0, 0.45, 1.25)
 	sprite.flip_h = target.x < origin.x
 	_play_once(&"jump")
 	_motion = create_tween()
+	visual_movement_started.emit(state, duration)
 	_motion.tween_method(func(progress: float) -> void:
 		# Arco modesto, com ambos os pés novamente no ground ao terminar.
-		position = origin.lerp(target, progress) - Vector2(0.0, sin(progress * PI) * 24.0),
+		_jump_ground_position = origin.lerp(target, progress)
+		position = _jump_ground_position - Vector2(0.0, sin(progress * PI) * 24.0),
 		0.0, 1.0, duration)
 	_motion.finished.connect(func() -> void:
 		position = target
+		_jump_ground_position = Vector2.INF
 		play_idle()
 		_schedule_roam())
 
@@ -295,8 +338,17 @@ func _walk_to(target: Vector2, resume_roam: bool) -> void:
 		sprite.flip_h = target.x < position.x
 		sprite.play(&"walk")
 	_motion = create_tween()
-	_motion.tween_property(self, "position", target,
-		maxf(0.25, position.distance_to(target) / 85.0))
+	var origin := position
+	var duration := maxf(0.25, origin.distance_to(target) / 85.0)
+	if origin.distance_to(target) > 2.0:
+		visual_movement_started.emit(state, duration)
+	var detour := _avoidance_control_point(origin, target)
+	if detour == Vector2.INF:
+		_motion.tween_property(self, "position", target, duration)
+	else:
+		_motion.tween_method(func(progress: float) -> void:
+			position = origin.lerp(detour, progress).lerp(
+				detour.lerp(target, progress), progress), 0.0, 1.0, duration)
 	_motion.finished.connect(func() -> void:
 		play_idle()
 		if resume_roam:
@@ -304,41 +356,41 @@ func _walk_to(target: Vector2, resume_roam: bool) -> void:
 	)
 
 
-func _start_carry_to(target: Vector2) -> void:
-	_carry_target = target
-	_carrying_cat = true
-	# O quarto desenho não entra nesta animação: só aparece no pouso.
-	sprite.play(&"carrying_pickup")
-
-
-func _begin_held_travel() -> void:
-	if not _carrying_cat:
-		return
-	# Alterna lentamente os desenhos 2 e 3 durante TODO o transporte.
-	sprite.play(&"carrying_held")
-	_motion = create_tween()
-	_motion.tween_property(self, "position", _carry_target,
-		maxf(1.2, position.distance_to(_carry_target) / 85.0))
-	_motion.finished.connect(_land_cat)
-
-
-func _land_cat() -> void:
-	if not _carrying_cat:
-		return
-	position = _carry_target
-	sprite.play(&"carrying_landing")
-	_landing_timer.start(1.5)
+func _avoidance_control_point(origin: Vector2, target: Vector2) -> Vector2:
+	var travel := target - origin
+	if travel.length_squared() < 1600.0 or not get_parent() is Node2D:
+		return Vector2.INF
+	var nearest := INF
+	var obstacle_side := 0.0
+	for other in get_tree().get_nodes_in_group("map_entity_visual"):
+		if other == self or not other is Node2D or not other.visible:
+			continue
+		var point := (get_parent() as Node2D).to_local(other.global_position)
+		var progress := (point - origin).dot(travel) / travel.length_squared()
+		if progress <= 0.12 or progress >= 0.88:
+			continue
+		var projected := origin + travel * progress
+		var clearance := point.distance_to(projected)
+		if clearance < 48.0 and clearance < nearest:
+			nearest = clearance
+			obstacle_side = travel.cross(point - origin)
+	if nearest == INF:
+		return Vector2.INF
+	var perpendicular := Vector2(-travel.y, travel.x).normalized()
+	return origin.lerp(target, 0.5) + perpendicular * \
+		(-64.0 if obstacle_side >= 0.0 else 64.0)
 
 
 func _finish_landing() -> void:
-	_carrying_cat = false
 	play_idle()
 
 
 func _stop_motion() -> void:
-	_carrying_cat = false
+	if _motion != null and _motion.is_running() and state != null:
+		visual_movement_stopped.emit(state)
 	_mouse_carried = false
 	_carry_preview = false
+	_jump_ground_position = Vector2.INF
 	if _motion != null and _motion.is_running():
 		_motion.kill()
 	if _roam_timer != null:
@@ -354,30 +406,42 @@ func _on_animation_finished() -> void:
 	if sprite.animation == &"carrying_pickup" and _mouse_carried:
 		sprite.play(&"carrying_held")
 		return
-	if sprite.animation == &"carrying_pickup" and _carrying_cat:
-		_begin_held_travel()
-		return
 	if sprite.animation == &"jump" and _motion != null and _motion.is_running():
 		return
 	if sprite.animation in [&"attack", &"jump", &"hurt"]:
 		play_idle()
 
 
+func hold_combat_hit() -> void:
+	_combat_hit_held = true
+
+
+func cancel_combat_hit() -> void:
+	_combat_hit_held = false
+
+
+func present_combat_hit() -> void:
+	_combat_hit_held = false
+	if state == null:
+		return
+	if state.current_health <= 0:
+		_play_death()
+	elif sprite.sprite_frames != null and sprite.sprite_frames.has_animation(&"hurt"):
+		sprite.set_frame_and_progress(0, 0.0)
+		sprite.play(&"hurt")
+	else:
+		var flash := create_tween()
+		flash.tween_property(sprite, "modulate", Color(1.0, 0.44, 0.48), 0.07)
+		flash.tween_property(sprite, "modulate", Color.WHITE, 0.16)
+
+
 func _on_health_changed(_previous: int, current: int) -> void:
+	if _combat_hit_held and current < _previous:
+		return
 	if current <= 0:
-		if _dying:
-			return
-		_dying = true
-		_stop_motion()
-		if sprite.sprite_frames != null and sprite.sprite_frames.has_animation(&"hurt"):
-			sprite.animation = &"hurt"
-			sprite.stop()
-			sprite.frame = mini(_animation.death_hurt_frame,
-				sprite.sprite_frames.get_frame_count(&"hurt") - 1)
-		else:
-			# Pets ainda não têm folha Hurt própria; vermelho temporário no sprite.
-			sprite.modulate = Color(1.0, 0.20, 0.24)
-		_death_tween = DEATH_BLINK.start(self)
+		_play_death()
+	elif current < _previous:
+		present_combat_hit()
 	elif _dying:
 		if _death_tween != null and _death_tween.is_running():
 			_death_tween.kill()
@@ -386,3 +450,21 @@ func _on_health_changed(_previous: int, current: int) -> void:
 		sprite.modulate = Color.WHITE
 		show()
 		play_idle()
+
+
+func _play_death() -> void:
+	if _dying:
+		return
+	_dying = true
+	_stop_motion()
+	if sprite.sprite_frames != null and sprite.sprite_frames.has_animation(&"hurt"):
+		sprite.animation = &"hurt"
+		sprite.stop()
+		var hurt_frame := _animation.death_hurt_frame if _animation != null \
+			else state.data.playable_animation.death_hurt_frame
+		sprite.frame = mini(hurt_frame,
+			sprite.sprite_frames.get_frame_count(&"hurt") - 1)
+	else:
+		# Pets ainda não têm folha Hurt própria; vermelho temporário no sprite.
+		sprite.modulate = Color(1.0, 0.20, 0.24)
+	_death_tween = DEATH_BLINK.start(self)

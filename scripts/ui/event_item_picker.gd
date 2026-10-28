@@ -158,7 +158,7 @@ func _ready() -> void:
 	var forfeit_explanation := Label.new()
 	forfeit_explanation.text = "O evento será encerrado sem o item nem os efeitos desta escolha. Esta decisão não pode ser refeita."
 	forfeit_explanation.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	forfeit_explanation.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	UINarrativeFont.apply_label(forfeit_explanation)
 	forfeit_explanation.add_theme_font_size_override("font_size", 16)
 	forfeit_body.add_child(forfeit_explanation)
 	var forfeit_actions := HBoxContainer.new()

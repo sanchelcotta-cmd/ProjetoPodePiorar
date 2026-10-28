@@ -27,7 +27,7 @@ script = ExtResource("1_68pr0")
 id = &"ev_00006_out_01"
 id = &"ev_00006_out_01"
 display_name = "Consequência Ruim!"
-narrative_description = "K-bum!"
+narrative_description = "K-bum! É uma loucura como tem dia que parece que você acordou com dois pés esquerdos.\nO raio doeu — E você perde o próximo turno."
 effects = Array[ExtResource("2_whmba")]([SubResource("Resource_m7ah1"), SubResource("Resource_wkoxg")])
 metadata/_custom_type_script = "uid://bt744s7p4h7ks"
 

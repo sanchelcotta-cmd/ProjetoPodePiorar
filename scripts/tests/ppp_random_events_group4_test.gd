@@ -30,17 +30,25 @@ func _run() -> void:
 	var grid := campaign.current_map
 	var event10 := load("res://resources/events/random_events/10-soro_desconhecido.tres") as EventData
 	var event24 := load("res://resources/events/random_events/24-fantasmas_buh.tres") as EventData
+	var event25 := load("res://resources/events/random_events/25-pacto_de_sangue.tres") as EventData
 	var event44 := load("res://resources/events/random_events/44-duas_caras.tres") as EventData
 	var results: Array[Dictionary] = []
 	executor.result_ready.connect(func(_context: Dictionary, result: Dictionary) -> void:
 		results.append(result.duplicate(true)))
 	check(scene.get_node_or_null("RandomRollUI") == null,
 		"Não há mais botão provisório de moeda no mapa.")
-	check(event10 != null and event24 != null and event44 != null,
-		"Resources 10, 24 e 44 carregam.")
-	if event10 == null or event24 == null or event44 == null:
+	check(event10 != null and event24 != null and event25 != null and event44 != null,
+		"Resources 10, 24, 25 e 44 carregam.")
+	if event10 == null or event24 == null or event25 == null or event44 == null:
 		quit(1)
 		return
+	check(event24.narrative_description == "Os fantasmas podem ser bonzinhos. Mas nem todos... Alguns Outros, não são!"
+		and event24.outcomes[0].narrative_description.contains("desaparece dando uma risadinha")
+		and event24.outcomes[1].narrative_description.contains("Buh!\nQuando tudo acaba, o terror ainda ecoa."),
+		"24 exibe a abertura e as duas narrativas revisadas.")
+	check(event25.outcomes[0].narrative_description.contains("Você perde um pouco de vida, mas garante um item.")
+		and event25.outcomes[1].narrative_description.contains("Você não perde nada, mas também não ganha nada."),
+		"25 exibe a consequência narrativa de aceitar ou recusar.")
 
 	# O mecanismo da moeda consulta as opções do Resource: não há lógica
 	# exclusiva de ev_00044, então outro Evento pode usá-lo depois.
@@ -141,6 +149,26 @@ func _run() -> void:
 				and branch_actor.attack == base_attack, "Placebo não altera atributos.")
 	check(executor._select_outcome(event10, {"accepted": false}).get("outcome") == null,
 		"Recusar o Soro não gera consequência.")
+	coord = Vector2i(6, 0)
+	grid.set_ppp_block(coord, HexGrid.PPPBlockType.EVENT, event10)
+	check(block.begin_activation(coord, actor), "10 abre a opção de recusar o Soro.")
+	var refusal_health := actor.max_health
+	var refusal_attack := actor.attack
+	var results_before_refusal := results.size()
+	popup._confirm_event({"accepted": false})
+	check(popup._outcome_reading and popup.title_label.text == "RECUSA"
+		and popup.narrative_label.text == event10.refusal_narrative_description,
+		"10 apresenta a narrativa de recusa numa caixa de resultado.")
+	check(results.size() == results_before_refusal and actor.max_health == refusal_health
+		and actor.attack == refusal_attack,
+		"A recusa não aplica efeitos antes do OK.")
+	popup._execute_prepared_event()
+	check(not block.is_busy() and results.size() == results_before_refusal + 1
+		and not results.back().get("accepted", true)
+		and results.back().get("outcome_id", &"") == &""
+		and actor.max_health == refusal_health and actor.attack == refusal_attack,
+		"Após o OK, a recusa encerra sem sorteio ou efeito.")
+	campaign.event_last_handled_round.erase(event10.resource_path)
 	coord = Vector2i(7, 0)
 	grid.set_ppp_block(coord, HexGrid.PPPBlockType.EVENT, event10)
 	check(block.begin_activation(coord, actor), "10 abre a escolha do Soro.")

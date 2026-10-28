@@ -56,14 +56,14 @@ func _run() -> void:
 	await _capture("craft_01_receita_unica")
 	group.open_craft_for(actor, knife)
 	await _settle()
-	check((group.craft_panel._current()["results"] as Array).size() == 2,
-		"Faca oferece as duas escolhas épicas.")
+	check((group.craft_panel._current()["results"] as Array).size() == 3,
+		"Faca oferece as três escolhas épicas.")
 	await _capture("craft_02_duas_opcoes")
 	group.craft_panel._on_create_pressed()
 	await _settle()
 	check(group.craft_panel._phase == &"choose_result" and
-		(group.craft_panel._current()["results"] as Array).size() == 2,
-		"Criar abre a seleção entre dois épicos sem consumir ingredientes.")
+		(group.craft_panel._current()["results"] as Array).size() == 3,
+		"Criar abre a seleção entre três épicos sem consumir ingredientes.")
 	check(group.craft_panel.intro.text.begins_with("Junte 3 itens comuns iguais")
 		and group.craft_panel.choice_hint.visible
 		and group.craft_panel.choice_hint.text == "Escolha qual item épico criar",
@@ -118,7 +118,36 @@ func _run() -> void:
 	check(bool(group.craft_panel._current().get("preview_only", false)) and
 		(group.craft_panel._current()["ingredient"] as ItemData).id == knife.id,
 		"O clique no item branco explica como reunir cópias, mesmo havendo outra receita.")
+	group.craft_panel.close()
+	group.open()
+	var split_equipped := second.inventory_items[-1] as InventoryItemState
+	check(equipment.equip(second, split_equipped, skills, game.campaign),
+		"Uma cópia distribuída também pode ficar equipada.")
+	group.refresh()
+	group._on_equipped_clicked(1, 0)
+	check(_has_menu_action(group.item_menu, "Desequipar")
+		and _has_menu_action(group.item_menu, "Criar Épico"),
+		"No inventário do grupo, Desequipar e Criar Épico são ações independentes.")
+	group.item_menu._unequip()
+	check(split_equipped in second.inventory_items
+		and split_equipped not in second.equipped_weapons,
+		"Desequipar não abre craft nem consome a cópia distribuída.")
+	check(equipment.equip(second, split_equipped, skills, game.campaign),
+		"A mesma cópia pode ser equipada novamente para testar o HUD.")
+	var hud := scene.get_node("PartyStatusHUD") as PartyStatusHUD
+	hud._on_equipped_item_selected(hud.cards[1], split_equipped,
+		Rect2(Vector2(280, 180), Vector2(50, 50)))
+	check(_has_menu_action(hud.item_menu, "Desequipar")
+		and _has_menu_action(hud.item_menu, "Criar Épico"),
+		"No HUD, item equipável de receita também oferece Desequipar.")
+	hud.item_menu._unequip()
+	check(split_equipped in second.inventory_items
+		and split_equipped not in second.equipped_weapons,
+		"O HUD desequipa sem forçar a receita épica.")
 	print("PPP epic craft UI: %s" % ("0 falhas" if failures == 0 else "%d falhas" % failures))
+	scene.queue_free()
+	for index in 4:
+		await process_frame
 	quit(0 if failures == 0 else 1)
 
 
@@ -142,3 +171,10 @@ func check(condition: bool, message: String) -> void:
 	if not condition:
 		failures += 1
 		push_error(message)
+
+
+func _has_menu_action(item_menu: InventoryItemMenu, label: String) -> bool:
+	for child in item_menu.rows.get_children():
+		if child is Button and (child as Button).text == label:
+			return true
+	return false

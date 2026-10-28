@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/visuals/playable_actor_visual.tscn" id="2_visual"]
 
 [node name="PlayableSelectionCard" type="Button"]
-custom_minimum_size = Vector2(144, 240)
+custom_minimum_size = Vector2(180, 320)
 focus_mode = 2
 script = ExtResource("1_card")
 
@@ -12,13 +12,21 @@ script = ExtResource("1_card")
 
 [node name="CharacterName" type="Label" parent="."]
 mouse_filter = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="SlotLabel" type="Label" parent="."]
+[node name="Stats" type="Label" parent="."]
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.52, 0.91, 1, 1)
-theme_override_font_sizes/font_size = 14
-horizontal_alignment = 1
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 3
+
+[node name="Masteries" type="Label" parent="."]
+mouse_filter = 2
+theme_override_font_sizes/font_size = 10
+autowrap_mode = 3
+
+[node name="Details" type="Button" parent="."]
+custom_minimum_size = Vector2(0, 28)
+text = "DETALHES  ⓘ"

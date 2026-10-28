@@ -6,7 +6,7 @@
 [ext_resource type="Resource" uid="uid://bi7qkkp5atpu0" path="res://resources/skills/passives/ataque_extra.tres" id="4_jnt5c"]
 [ext_resource type="Script" uid="uid://eticmfa8q3xa" path="res://scripts/resources/skills/skill_effect_data.gd" id="5_22k7p"]
 
-[ext_resource type="Texture2D" path="res://sprites/itens_icons/armas_epicas_1.png" id="ppp_icon_sheet"]
+[ext_resource type="Texture2D" path="res://sprites/itens_icons/armas_epicas_2_transparent.png" id="ppp_icon_sheet"]
 
 [sub_resource type="Resource" id="Resource_d3hys"]
 script = ExtResource("5_22k7p")
@@ -17,11 +17,12 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [sub_resource type="Resource" id="Resource_whmwm"]
 script = ExtResource("3_whmwm")
+id = &"ps_dagger_light"
 display_name = "Ataque de Luz"
-description = "Dobra o resultado do ataque escolhido pelo sorteio de Luz ou Sombra."
+description = "A cada ataque alternado de Luz, dobra o resultado do ataque."
 trigger = 5
-random_choice_group = &"adaga_luz_sombra"
 required_attack_item_id = &"aa_00001"
+required_attack_aspect = &"light"
 effects = Array[ExtResource("5_22k7p")]([SubResource("Resource_d3hys")])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"
 
@@ -34,24 +35,25 @@ metadata/_custom_type_script = "uid://eticmfa8q3xa"
 
 [sub_resource type="Resource" id="Resource_22k7p"]
 script = ExtResource("3_whmwm")
+id = &"ps_dagger_shadow"
 display_name = "Ataque de Sombra"
-description = "Vampirismo 60%"
+description = "A cada ataque alternado de Sombra, cura 60% do dano causado."
 trigger = 5
-random_choice_group = &"adaga_luz_sombra"
 required_attack_item_id = &"aa_00001"
+required_attack_aspect = &"shadow"
 effects = Array[ExtResource("5_22k7p")]([SubResource("Resource_uu8ag")])
 metadata/_custom_type_script = "uid://c6mkwdy3ih6pd"
 
 [sub_resource type="AtlasTexture" id="ppp_item_icon"]
 atlas = ExtResource("ppp_icon_sheet")
-region = Rect2(182, 48, 67, 72)
+region = Rect2(216, 194, 252, 312)
 
 [resource]
 script = ExtResource("1_jnt5c")
 icon = SubResource("ppp_item_icon")
 id = &"aa_00001"
 display_name = "Adaga de Sombra e Luz"
-description = "A cada ataque com esta adaga, sorteia Luz ou Sombra (50% cada, nunca ambos). Luz dobra o resultado do ataque; Sombra cura 60% do dano causado."
+description = "Alterna Luz e Sombra a cada ataque: começa com Luz, que dobra o resultado; no ataque seguinte, Sombra cura 60% do dano causado. A adaga na mão mostra qual será o próximo."
 rarity = 4
 acquisition_sources = 4
 tags = Array[StringName]([&"arma", &"epica", &"lamina"])

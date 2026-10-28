@@ -15,6 +15,7 @@ debuff = ExtResource("4_debuff")
 script = ExtResource("2_outcome")
 id = &"ev_00079_out_01"
 display_name = "O prego deixa uma lembrança."
+narrative_description = "O prego deixa uma lembrança.\nVocê está doente!"
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_disease")])
 
 [resource]

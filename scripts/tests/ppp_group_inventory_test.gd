@@ -128,14 +128,10 @@ func _run() -> void:
 		"O arrasto do Inventário respeita a margem de 15 px da câmera.")
 	for index in 3:
 		var card := group.columns[index]["card"] as Control
-		check((card.get_node("BlockActivationFrame") as TextureRect).texture \
-			== GroupInventoryPanel.CHARACTER_FRAME,
-			"Cada personagem usa a moldura uielementx_00001.")
-		var trace := group.columns[index]["trace"] as TextureRect
-		check(trace.texture == GroupInventoryPanel.TRACE_CORNER \
-			and trace.modulate.a >= 0.15 and trace.modulate.a <= 0.25 \
-			and trace.mouse_filter == Control.MOUSE_FILTER_IGNORE,
-			"O circuito da janela é sutil e nunca captura clique.")
+		var frame := card.get_node("BlockActivationFrame") as Panel
+		check(frame != null and frame.mouse_filter == Control.MOUSE_FILTER_IGNORE \
+			and (frame.get_theme_stylebox("panel") as StyleBoxFlat).border_width_left == 2,
+			"Cada personagem usa margem rosa simples sem decoração de canto.")
 	check((group.columns[0]["name"] as Label).text == "JORNALISTA"
 		and (group.columns[1]["name"] as Label).text == "PEDREIRO",
 		"Cada coluna lê o personagem da vaga correspondente.")

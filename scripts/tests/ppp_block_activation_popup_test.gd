@@ -126,6 +126,12 @@ func _run_test() -> void:
 	check(block.begin_activation(Vector2i(7, 1), actor), "Evento abre a narrativa.")
 	check(event_signals[0] == 0 and popup.overlay.visible,
 		"Evento não executa antes do botão.")
+	if "--preview" in OS.get_cmdline_user_args() and DisplayServer.get_name() != "headless":
+		await create_timer(0.30).timeout
+		RenderingServer.force_draw(false)
+		var event_preview_path := "user://ppp_event_popup_preview.png"
+		root.get_texture().get_image().save_png(event_preview_path)
+		print("EVENT_POPUP_PREVIEW=" + ProjectSettings.globalize_path(event_preview_path))
 	(popup.buttons.get_child(0) as Button).pressed.emit()
 	check(event_signals[0] == 1 and block.is_busy(),
 		"O clique envia a decisão, sem fingir que os efeitos terminaram.")
@@ -150,6 +156,18 @@ func _run_test() -> void:
 	var group_inventory := (scene.get_node("CampaignTopBar") as CampaignTopBar).group_inventory
 	check(group_inventory.visible and block.is_busy(),
 		"Inventário do grupo abre para escolher a troca obrigatória.")
+	var exchange_escape := InputEventKey.new()
+	exchange_escape.keycode = KEY_ESCAPE
+	exchange_escape.pressed = true
+	group_inventory._input(exchange_escape)
+	await process_frame
+	check(not group_inventory.visible and popup.overlay.visible and block.is_busy()
+		and not actor.inventory_items.any(func(entry: InventoryItemState) -> bool:
+			return entry.data == curse),
+		"Esc volta à caixa do item ainda pendente, sem aceitá-lo nem descartá-lo.")
+	(popup.buttons.get_child(0) as Button).pressed.emit()
+	check(group_inventory.visible and block.is_busy(),
+		"A caixa anterior permite reconsiderar e abrir a troca novamente.")
 	var outgoing: InventoryItemState
 	for entry in actor.inventory_items:
 		if entry.data.can_be_discarded and entry.data.item_type != ItemData.ItemType.CURSED:

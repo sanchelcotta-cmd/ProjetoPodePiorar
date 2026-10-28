@@ -133,10 +133,12 @@ func _run() -> void:
 	check(human.base_inventory_capacity == 0,
 		"Aliado humano não carrega itens.")
 	var view := scene.get_node("MapRoot/DepthSorted/CompanionActors") as CompanionPartyView
-	check(view.visuals_by_id.size() == 2,
-		"Somente Gatinho e Doguinho aparecem visualmente na Exploração.")
+	check(view.visuals_by_id.size() == 3,
+		"Gatinho, Doguinho e aliado humano aparecem visualmente na Exploração.")
 	for visual in view.visuals_by_id.values():
 		var actor_visual := visual as CompanionActorVisual
+		if actor_visual.state.data.tags.has(&"jogavel"):
+			continue
 		check((actor_visual._roam_timer.time_left >= 5.0 \
 			or (actor_visual._motion != null and actor_visual._motion.is_running())) \
 			and actor_visual.state.position == EntityState.UNPLACED,
@@ -169,11 +171,13 @@ func _run() -> void:
 	check("Pele Endurecida" in acquired_text and "Áurea Milagrosa" in acquired_text,
 		"Ficha apresenta as Passivas adquiridas nos Eventos 59 e 60.")
 	sheet.hide()
-	check(hud.ally_button.visible and hud._ally_portrait.texture != null,
-		"A caixa do dono oferece Aliado com retrato e informações.")
-	hud._on_ally_selected(2)
-	check(hud._ally_equipment.visible and hud._ally_equipment.get_child_count() == 3,
-		"Aliado humano mostra os três espaços de equipamento na caixa-filha.")
+	check(hud.ally_button.visible and hud._ally_roster.get_child_count() == 3,
+		"A caixa do dono lista os três aliados para abrir suas fichas.")
+	var human_listed := false
+	for row in hud._ally_roster.get_children():
+		human_listed = human_listed or (row.get_child(0) as Button).text \
+			== human.visible_name().to_upper()
+	check(human_listed, "O aliado humano aparece pelo nome na lista de aliados.")
 	var donor := gerencia.campaign.active_entity_states[1]
 	var recipient := gerencia.campaign.active_entity_states[2]
 	var weapon := InventoryItemState.new(load("res://resources/itens/equipments/armas/martelo.tres"))
@@ -295,6 +299,10 @@ func _run() -> void:
 		and actor.current_health == playable_health_before_victory,
 		"Ao concluir o Encontro, todos os aliados recuperam Vida total sem curar o jogável.")
 	print("PPP permanent effects: %d falhas" % failures)
+	await create_timer(2.6).timeout
+	scene.queue_free()
+	for _frame in 4:
+		await process_frame
 	quit(1 if failures else 0)
 
 

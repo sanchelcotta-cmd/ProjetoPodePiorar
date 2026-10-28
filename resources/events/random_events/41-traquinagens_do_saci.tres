@@ -19,6 +19,7 @@ reset_replaced_blocks_to_hidden = true
 script = ExtResource("2_outcome")
 id = &"ev_00041_out_01"
 display_name = "O redemoinho refaz a linha inteira."
+narrative_description = "Após a gargalhada desaparecer em eco... O redemoinho deixa um trilho de caos. Por uma linha reta, tudo mudou!"
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]

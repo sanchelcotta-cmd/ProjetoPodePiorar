@@ -16,6 +16,7 @@ script = ExtResource("2_outcome")
 id = &"ev_00070_out_01"
 id = &"ev_00070_out_01"
 display_name = "Arqui-inimigo pode ser declarado."
+narrative_description = "Arqui-inimigo pode ser declarado.\nEm combate: pode declarar um tipo de inimigo. Você causará o dobro de dano à inimigos daquele tipo, mas recebe dano dobrado deles.\nEssa escolha é permanente."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect_grant_active")])
 
 [resource]

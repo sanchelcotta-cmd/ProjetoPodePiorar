@@ -16,6 +16,7 @@ script = ExtResource("2_outcome")
 id = &"ev_00069_out_01"
 id = &"ev_00069_out_01"
 display_name = "A Maleta de Cura está disponível."
+narrative_description = "A Maleta de Cura está disponível.\nAo usá-la: a maleta remove todas as Doenças de todos os personagens do grupo e então é consumida."
 effects = Array[ExtResource("3_effect")]([SubResource("Effect")])
 
 [resource]
