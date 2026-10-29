@@ -53,7 +53,7 @@ func _run() -> void:
 	await process_frame
 	_check(audio.call("get_music_context") == &"menu" and menu_player.playing,
 		"Confirmação de campanha mantém a música do pré-jogo.")
-	var game := load("res://teste.tscn").instantiate() as PPPMapView
+	var game := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(game)
 	current_scene = game
 	summary.queue_free()

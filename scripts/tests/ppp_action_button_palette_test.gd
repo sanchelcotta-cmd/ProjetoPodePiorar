@@ -10,7 +10,7 @@ func _initialize() -> void:
 func _run() -> void:
 	var palette := root.get_node("UIColorManager")
 	var original := str(palette.get("palette_id"))
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var hud := scene.get_node("PartyStatusHUD") as PartyStatusHUD

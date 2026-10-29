@@ -1,6 +1,6 @@
 extends SceneTree
 
-const GAME := preload("res://teste.tscn")
+const GAME := preload("res://scenes/game/campaign_game.tscn")
 const PANEL := preload("res://scripts/ui/campaign_debug_panel.gd")
 const SERVICE := preload("res://scripts/managers/debug_command_service.gd")
 var failures := 0
@@ -12,10 +12,22 @@ func _initialize() -> void:
 
 func _run() -> void:
 	print("DEBUG_FEATURE=", OS.has_feature("debug"))
+	ProjectSettings.set_setting("ppp/debug/enabled", true)
 	var game := GAME.instantiate()
 	root.add_child(game)
 	var panel := PANEL.new()
 	game.add_child(panel)
+	if OS.has_feature("debug"):
+		panel._kind.select(10)
+		panel._refresh_category()
+		_check(panel._rows.size() == 7,
+			"Categoria Anomalias abre sem erro de tipo e lista todas as opções.")
+		panel._kind.select(9)
+		panel._refresh_category()
+		_check(panel._rows.is_empty(),
+			"Categoria Tempo abre sem erro de tipo e sem Resource.")
+		panel._kind.select(0)
+		panel._refresh_category()
 	var debug := SERVICE.new()
 	debug.setup(game)
 	_check(not debug.catalog("active").is_empty(), "Catálogo de ativas usa IDs reais.")
@@ -68,6 +80,20 @@ func _run() -> void:
 			"Nem a força de debug cria Informação duplicada.")
 	var round_manager := game.get_node("RoundManager") as RoundManager
 	_check(round_manager.start_first_map(), "Mapa de teste é gerado pelo fluxo real.")
+	await process_frame
+	if OS.has_feature("debug") and gerencia.campaign.current_map != null:
+		_check(gerencia.campaign.day == 1,
+			"Teste de anomalia forçada ocorre no primeiro dia.")
+		panel._kind.select(10)
+		panel._refresh_category()
+		panel._resource.select(5) # Galo ao fundo; independe de objeto-base.
+		_check(not panel._force.disabled,
+			"Forçar anomalia fica disponível no dia 1.")
+		panel._execute(true)
+		_check(gerencia.campaign.current_map.ppp_anomaly_kind == &"anomalia_galo",
+			"O painel força anomalia no dia 1, sem consultar o sorteio normal.")
+		panel._kind.select(0)
+		panel._refresh_category()
 	if gerencia.campaign.current_map != null:
 		var map := gerencia.campaign.current_map
 		var original: Dictionary = {}
@@ -114,8 +140,13 @@ func _run() -> void:
 		_check(panel.get_child(0).get_node_or_null("DebugBugButton") != null,
 			"O botão de bug existe na camada de interface.")
 		_check(panel.get_child_count() > 0, "Painel interno cria a interface.")
-	game.queue_free()
+	root.remove_child(game)
+	game.free()
 	print("DEBUG_PANEL_TEST: ", "PASS" if failures == 0 else "FAIL")
+	_finish_test.call_deferred()
+
+
+func _finish_test() -> void:
 	quit(0 if failures == 0 else 1)
 
 

@@ -9,7 +9,7 @@ func _initialize() -> void:
 
 func _run_test() -> void:
 	root.size = Vector2i(1152, 648)
-	var game := load("res://teste.tscn").instantiate() as PPPMapView
+	var game := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	check(game != null, "Cena de jogo deve carregar.")
 	if game == null:
 		quit(1)

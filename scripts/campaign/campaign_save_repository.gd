@@ -957,6 +957,7 @@ func apply_to_scene(scene_root: Node, decoded: Dictionary) -> Dictionary:
 		for enemy in combat.enemies:
 			combat._draw_enemy(enemy)
 		combat._draw_silhouette_companions(living_campaign)
+		combat.bind_initiative_health()
 		var journal := scene_root.get_node_or_null("CampaignJournalRecorder") as CampaignJournalRecorder
 		if journal != null:
 			journal.suspended = true

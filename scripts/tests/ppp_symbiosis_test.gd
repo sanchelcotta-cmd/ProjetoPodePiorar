@@ -11,7 +11,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	root.size = Vector2i(1656, 932)
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo
@@ -91,7 +91,7 @@ func _run() -> void:
 		and popup.buttons.get_child_count() == 1 \
 		and (popup.buttons.get_child(0) as Button).text == "OKAY",
 		"Sem arma, a única resposta é OKAY e aparece o texto exato de erro.")
-	var second_scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var second_scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(second_scene)
 	await process_frame
 	var second_game := second_scene.get_node("GerenciaJogo") as GerenciaJogo

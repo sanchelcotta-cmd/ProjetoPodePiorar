@@ -11,11 +11,12 @@ const LOAD_PANEL_SCRIPT := preload("res://scripts/ui/campaign_load_panel.gd")
 const ARCHIVE_LIBRARY_SCRIPT := preload("res://scripts/ui/campaign_archive_library.gd")
 const SETTINGS_MENU_SCRIPT := preload("res://scripts/ui/campaign_settings_menu.gd")
 const DIALOG_STYLE := preload("res://scripts/ui/game_dialog_style.gd")
-const GAME_SCENE_PATH := "res://teste.tscn"
+const GAME_SCENE_PATH := "res://scenes/game/campaign_game.tscn"
 const LOADING_OVERLAY_SCRIPT := preload("res://scripts/ui/scene_loading_overlay.gd")
 const MAIN_MENU_SCENE := "res://scenes/ui/main_menu.tscn"
 const PAUSE_LOGO := preload("res://sprites/ui/logo/logo_outline.png")
 const PAUSE_LOGO_SHADER := preload("res://shaders/pause_logo_outline.gdshader")
+const KEYBOARD_NAV := preload("res://scripts/ui/keyboard_button_navigation.gd")
 const CYAN := Color(0.27, 0.83, 0.94)
 const PINK := Color(0.97, 0.34, 0.68)
 const GREEN := Color(0.30, 0.89, 0.52)
@@ -43,6 +44,7 @@ var _debug_was_visible := false
 var _button_tweens: Dictionary = {}
 var _panels_ready := false
 var _panels_preparing := false
+var _keyboard_navigation := KEYBOARD_NAV.new()
 
 
 func _ready() -> void:
@@ -84,6 +86,7 @@ func open() -> void:
 	if top_bar != null:
 		top_bar.close_expandable_boxes()
 	_screen.show()
+	_keyboard_navigation.reset(_menu)
 	var debug_panel := top_bar.get_parent().get_node_or_null("CampaignDebugPanel") as CanvasLayer
 	_debug_was_visible = debug_panel != null and debug_panel.visible
 	if debug_panel != null:
@@ -111,6 +114,7 @@ func close() -> void:
 	_exit.hide()
 	_abandon.hide()
 	_screen.hide()
+	_keyboard_navigation.reset(_menu)
 	var debug_panel := top_bar.get_parent().get_node_or_null("CampaignDebugPanel") as CanvasLayer
 	if debug_panel != null and _debug_was_visible:
 		debug_panel.show()
@@ -482,6 +486,8 @@ func _build_settings_panel() -> void:
 	_settings_menu.set_meta("defer_settings_build",
 		bool(top_bar.get_parent().get_meta("defer_preview_map", false)))
 	_screen.add_child(_settings_menu)
+	_settings_menu.tutorial_requested.connect(func() -> void:
+		top_bar.open_tutorial_from_settings())
 
 
 func _on_save_requested(slot_number: int, occupied: bool) -> void:
@@ -580,7 +586,7 @@ func _perform_load(campaign_id: String, slot_number: int,
 	var previous := get_tree().current_scene
 	var loading := LOADING_OVERLAY_SCRIPT.new() as CanvasLayer
 	get_tree().root.add_child(loading)
-	loading.call("set_steps", 0, 31)
+	loading.call("set_steps", 0, 42)
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var packed := load(GAME_SCENE_PATH) as PackedScene
@@ -688,25 +694,18 @@ func _autosave_controller() -> CampaignAutosaveController:
 	return top_bar.get_parent().get_node_or_null("CampaignAutosaveController") as CampaignAutosaveController
 
 
-func _unhandled_key_input(event: InputEvent) -> void:
-	if not is_open() or not event.is_action_pressed("ui_cancel"):
+func _input(event: InputEvent) -> void:
+	if not is_open() or not event is InputEventKey or not event.pressed \
+			or event.echo:
+		return
+	if event.keycode == KEY_P:
+		close()
+		get_viewport().set_input_as_handled()
 		return
 	if _exit.visible or _abandon.visible or _overwrite.visible \
-			or _load_confirmation.visible or _notice.visible:
+			or _load_confirmation.visible or _notice.visible \
+			or _archive_library.visible or _settings_menu.visible \
+			or _journal.is_book_open() or _save_panel.visible or _load_panel.visible:
 		return
-	if _archive_library.visible:
-		if _archive_library.get("_veil").visible:
-			_archive_library.call("_close_overlay")
-		else:
-			_back_from_archive()
-	elif _settings_menu.visible:
-		_settings_menu.call("close")
-	elif _journal.is_book_open():
-		_journal.close_book()
-	elif _save_panel.visible:
-		_save_panel.call("close")
-	elif _load_panel.visible:
-		_load_panel.call("close")
-	else:
-		close()
-	get_viewport().set_input_as_handled()
+	if _keyboard_navigation.handle(event, _menu):
+		get_viewport().set_input_as_handled()

@@ -18,7 +18,7 @@ const BUS_NAMES := {
 	MUSIC: &"Music",
 }
 const EFFECT_MIX_LEVELS := {
-	&"Ambience": 0.85,
+	&"Ambience": 0.8075,
 	&"GeneralSFX": 1.00,
 	&"CombatSFX": 1.00,
 	&"SpecialSFX": 1.00,
@@ -190,6 +190,15 @@ func next_station() -> bool:
 	return true
 
 
+## Índices de atalho são 1–9; rádios ainda não cadastradas não fazem nada.
+func select_station_number(number: int) -> bool:
+	if number < 1 or number > _stations.size() \
+			or _game_context not in [&"exploration", &"combat"]:
+		return false
+	_play_station(number - 1)
+	return true
+
+
 func get_music_context() -> StringName:
 	return _game_context
 
@@ -324,6 +333,8 @@ func _play_station(index: int, remember: bool = true) -> void:
 	_combat_player.stream = _station_stream(index, "combat_stream", "combat_path")
 	if _game_context == &"exploration":
 		_music_player.play()
+	elif _game_context == &"combat" and _combat_player.stream != null:
+		_combat_player.play()
 	if remember:
 		_save_settings()
 	station_changed.emit(station["id"], str(station["title"]))

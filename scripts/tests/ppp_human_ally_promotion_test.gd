@@ -87,7 +87,7 @@ func _run() -> void:
 
 func _test_combat_pause_and_inventory(selected: Array[EntityData],
 		student: EntityData, item: ItemData) -> void:
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo

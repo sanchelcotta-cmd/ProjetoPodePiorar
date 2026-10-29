@@ -138,10 +138,7 @@ func _duration_text(instance: DebuffInstanceState,
 func _input(event: InputEvent) -> void:
 	if not visible or not pinned:
 		return
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-		hide()
-		pinned = false
-	elif event is InputEventMouseButton and event.pressed \
+	if event is InputEventMouseButton and event.pressed \
 			and event.button_index == MOUSE_BUTTON_LEFT \
 			and not get_global_rect().has_point(event.position):
 		hide()

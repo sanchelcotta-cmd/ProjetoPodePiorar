@@ -73,6 +73,8 @@ func apply_debuff(target: EntityState, data: DebuffData,
 		source_die_result: int = 0) -> Dictionary:
 	if target == null or data == null or data.id == &"" or target.current_health <= 0:
 		return {"success": false, "reason": "Alvo ou Debuff inválido."}
+	if target.is_innately_immune_to_status(data.id):
+		return {"success": false, "immune": true}
 	# A imunidade concedida por Eventos mora no personagem. Conferir aqui também
 	# impede que contágio e outras aplicações diretas ignorem essa proteção.
 	if data.id in target.permanent_status_immunities \

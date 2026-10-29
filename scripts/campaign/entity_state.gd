@@ -137,6 +137,11 @@ func has_divine_amulet_status_immunity(status_id: StringName) -> bool:
 
 func is_curse_immune() -> bool:
 	return permanent_curse_immunity or attuned_divine_amulet() != null
+
+
+func is_innately_immune_to_status(status_id: StringName) -> bool:
+	return data != null and data.id in [&"en_00001", &"en_00002"] \
+		and status_id in DebuffManager.DISEASE_STAGES
 var unavailable_until_owner_turn_serial: int = 0
 # EntityData registra QUAIS Maestrias existem. Bônus numéricos recebidos
 # durante a campanha ficam separados até definirmos a fórmula de combate.

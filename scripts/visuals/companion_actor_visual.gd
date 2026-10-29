@@ -362,7 +362,10 @@ func _avoidance_control_point(origin: Vector2, target: Vector2) -> Vector2:
 		return Vector2.INF
 	var nearest := INF
 	var obstacle_side := 0.0
-	for other in get_tree().get_nodes_in_group("map_entity_visual"):
+	var blocker_radius := 48.0
+	var blockers := get_tree().get_nodes_in_group("map_entity_visual")
+	blockers.append_array(get_tree().get_nodes_in_group("map_walk_obstacle"))
+	for other in blockers:
 		if other == self or not other is Node2D or not other.visible:
 			continue
 		var point := (get_parent() as Node2D).to_local(other.global_position)
@@ -371,14 +374,17 @@ func _avoidance_control_point(origin: Vector2, target: Vector2) -> Vector2:
 			continue
 		var projected := origin + travel * progress
 		var clearance := point.distance_to(projected)
-		if clearance < 48.0 and clearance < nearest:
+		var radius := float(other.get_meta("walk_radius", 48.0))
+		if clearance < radius and clearance < nearest:
 			nearest = clearance
 			obstacle_side = travel.cross(point - origin)
+			blocker_radius = radius
 	if nearest == INF:
 		return Vector2.INF
 	var perpendicular := Vector2(-travel.y, travel.x).normalized()
 	return origin.lerp(target, 0.5) + perpendicular * \
-		(-64.0 if obstacle_side >= 0.0 else 64.0)
+		(-2.0 * (blocker_radius + 12.0) if obstacle_side >= 0.0 \
+		else 2.0 * (blocker_radius + 12.0))
 
 
 func _finish_landing() -> void:

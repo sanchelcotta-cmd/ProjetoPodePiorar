@@ -9,7 +9,7 @@ func _initialize() -> void:
 
 func _run_test() -> void:
 	root.size = Vector2i(1152, 648)
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo
@@ -33,10 +33,16 @@ func _run_test() -> void:
 		and popup.narrative_label.text == information.descricao \
 		and not gerencia.campaign.obtained_information_ids.has(information.id),
 		"Título e texto da Informação aparecem sem antecipar o registro.")
-	(popup.buttons.get_child(0) as Button).pressed.emit()
+	var keyboard_accept := InputEventKey.new()
+	keyboard_accept.keycode = KEY_ENTER
+	keyboard_accept.pressed = true
+	popup._input(keyboard_accept)
+	check(popup.overlay.visible and not gerencia.campaign.obtained_information_ids.has(information.id),
+		"Primeiro Enter apenas destaca o botão de confirmação.")
+	popup._input(keyboard_accept)
 	check(not block.is_busy() and not popup.overlay.visible \
 		and gerencia.campaign.obtained_information_ids.has(information.id),
-		"Confirmar registra a Informação e fecha a janela.")
+		"Segundo Enter confirma a Informação e fecha a janela.")
 	var item := load("res://resources/itens/equipments/armas/estilingue.tres") as ItemData
 	grid.set_ppp_block(Vector2i(7, 4), HexGrid.PPPBlockType.EQUIPMENT, item)
 	check(block.begin_activation(Vector2i(7, 4), actor), "Um item abre a resolução.")
@@ -161,10 +167,14 @@ func _run_test() -> void:
 	exchange_escape.pressed = true
 	group_inventory._input(exchange_escape)
 	await process_frame
+	check(group_inventory.visible and block.is_busy(),
+		"Esc não fecha uma troca sem botão X nem confirma o item pendente.")
+	group_inventory._close_button.pressed.emit()
+	await process_frame
 	check(not group_inventory.visible and popup.overlay.visible and block.is_busy()
 		and not actor.inventory_items.any(func(entry: InventoryItemState) -> bool:
 			return entry.data == curse),
-		"Esc volta à caixa do item ainda pendente, sem aceitá-lo nem descartá-lo.")
+		"Voltar retorna à caixa do item sem aceitá-lo nem descartá-lo.")
 	(popup.buttons.get_child(0) as Button).pressed.emit()
 	check(group_inventory.visible and block.is_busy(),
 		"A caixa anterior permite reconsiderar e abrir a troca novamente.")

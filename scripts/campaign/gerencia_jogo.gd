@@ -88,13 +88,14 @@ func prepare_map(
 	var suppress_hazards := target_difficulty == GameDifficulty.Mode.SUGAR \
 		and (campaign.has_carried_curse() \
 		or campaign.has_catastrophe_at(target_day, target_round_index))
-	return _map_generator.generate_new_map(
+	var source_rng := rng if rng != null else campaign.world_rng
+	var new_map := _map_generator.generate_new_map(
 		remaining,
 		target_district,
 		target_period,
 		campaign.event_campaign_counts.duplicate(),
 		campaign.occurred_unique_encounter_ids.duplicate(),
-		rng if rng != null else campaign.world_rng,
+		source_rng,
 		campaign.get_events_on_standby(target_round_index),
 		target_day,
 		not campaign.last_encounter_entity_types.is_empty(),
@@ -106,6 +107,11 @@ func prepare_map(
 		target_difficulty,
 		suppress_hazards,
 	)
+	if new_map != null:
+		new_map.ppp_decoration_seed = source_rng.randi()
+		new_map.ppp_anomaly_planned = source_rng.randf() \
+			< campaign.decoration_anomaly_chance(target_day)
+	return new_map
 
 
 ## Só instala um mapa COMPLETO. O controlador temporal chama isto depois de

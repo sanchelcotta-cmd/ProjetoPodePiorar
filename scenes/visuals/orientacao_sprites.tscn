@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dj8pb2c31jbvq"]
 
-[ext_resource type="Script" path="res://scripts/visuals/sprite_orientation_reference.gd" id="script_orientation"]
+[ext_resource type="Script" uid="uid://c25mph44acswm" path="res://scripts/visuals/sprite_orientation_reference.gd" id="script_orientation"]
 [ext_resource type="Texture2D" uid="uid://e2sh17mwdlc4" path="res://sprites/playable/v2/cozinheiro/cozinheiro_idle_1x.png" id="tex_0"]
 [ext_resource type="Texture2D" uid="uid://bsmctigu46nu" path="res://sprites/playable/v2/jornalista/jornalista_idle_1x.png" id="tex_1"]
 [ext_resource type="Texture2D" uid="uid://lwb7cxpaaako" path="res://sprites/playable/v2/mae/mae_idle_1x.png" id="tex_2"]
@@ -14,6 +14,8 @@
 [ext_resource type="Texture2D" uid="uid://b5c2vorg38i5a" path="res://sprites/entities_allies/gatinho_idle_rajado_1x.png" id="tex_10"]
 [ext_resource type="Texture2D" uid="uid://bbi8h7f48wfcl" path="res://sprites/entities_allies/doguinho_idle_sit_1x.png" id="tex_11"]
 [ext_resource type="Texture2D" uid="uid://bojtbkylp3abp" path="res://sprites/duendes/duende_caos_1.png" id="tex_12"]
+[ext_resource type="Texture2D" uid="uid://bljuub6yn2haf" path="res://sprites/playable/galinha/galinha_idle.png" id="tex_galinha"]
+[ext_resource type="Texture2D" path="res://sprites/entities_allies/event_followers/bonequinho_idle.png" id="tex_event_follower"]
 
 [node name="OrientacaoSprites" type="Node2D" unique_id=2130441676]
 script = ExtResource("script_orientation")
@@ -69,6 +71,15 @@ offset_bottom = 645.0
 theme_override_colors/font_color = Color(0.66, 0.9, 0.6, 1)
 theme_override_font_sizes/font_size = 18
 text = "DUENDES · DUENDE 1 É A RÉGUA DE TODAS AS CORES"
+
+[node name="TransformacoesTitulo" type="Label" parent="." unique_id=406947382]
+offset_left = 890.0
+offset_top = 615.0
+offset_right = 1550.0
+offset_bottom = 645.0
+theme_override_colors/font_color = Color(1, 0.82, 0.58, 1)
+theme_override_font_sizes/font_size = 18
+text = "TRANSFORMAÇÕES · ARRASTE A ESCALA"
 
 [node name="LinhaReguas" type="Line2D" parent="." unique_id=688187020]
 points = PackedVector2Array(40, 280, 1560, 280)
@@ -406,6 +417,43 @@ theme_override_font_sizes/font_size = 14
 text = "Doguinho caramelo"
 horizontal_alignment = 1
 
+[node name="SeguidoresEventosTitulo" type="Label" parent="."]
+offset_left = 420.0
+offset_top = 615.0
+offset_right = 850.0
+offset_bottom = 645.0
+theme_override_colors/font_color = Color(1, 0.72, 0.84, 1)
+theme_override_font_sizes/font_size = 18
+text = "SEGUIDORES DE EVENTO · UMA RÉGUA"
+
+[node name="SeguidoresEventos" type="Node2D" parent="."]
+
+[node name="BonequinhoAmigo" type="Node2D" parent="SeguidoresEventos"]
+position = Vector2(650, 770)
+metadata/source_resource = "res://resources/events/random_events/43-boneco_de_madeira.tres"
+metadata/reference_fixed = false
+
+[node name="Sprite" type="Sprite2D" parent="SeguidoresEventos/BonequinhoAmigo"]
+texture_filter = 1
+scale = Vector2(2.140625, 2.140625)
+texture = ExtResource("tex_event_follower")
+centered = false
+offset = Vector2(-32, -64)
+region_enabled = true
+region_rect = Rect2(0, 0, 64, 64)
+metadata/base_scale = 2.140625
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="SeguidoresEventos/BonequinhoAmigo"]
+offset_left = -155.0
+offset_top = 9.0
+offset_right = 155.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.86, 0.91, 0.94, 1)
+theme_override_font_sizes/font_size = 14
+text = "Bonequinho / Amigo Imaginário"
+horizontal_alignment = 1
+
 [node name="Duendes" type="Node2D" parent="." unique_id=708828003]
 
 [node name="Duende1" type="Node2D" parent="Duendes" unique_id=1863770719]
@@ -435,7 +483,36 @@ theme_override_font_sizes/font_size = 14
 text = "Duende 1"
 horizontal_alignment = 1
 
-[node name="EntidadesTitulo" type="Label" parent="."]
+[node name="Transformacoes" type="Node2D" parent="." unique_id=1295782267]
+
+[node name="Galinha" type="Node2D" parent="Transformacoes" unique_id=10204380]
+position = Vector2(1100, 770)
+metadata/source_resource = "res://resources/entities/animations/galinha_animation.tres"
+metadata/reference_fixed = false
+
+[node name="Sprite" type="Sprite2D" parent="Transformacoes/Galinha" unique_id=1423384720]
+texture_filter = 1
+position = Vector2(-1, 0)
+scale = Vector2(2.140625, 2.140625)
+texture = ExtResource("tex_galinha")
+centered = false
+offset = Vector2(-32, -64)
+region_enabled = true
+region_rect = Rect2(0, 0, 64, 64)
+metadata/base_scale = 2.140625
+metadata/reference_fixed = false
+
+[node name="Nome" type="Label" parent="Transformacoes/Galinha" unique_id=1734637105]
+offset_left = -130.0
+offset_top = 9.0
+offset_right = 130.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.86, 0.91, 0.94, 1)
+theme_override_font_sizes/font_size = 14
+text = "Galinha · transformação galiforme"
+horizontal_alignment = 1
+
+[node name="EntidadesTitulo" type="Label" parent="." unique_id=1701623206]
 offset_left = 40.0
 offset_top = 850.0
 offset_right = 1550.0
@@ -444,7 +521,7 @@ theme_override_colors/font_color = Color(1, 0.76, 0.45, 1)
 theme_override_font_sizes/font_size = 18
 text = "ENTIDADES DO MAPA · ESPAÇOS PARA UM SPRITE DE CADA CADASTRO"
 
-[node name="EntidadesInstrucao" type="Label" parent="."]
+[node name="EntidadesInstrucao" type="Label" parent="." unique_id=1216598319]
 offset_left = 40.0
 offset_top = 883.0
 offset_right = 1550.0
@@ -453,28 +530,27 @@ theme_override_colors/font_color = Color(0.68, 0.75, 0.79, 1)
 theme_override_font_sizes/font_size = 14
 text = "Espaços vazios até receberem arte. Arraste o Sprite para ajustar; a escala se mantém proporcional."
 
-[node name="EntidadesPendentes" type="Node2D" parent="."]
+[node name="EntidadesPendentes" type="Node2D" parent="." unique_id=225044047]
 
-[node name="a_experiencia" type="Node2D" parent="EntidadesPendentes"]
+[node name="a_experiencia" type="Node2D" parent="EntidadesPendentes" unique_id=1505203272]
 position = Vector2(170, 1110)
 metadata/source_resource = "res://resources/entities/entities_general/a_experiencia.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/a_experiencia"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/a_experiencia" unique_id=677641776]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/a_experiencia"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/a_experiencia" unique_id=1485403521]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/a_experiencia"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/a_experiencia" unique_id=1828351835]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -485,26 +561,25 @@ text = "A Experiência"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="aranha_interdimensional" type="Node2D" parent="EntidadesPendentes"]
+[node name="aranha_interdimensional" type="Node2D" parent="EntidadesPendentes" unique_id=1807704242]
 position = Vector2(470, 1110)
 metadata/source_resource = "res://resources/entities/entities_general/aranha_interdimensional.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/aranha_interdimensional"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/aranha_interdimensional" unique_id=332287571]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/aranha_interdimensional"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/aranha_interdimensional" unique_id=587500391]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/aranha_interdimensional"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/aranha_interdimensional" unique_id=549456427]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -515,26 +590,25 @@ text = "Aranha Interdimensional"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="barata_voadora" type="Node2D" parent="EntidadesPendentes"]
+[node name="barata_voadora" type="Node2D" parent="EntidadesPendentes" unique_id=159059029]
 position = Vector2(770, 1110)
 metadata/source_resource = "res://resources/entities/entities_general/barata_voadora.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/barata_voadora"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/barata_voadora" unique_id=717780657]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/barata_voadora"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/barata_voadora" unique_id=1772956156]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/barata_voadora"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/barata_voadora" unique_id=582306147]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -545,26 +619,25 @@ text = "Barata Gigante Voadora"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="bonequinha_de_pano" type="Node2D" parent="EntidadesPendentes"]
+[node name="bonequinha_de_pano" type="Node2D" parent="EntidadesPendentes" unique_id=1307142194]
 position = Vector2(1070, 1110)
 metadata/source_resource = "res://resources/entities/entities_general/bonequinha_de_pano.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/bonequinha_de_pano"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/bonequinha_de_pano" unique_id=1009015804]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/bonequinha_de_pano"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/bonequinha_de_pano" unique_id=1110331419]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/bonequinha_de_pano"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/bonequinha_de_pano" unique_id=293408764]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -575,26 +648,25 @@ text = "Bonequinha de Pano"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="cao_infernal" type="Node2D" parent="EntidadesPendentes"]
+[node name="cao_infernal" type="Node2D" parent="EntidadesPendentes" unique_id=1182806777]
 position = Vector2(1370, 1110)
 metadata/source_resource = "res://resources/entities/entities_general/cao_infernal.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/cao_infernal"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/cao_infernal" unique_id=1373389431]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/cao_infernal"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/cao_infernal" unique_id=14969506]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/cao_infernal"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/cao_infernal" unique_id=1361882994]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -605,26 +677,25 @@ text = "Cão Infernal"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="capanga_do_mal" type="Node2D" parent="EntidadesPendentes"]
+[node name="capanga_do_mal" type="Node2D" parent="EntidadesPendentes" unique_id=118231115]
 position = Vector2(170, 1290)
 metadata/source_resource = "res://resources/entities/entities_general/capanga_do_mal.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/capanga_do_mal"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/capanga_do_mal" unique_id=609082113]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/capanga_do_mal"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/capanga_do_mal" unique_id=2125351189]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/capanga_do_mal"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/capanga_do_mal" unique_id=151228951]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -635,26 +706,25 @@ text = "Capanga Do Mal"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="cobaia_mutante" type="Node2D" parent="EntidadesPendentes"]
+[node name="cobaia_mutante" type="Node2D" parent="EntidadesPendentes" unique_id=384686331]
 position = Vector2(470, 1290)
 metadata/source_resource = "res://resources/entities/entities_general/cobaia_mutante.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/cobaia_mutante"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/cobaia_mutante" unique_id=124084763]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/cobaia_mutante"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/cobaia_mutante" unique_id=795434897]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/cobaia_mutante"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/cobaia_mutante" unique_id=105974779]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -665,26 +735,25 @@ text = "Cobaia Mutante"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="criatura_esquisita_de_outra_dimensao" type="Node2D" parent="EntidadesPendentes"]
+[node name="criatura_esquisita_de_outra_dimensao" type="Node2D" parent="EntidadesPendentes" unique_id=843329242]
 position = Vector2(770, 1290)
 metadata/source_resource = "res://resources/entities/entities_general/criatura_esquisita_de_outra_dimensao.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/criatura_esquisita_de_outra_dimensao"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/criatura_esquisita_de_outra_dimensao" unique_id=988835248]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/criatura_esquisita_de_outra_dimensao"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/criatura_esquisita_de_outra_dimensao" unique_id=1633074534]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/criatura_esquisita_de_outra_dimensao"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/criatura_esquisita_de_outra_dimensao" unique_id=318606683]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -695,26 +764,25 @@ text = "Criatura Esquisita de Outra Dimensão"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="cultista_encapuzado" type="Node2D" parent="EntidadesPendentes"]
+[node name="cultista_encapuzado" type="Node2D" parent="EntidadesPendentes" unique_id=2066267799]
 position = Vector2(1070, 1290)
 metadata/source_resource = "res://resources/entities/entities_general/cultista_encapuzado.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/cultista_encapuzado"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/cultista_encapuzado" unique_id=914932221]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/cultista_encapuzado"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/cultista_encapuzado" unique_id=1476142250]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/cultista_encapuzado"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/cultista_encapuzado" unique_id=1725589132]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -725,26 +793,25 @@ text = "Cultista Encapuzado"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="dama_elemental" type="Node2D" parent="EntidadesPendentes"]
+[node name="dama_elemental" type="Node2D" parent="EntidadesPendentes" unique_id=824961109]
 position = Vector2(1370, 1290)
 metadata/source_resource = "res://resources/entities/entities_general/dama_elemental.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/dama_elemental"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/dama_elemental" unique_id=927597705]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/dama_elemental"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/dama_elemental" unique_id=121226202]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/dama_elemental"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/dama_elemental" unique_id=18948953]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -755,26 +822,25 @@ text = "Dama Elemental"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="diabretes_flamejantes" type="Node2D" parent="EntidadesPendentes"]
+[node name="diabretes_flamejantes" type="Node2D" parent="EntidadesPendentes" unique_id=54391506]
 position = Vector2(170, 1470)
 metadata/source_resource = "res://resources/entities/entities_general/diabretes_flamejantes.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/diabretes_flamejantes"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/diabretes_flamejantes" unique_id=1445058318]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/diabretes_flamejantes"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/diabretes_flamejantes" unique_id=854495922]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/diabretes_flamejantes"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/diabretes_flamejantes" unique_id=2021617254]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -785,26 +851,25 @@ text = "Diabretes Flamejantes"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="esfera_flamejante" type="Node2D" parent="EntidadesPendentes"]
+[node name="esfera_flamejante" type="Node2D" parent="EntidadesPendentes" unique_id=1864261352]
 position = Vector2(470, 1470)
 metadata/source_resource = "res://resources/entities/entities_general/esfera_flamejante.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/esfera_flamejante"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/esfera_flamejante" unique_id=889671539]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/esfera_flamejante"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/esfera_flamejante" unique_id=403153186]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/esfera_flamejante"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/esfera_flamejante" unique_id=95369628]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -815,26 +880,25 @@ text = "Esfera Flamejante"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="goblin_1" type="Node2D" parent="EntidadesPendentes"]
+[node name="goblin_1" type="Node2D" parent="EntidadesPendentes" unique_id=1589650988]
 position = Vector2(770, 1470)
 metadata/source_resource = "res://resources/entities/entities_general/goblin_1.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/goblin_1"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/goblin_1" unique_id=1592272669]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/goblin_1"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/goblin_1" unique_id=1095195796]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/goblin_1"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/goblin_1" unique_id=1499717611]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -845,26 +909,25 @@ text = "Goblin"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="goblin_2" type="Node2D" parent="EntidadesPendentes"]
+[node name="goblin_2" type="Node2D" parent="EntidadesPendentes" unique_id=511909993]
 position = Vector2(1070, 1470)
 metadata/source_resource = "res://resources/entities/entities_general/goblin_2.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/goblin_2"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/goblin_2" unique_id=34489073]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/goblin_2"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/goblin_2" unique_id=526179794]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/goblin_2"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/goblin_2" unique_id=120738689]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -875,26 +938,25 @@ text = "Goblin"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="goblin_3" type="Node2D" parent="EntidadesPendentes"]
+[node name="goblin_3" type="Node2D" parent="EntidadesPendentes" unique_id=1965172983]
 position = Vector2(1370, 1470)
 metadata/source_resource = "res://resources/entities/entities_general/goblin_3.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/goblin_3"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/goblin_3" unique_id=681521586]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/goblin_3"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/goblin_3" unique_id=1791348987]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/goblin_3"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/goblin_3" unique_id=384269358]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -905,26 +967,25 @@ text = "Goblin"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="guarda_fantoche" type="Node2D" parent="EntidadesPendentes"]
+[node name="guarda_fantoche" type="Node2D" parent="EntidadesPendentes" unique_id=1176217093]
 position = Vector2(170, 1650)
 metadata/source_resource = "res://resources/entities/entities_general/guarda_fantoche.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/guarda_fantoche"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/guarda_fantoche" unique_id=1599432470]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/guarda_fantoche"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/guarda_fantoche" unique_id=880553539]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/guarda_fantoche"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/guarda_fantoche" unique_id=1675219649]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -935,26 +996,25 @@ text = "Guarda-Fantoche"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="homem_de_preto" type="Node2D" parent="EntidadesPendentes"]
+[node name="homem_de_preto" type="Node2D" parent="EntidadesPendentes" unique_id=287161445]
 position = Vector2(470, 1650)
 metadata/source_resource = "res://resources/entities/entities_general/homem_de_preto.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/homem_de_preto"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/homem_de_preto" unique_id=481611830]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/homem_de_preto"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/homem_de_preto" unique_id=403003941]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/homem_de_preto"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/homem_de_preto" unique_id=261790552]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -965,26 +1025,25 @@ text = "Homem de Preto"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="mimico_1" type="Node2D" parent="EntidadesPendentes"]
+[node name="mimico_1" type="Node2D" parent="EntidadesPendentes" unique_id=1739187137]
 position = Vector2(770, 1650)
 metadata/source_resource = "res://resources/entities/entities_general/mimico_1.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/mimico_1"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/mimico_1" unique_id=475593514]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/mimico_1"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/mimico_1" unique_id=671349655]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/mimico_1"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/mimico_1" unique_id=1328817476]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -995,26 +1054,25 @@ text = "Mímico"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="mimico_2" type="Node2D" parent="EntidadesPendentes"]
+[node name="mimico_2" type="Node2D" parent="EntidadesPendentes" unique_id=774723521]
 position = Vector2(1070, 1650)
 metadata/source_resource = "res://resources/entities/entities_general/mimico_2.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/mimico_2"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/mimico_2" unique_id=693621156]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/mimico_2"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/mimico_2" unique_id=235312490]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/mimico_2"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/mimico_2" unique_id=301913560]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -1025,26 +1083,25 @@ text = "Mímico"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="palhaco_assassino" type="Node2D" parent="EntidadesPendentes"]
+[node name="palhaco_assassino" type="Node2D" parent="EntidadesPendentes" unique_id=994841521]
 position = Vector2(1370, 1650)
 metadata/source_resource = "res://resources/entities/entities_general/palhaco_assassino.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/palhaco_assassino"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/palhaco_assassino" unique_id=14888237]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/palhaco_assassino"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/palhaco_assassino" unique_id=820194429]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/palhaco_assassino"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/palhaco_assassino" unique_id=928476483]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -1055,26 +1112,25 @@ text = "Palhaço Assassino"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="pinscher_raivoso" type="Node2D" parent="EntidadesPendentes"]
+[node name="pinscher_raivoso" type="Node2D" parent="EntidadesPendentes" unique_id=1993823316]
 position = Vector2(170, 1830)
 metadata/source_resource = "res://resources/entities/entities_general/pinscher_raivoso.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/pinscher_raivoso"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/pinscher_raivoso" unique_id=891596900]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/pinscher_raivoso"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/pinscher_raivoso" unique_id=645988237]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/pinscher_raivoso"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/pinscher_raivoso" unique_id=321577873]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -1085,26 +1141,25 @@ text = "Pinscher Raivoso"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="planta_carnivora" type="Node2D" parent="EntidadesPendentes"]
+[node name="planta_carnivora" type="Node2D" parent="EntidadesPendentes" unique_id=1514885764]
 position = Vector2(470, 1830)
 metadata/source_resource = "res://resources/entities/entities_general/planta_carnivora.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/planta_carnivora"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/planta_carnivora" unique_id=306099898]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/planta_carnivora"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/planta_carnivora" unique_id=699015367]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/planta_carnivora"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/planta_carnivora" unique_id=2044324496]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -1115,26 +1170,25 @@ text = "Planta Carnívora"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="pomba_maligna" type="Node2D" parent="EntidadesPendentes"]
+[node name="pomba_maligna" type="Node2D" parent="EntidadesPendentes" unique_id=475369228]
 position = Vector2(770, 1830)
 metadata/source_resource = "res://resources/entities/entities_general/pomba_maligna.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/pomba_maligna"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/pomba_maligna" unique_id=2070107958]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/pomba_maligna"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/pomba_maligna" unique_id=61965852]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/pomba_maligna"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/pomba_maligna" unique_id=1199329637]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -1145,26 +1199,25 @@ text = "Pomba Maligna"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="raizes_mutantes" type="Node2D" parent="EntidadesPendentes"]
+[node name="raizes_mutantes" type="Node2D" parent="EntidadesPendentes" unique_id=922156084]
 position = Vector2(1070, 1830)
 metadata/source_resource = "res://resources/entities/entities_general/raizes_mutantes.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/raizes_mutantes"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/raizes_mutantes" unique_id=603328069]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/raizes_mutantes"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/raizes_mutantes" unique_id=543400014]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/raizes_mutantes"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/raizes_mutantes" unique_id=791207562]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -1175,26 +1228,25 @@ text = "Raízes Mutantes"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="rato_mutante_do_baixo_centro" type="Node2D" parent="EntidadesPendentes"]
+[node name="rato_mutante_do_baixo_centro" type="Node2D" parent="EntidadesPendentes" unique_id=724018642]
 position = Vector2(1370, 1830)
 metadata/source_resource = "res://resources/entities/entities_general/rato_mutante_do_baixo_centro.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/rato_mutante_do_baixo_centro"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/rato_mutante_do_baixo_centro" unique_id=1975707050]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/rato_mutante_do_baixo_centro"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/rato_mutante_do_baixo_centro" unique_id=84162353]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/rato_mutante_do_baixo_centro"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/rato_mutante_do_baixo_centro" unique_id=1766984514]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -1205,26 +1257,25 @@ text = "Rato-Mutante do Baixo-Centro"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="servo_invocador_1" type="Node2D" parent="EntidadesPendentes"]
+[node name="servo_invocador_1" type="Node2D" parent="EntidadesPendentes" unique_id=927767410]
 position = Vector2(170, 2010)
 metadata/source_resource = "res://resources/entities/entities_general/servo_invocador_1.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/servo_invocador_1"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/servo_invocador_1" unique_id=580301838]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/servo_invocador_1"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/servo_invocador_1" unique_id=515980047]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/servo_invocador_1"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/servo_invocador_1" unique_id=1243743082]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -1235,26 +1286,25 @@ text = "Servo Invocador 1"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="servo_invocador_2" type="Node2D" parent="EntidadesPendentes"]
+[node name="servo_invocador_2" type="Node2D" parent="EntidadesPendentes" unique_id=237812854]
 position = Vector2(470, 2010)
 metadata/source_resource = "res://resources/entities/entities_general/servo_invocador_2.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/servo_invocador_2"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/servo_invocador_2" unique_id=740761486]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/servo_invocador_2"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/servo_invocador_2" unique_id=1267508749]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/servo_invocador_2"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/servo_invocador_2" unique_id=868940465]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -1265,26 +1315,25 @@ text = "Servo Invocador 2"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="sombra_disforme" type="Node2D" parent="EntidadesPendentes"]
+[node name="sombra_disforme" type="Node2D" parent="EntidadesPendentes" unique_id=1158142575]
 position = Vector2(770, 2010)
 metadata/source_resource = "res://resources/entities/entities_general/sombra_disforme.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/sombra_disforme"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/sombra_disforme" unique_id=86068303]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/sombra_disforme"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/sombra_disforme" unique_id=1884383070]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/sombra_disforme"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/sombra_disforme" unique_id=844707549]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -1295,26 +1344,25 @@ text = "Sombra Disforme"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="uma_versao_do_mal" type="Node2D" parent="EntidadesPendentes"]
+[node name="uma_versao_do_mal" type="Node2D" parent="EntidadesPendentes" unique_id=331919280]
 position = Vector2(1070, 2010)
 metadata/source_resource = "res://resources/entities/entities_general/uma_versao_do_mal.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/uma_versao_do_mal"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/uma_versao_do_mal" unique_id=972383746]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/uma_versao_do_mal"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/uma_versao_do_mal" unique_id=134088632]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/uma_versao_do_mal"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/uma_versao_do_mal" unique_id=970803358]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -1325,26 +1373,25 @@ text = "Uma versão igual a você só que do mal"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="vilao_tipicamente_do_mal" type="Node2D" parent="EntidadesPendentes"]
+[node name="vilao_tipicamente_do_mal" type="Node2D" parent="EntidadesPendentes" unique_id=749172100]
 position = Vector2(1370, 2010)
 metadata/source_resource = "res://resources/entities/entities_general/vilao_tipicamente_do_mal.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/vilao_tipicamente_do_mal"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/vilao_tipicamente_do_mal" unique_id=355569116]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/vilao_tipicamente_do_mal"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/vilao_tipicamente_do_mal" unique_id=698775233]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/vilao_tipicamente_do_mal"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/vilao_tipicamente_do_mal" unique_id=970114952]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -1355,26 +1402,25 @@ text = "Vilão-Tipicamente Do Mal"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="zumbi_dancarino" type="Node2D" parent="EntidadesPendentes"]
+[node name="zumbi_dancarino" type="Node2D" parent="EntidadesPendentes" unique_id=1676531474]
 position = Vector2(170, 2190)
 metadata/source_resource = "res://resources/entities/entities_general/zumbi_dancarino.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/zumbi_dancarino"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/zumbi_dancarino" unique_id=20685383]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/zumbi_dancarino"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/zumbi_dancarino" unique_id=1511403284]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/zumbi_dancarino"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/zumbi_dancarino" unique_id=1169708036]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0
@@ -1385,26 +1431,25 @@ text = "Zumbi Dançarino"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="zumbi_que_taca_gosma" type="Node2D" parent="EntidadesPendentes"]
+[node name="zumbi_que_taca_gosma" type="Node2D" parent="EntidadesPendentes" unique_id=620426918]
 position = Vector2(470, 2190)
 metadata/source_resource = "res://resources/entities/entities_general/zumbi_que_taca_gosma.tres"
 metadata/pending_sprite = true
 
-[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/zumbi_que_taca_gosma"]
+[node name="Espaco" type="ColorRect" parent="EntidadesPendentes/zumbi_que_taca_gosma" unique_id=1922250430]
 offset_left = -90.0
 offset_top = -145.0
 offset_right = 90.0
-offset_bottom = 0.0
 mouse_filter = 2
 color = Color(0.1, 0.12, 0.14, 1)
 
-[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/zumbi_que_taca_gosma"]
+[node name="Sprite" type="Sprite2D" parent="EntidadesPendentes/zumbi_que_taca_gosma" unique_id=1777378289]
 texture_filter = 1
 offset = Vector2(0, -48)
 metadata/base_scale = 1.0
 metadata/reference_fixed = false
 
-[node name="Nome" type="Label" parent="EntidadesPendentes/zumbi_que_taca_gosma"]
+[node name="Nome" type="Label" parent="EntidadesPendentes/zumbi_que_taca_gosma" unique_id=1258547769]
 offset_left = -135.0
 offset_top = 9.0
 offset_right = 135.0

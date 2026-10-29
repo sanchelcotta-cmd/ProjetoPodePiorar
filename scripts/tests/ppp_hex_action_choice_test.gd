@@ -9,7 +9,7 @@ func _initialize() -> void:
 
 func _run_test() -> void:
 	root.size = Vector2i(1152, 648)
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var exploration := scene.get_node("ExplorationManager") as ExplorationManager
@@ -128,7 +128,7 @@ func _run_test() -> void:
 	resolved_hexes.free()
 
 	# Verifica também o outro caminho: botão da ficha antes do clique no hex.
-	var walk_scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var walk_scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(walk_scene)
 	await process_frame
 	var walk_gerencia := walk_scene.get_node("GerenciaJogo") as GerenciaJogo
@@ -147,7 +147,7 @@ func _run_test() -> void:
 	check(walk_exploration.current_actor.position == coord and not walk_hud.hex_choice.visible,
 		"Depois de escolher Andar até na ficha, clicar no hex move diretamente.")
 
-	var pedreiro_scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var pedreiro_scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(pedreiro_scene)
 	await process_frame
 	var pedreiro_exploration := pedreiro_scene.get_node("ExplorationManager") as ExplorationManager
@@ -189,7 +189,7 @@ func _run_test() -> void:
 		and not popup.overlay.visible,
 		"A escolha executa Quebra da Parede e destrói o Evento.")
 
-	var normal_scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var normal_scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(normal_scene)
 	await process_frame
 	var normal_exploration := normal_scene.get_node("ExplorationManager") as ExplorationManager

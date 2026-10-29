@@ -5,7 +5,7 @@ extends Control
 ## O jogo sorteia vagas restantes sem repetição; a campanha sempre recebe
 ## três personagens diferentes em Playable_1, 2 e 3.
 const CARD_SCENE := preload("res://scenes/ui/playable_selection_card.tscn")
-const GAME_SCENE_PATH := "res://teste.tscn"
+const GAME_SCENE_PATH := "res://scenes/game/campaign_game.tscn"
 const LOADING_OVERLAY_SCRIPT := preload("res://scripts/ui/scene_loading_overlay.gd")
 const PREGAME_SCENE := preload("res://scenes/ui/campaign_pregame_summary.tscn")
 const LOAD_PANEL_SCRIPT := preload("res://scripts/ui/campaign_load_panel.gd")
@@ -13,6 +13,7 @@ const DETAIL_PANEL_SCRIPT := preload("res://scripts/ui/playable_selection_detail
 const DIALOG_STYLE := preload("res://scripts/ui/game_dialog_style.gd")
 const NARRATIVE_FONT := preload("res://scripts/ui/ui_narrative_font.gd")
 const BOLD_FONT := preload("res://fonts/UbuntuSans-Bold.ttf")
+const KEYBOARD_NAV := preload("res://scripts/ui/keyboard_button_navigation.gd")
 const CARD_HEIGHT := 320.0
 const CARD_MIN_WIDTH := 166.0
 const CARD_GAP := 8.0
@@ -64,6 +65,7 @@ var _card_page := 0
 var _cards_per_page := CARDS_PER_PAGE
 var _difficulty_info: AcceptDialog
 var _loading_save := false
+var _keyboard_navigation := KEYBOARD_NAV.new()
 
 
 func _ready() -> void:
@@ -170,6 +172,16 @@ func _ready() -> void:
 		_status.text = "São necessários ao menos três personagens cadastrados."
 	if ProjectSettings.get_setting("ppp/profile_startup", false):
 		print("PPP_DETAIL selection total %d ms" % (Time.get_ticks_msec() - profile_start))
+	_keyboard_navigation.reset(self)
+
+
+func _input(event: InputEvent) -> void:
+	if _loading_save or (_load_panel != null and _load_panel.visible) \
+			or (_detail_panel != null and _detail_panel.visible) \
+			or (_difficulty_info != null and _difficulty_info.visible):
+		return
+	if _keyboard_navigation.handle(event, self):
+		get_viewport().set_input_as_handled()
 
 
 func _update_layout() -> void:

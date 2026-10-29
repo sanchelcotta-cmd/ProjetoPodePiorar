@@ -8,13 +8,14 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo
 	var combat := scene.get_node("CombatManager") as CombatManager
 	var skills := scene.get_node("SkillManager") as SkillManager
 	var hud := scene.get_node("PartyStatusHUD") as PartyStatusHUD
+	var top_bar := scene.get_node("CampaignTopBar") as CampaignTopBar
 	var selected: Array[EntityData] = [
 		load("res://resources/entities/entities_playable/universitario.tres"),
 		load("res://resources/entities/entities_playable/cozinheiro.tres"),
@@ -34,24 +35,39 @@ func _run() -> void:
 	student.position = Vector2i(0, 0)
 	var target_data := load("res://resources/entities/entities_general/zumbi_dancarino.tres") as EntityData
 	var attack_target := EntityState.from_encounter_member(target_data, &"native", 9, Vector2i(1, 0))
+	# O alvo precisa sobreviver às duas investidas para testar o segundo ciclo,
+	# não encerrar o combate após o primeiro golpe.
+	attack_target.max_health = 1000
+	attack_target.current_health = 1000
 	combat.enemies.append(attack_target)
 	combat._turn_die = 3
 	_check(combat._resolve_attack(student, attack_target).get("success", false) \
 		and combat._attacks_used == 1 and combat._turn_die == 0 \
 		and not combat.can_roll_player_turn_die(),
 		"O primeiro ataque consome o dado, sem permitir nova rolagem gratuita.")
+	hud._sync_slots()
+	hud._open_card = hud.cards[0]
+	hud._rebuild_action_buttons()
+	_check(hud.walk_button.disabled,
+		"Antes do consumo, o botão de jogar dado permanece indisponível.")
 	var food := load("res://resources/itens/consumables/bolinho_de_chuva.tres") as ItemData
 	var inventory := InventoryManager.new()
 	_check(inventory.add_item(student, food), "Universitário recebe consumível.")
 	var first := student.inventory_items[0]
-	_check(inventory.use_consumable(student, first, skills, campaign, null, null, combat).get(
-		"success", false), "Consumo no combate é executado.")
+	_check(not inventory.use_consumable(student, first, skills, campaign).get(
+		"success", false) and first in student.inventory_items,
+		"Sem contexto de combate, o item não é gasto nem a passiva perdida.")
+	var group_menu := top_bar.group_inventory.item_menu
+	_check(top_bar.group_inventory.combat_manager == combat \
+		and group_menu.combat_manager == combat,
+		"Inventário do grupo entrega o combate ao menu de itens antes da abertura.")
+	group_menu.open_for(student, first, false, Rect2(100, 100, 1, 1), campaign, skills)
+	group_menu._consume()
+	_check(first not in student.inventory_items,
+		"Consumo pelo menu real do inventário do grupo é executado.")
 	_check(student.extra_attacks_this_turn == 1 \
 		and combat.can_roll_player_turn_die(),
 		"Após o primeiro ataque e o consumo, surge uma nova rolagem.")
-	hud._sync_slots()
-	hud._open_card = hud.cards[0]
-	hud._rebuild_action_buttons()
 	_check(not hud.walk_button.disabled and hud.skill_buttons.get_child_count() >= 2 \
 		and (hud.skill_buttons.get_child(1) as Button).disabled,
 		"A interface oferece Jogar Dado e segura Atacar até a nova rolagem.")
@@ -156,6 +172,8 @@ func _run() -> void:
 	_check(familiarity.size() == 1 and old_lady.attack == old_attack \
 		and int(familiarity[0]["effects"][0].get("current_attack_bonus", 0)) == 3,
 		"Velha recebe +3 somente no ataque ao tipo de inimigo já enfrentado.")
+	root.remove_child(scene)
+	scene.free()
 	print("NATIVE_PASSIVE_COMBAT_TEST_OK" if failures == 0 else \
 		"NATIVE_PASSIVE_COMBAT_TEST_FAILED: %d" % failures)
 	quit(1 if failures > 0 else 0)

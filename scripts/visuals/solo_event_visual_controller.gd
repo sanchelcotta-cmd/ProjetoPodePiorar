@@ -157,8 +157,6 @@ func _dismiss_return_dialog() -> void:
 	_dialog_layer.hide()
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if _dialog_layer != null and _dialog_layer.visible \
-			and _dialog_kind == &"return" and event.is_action_pressed("ui_cancel"):
-		_dismiss_return_dialog()
-		get_viewport().set_input_as_handled()
+func _unhandled_input(_event: InputEvent) -> void:
+	# O retorno exige o botão visível; Esc não confirma o aviso.
+	pass

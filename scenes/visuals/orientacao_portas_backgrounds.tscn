@@ -1,0 +1,632 @@
+[gd_scene format=3 uid="uid://dthd7bj8r4kgp"]
+
+[ext_resource type="Texture2D" uid="uid://fw0umywlxwwe" path="res://sprites/background/cena_suburbio_0001.png" id="bg_1"]
+[ext_resource type="Texture2D" uid="uid://dabylwk68yg72" path="res://sprites/background/cena_suburbio_0002.png" id="bg_2"]
+[ext_resource type="Texture2D" uid="uid://xksbavgi36ro" path="res://sprites/background/cena_suburbio_0003.png" id="bg_3"]
+[ext_resource type="Texture2D" uid="uid://d4i3j0foj6lv0" path="res://sprites/background/cena_baixocentro_0001.png" id="bg_4"]
+[ext_resource type="Texture2D" uid="uid://dgbndbdtqsggj" path="res://sprites/background/cena_baixocentro_0002.png" id="bg_5"]
+[ext_resource type="Texture2D" uid="uid://cjiuaqxjnpl5a" path="res://sprites/background/cena_centro_0001.png" id="bg_6"]
+[ext_resource type="Texture2D" uid="uid://j7ugx53lyubo" path="res://sprites/background/cena_centro_0002.png" id="bg_7"]
+
+[node name="OrientacaoPortasBackgrounds" type="Node2D" unique_id=967614566]
+metadata/_editor_description = "Referência editorial. Selecione Porta_XX na árvore e arraste/redimensione a borda rosa no editor 2D. As áreas são rascunhos; revise e salve. Esta cena ainda não altera os mapas."
+
+[node name="FundoDeEdicao" type="ColorRect" parent="." unique_id=17248050]
+offset_left = 2.0
+offset_right = 1212.0
+offset_bottom = 3700.0
+mouse_filter = 2
+color = Color(0.055, 0.068, 0.082, 1)
+
+[node name="Titulo" type="Label" parent="." unique_id=1232916741]
+offset_left = 50.0
+offset_top = 20.0
+offset_right = 1150.0
+offset_bottom = 50.0
+theme_override_colors/font_color = Color(0.35, 0.87, 0.94, 1)
+theme_override_font_sizes/font_size = 25
+text = "ORIENTAÇÃO DE PORTAS · BACKGROUNDS"
+
+[node name="Instrucao" type="Label" parent="." unique_id=1016556121]
+offset_left = 50.0
+offset_top = 55.0
+offset_right = 1160.0
+offset_bottom = 130.0
+theme_override_colors/font_color = Color(0.85, 0.9, 0.94, 1)
+theme_override_font_sizes/font_size = 15
+text = "Contornos rosa: entradas que devem ficar livres. Selecione Porta_XX na árvore e arraste as bordas no editor 2D. Ctrl+D duplica; Delete remove. Revise todos os rascunhos antes de usar na geração de decorações."
+autowrap_mode = 3
+
+[node name="Fachadas" type="Node2D" parent="." unique_id=1984400643]
+
+[node name="Suburbio_0001" type="Node2D" parent="Fachadas" unique_id=1943724442]
+position = Vector2(55, 150)
+metadata/source_background = "res://sprites/background/cena_suburbio_0001.png"
+metadata/revisao = "rascunho: confirmar entradas e largura do corredor até a calçada"
+
+[node name="Nome" type="Label" parent="Fachadas/Suburbio_0001" unique_id=40615461]
+offset_right = 1110.0
+offset_bottom = 31.0
+theme_override_colors/font_color = Color(1, 0.7, 0.82, 1)
+theme_override_font_sizes/font_size = 18
+text = "cena_suburbio_0001.png  ·  5 marcações iniciais"
+
+[node name="Imagem" type="Sprite2D" parent="Fachadas/Suburbio_0001" unique_id=30508651]
+position = Vector2(0, 38)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("bg_1")
+centered = false
+
+[node name="Portas" type="Node2D" parent="Fachadas/Suburbio_0001" unique_id=1306568956]
+position = Vector2(0, 38)
+scale = Vector2(0.5, 0.5)
+metadata/_editor_description = "As posições destes ReferenceRect são medidas em pixels da imagem original. Selecione um contorno e arraste suas bordas. Inclua a passagem livre até a calçada, não apenas a folha da porta."
+
+[node name="Porta_01" type="ReferenceRect" parent="Fachadas/Suburbio_0001/Portas" unique_id=1123434760]
+offset_left = 130.0
+offset_top = 424.0
+offset_right = 227.0
+offset_bottom = 664.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_02" type="ReferenceRect" parent="Fachadas/Suburbio_0001/Portas" unique_id=1839680522]
+offset_left = 474.0
+offset_top = 458.0
+offset_right = 568.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_03" type="ReferenceRect" parent="Fachadas/Suburbio_0001/Portas" unique_id=1799788112]
+offset_left = 908.0
+offset_top = 416.0
+offset_right = 1008.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_04" type="ReferenceRect" parent="Fachadas/Suburbio_0001/Portas" unique_id=1639074305]
+offset_left = 1251.0
+offset_top = 429.0
+offset_right = 1360.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_05" type="ReferenceRect" parent="Fachadas/Suburbio_0001/Portas" unique_id=128980308]
+offset_left = 1612.0
+offset_top = 443.0
+offset_right = 1787.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Suburbio_0002" type="Node2D" parent="Fachadas" unique_id=701909219]
+position = Vector2(55, 630)
+metadata/source_background = "res://sprites/background/cena_suburbio_0002.png"
+metadata/revisao = "rascunho: confirmar entradas e largura do corredor até a calçada"
+
+[node name="Nome" type="Label" parent="Fachadas/Suburbio_0002" unique_id=451925821]
+offset_right = 1110.0
+offset_bottom = 31.0
+theme_override_colors/font_color = Color(1, 0.7, 0.82, 1)
+theme_override_font_sizes/font_size = 18
+text = "cena_suburbio_0002.png  ·  5 marcações iniciais"
+
+[node name="Imagem" type="Sprite2D" parent="Fachadas/Suburbio_0002" unique_id=494135438]
+position = Vector2(0, 38)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("bg_2")
+centered = false
+
+[node name="Portas" type="Node2D" parent="Fachadas/Suburbio_0002" unique_id=1985797231]
+position = Vector2(0, 38)
+scale = Vector2(0.5, 0.5)
+metadata/_editor_description = "As posições destes ReferenceRect são medidas em pixels da imagem original. Selecione um contorno e arraste suas bordas. Inclua a passagem livre até a calçada, não apenas a folha da porta."
+
+[node name="Porta_01" type="ReferenceRect" parent="Fachadas/Suburbio_0002/Portas" unique_id=887995575]
+offset_left = 45.0
+offset_top = 386.0
+offset_right = 155.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_02" type="ReferenceRect" parent="Fachadas/Suburbio_0002/Portas" unique_id=1235354215]
+offset_left = 370.0
+offset_top = 390.0
+offset_right = 480.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_03" type="ReferenceRect" parent="Fachadas/Suburbio_0002/Portas" unique_id=113210279]
+offset_left = 804.0
+offset_top = 402.0
+offset_right = 938.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_04" type="ReferenceRect" parent="Fachadas/Suburbio_0002/Portas" unique_id=591368533]
+offset_left = 1485.0
+offset_top = 385.0
+offset_right = 1603.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_05" type="ReferenceRect" parent="Fachadas/Suburbio_0002/Portas" unique_id=1803854198]
+offset_left = 1680.0
+offset_top = 392.0
+offset_right = 1790.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Suburbio_0003" type="Node2D" parent="Fachadas" unique_id=1931053619]
+position = Vector2(55, 1110)
+metadata/source_background = "res://sprites/background/cena_suburbio_0003.png"
+metadata/revisao = "rascunho: confirmar entradas e largura do corredor até a calçada"
+
+[node name="Nome" type="Label" parent="Fachadas/Suburbio_0003" unique_id=610986409]
+offset_right = 1110.0
+offset_bottom = 31.0
+theme_override_colors/font_color = Color(1, 0.7, 0.82, 1)
+theme_override_font_sizes/font_size = 18
+text = "cena_suburbio_0003.png  ·  5 marcações iniciais"
+
+[node name="Imagem" type="Sprite2D" parent="Fachadas/Suburbio_0003" unique_id=2048125712]
+position = Vector2(0, 38)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("bg_3")
+centered = false
+
+[node name="Portas" type="Node2D" parent="Fachadas/Suburbio_0003" unique_id=1461789411]
+position = Vector2(0, 38)
+scale = Vector2(0.5, 0.5)
+metadata/_editor_description = "As posições destes ReferenceRect são medidas em pixels da imagem original. Selecione um contorno e arraste suas bordas. Inclua a passagem livre até a calçada, não apenas a folha da porta."
+
+[node name="Porta_01" type="ReferenceRect" parent="Fachadas/Suburbio_0003/Portas" unique_id=967162107]
+offset_top = 585.0
+offset_right = 105.0
+offset_bottom = 860.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_03" type="ReferenceRect" parent="Fachadas/Suburbio_0003/Portas" unique_id=1015188387]
+offset_left = 450.0
+offset_top = 617.0
+offset_right = 570.0
+offset_bottom = 860.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_04" type="ReferenceRect" parent="Fachadas/Suburbio_0003/Portas" unique_id=562683063]
+offset_left = 1080.0
+offset_top = 576.0
+offset_right = 1190.0
+offset_bottom = 860.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_05" type="ReferenceRect" parent="Fachadas/Suburbio_0003/Portas" unique_id=1043795957]
+offset_left = 1460.0
+offset_top = 585.0
+offset_right = 1536.0
+offset_bottom = 860.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="BaixoCentro_0001" type="Node2D" parent="Fachadas" unique_id=1344324661]
+position = Vector2(55, 1740)
+metadata/source_background = "res://sprites/background/cena_baixocentro_0001.png"
+metadata/revisao = "rascunho: confirmar entradas e largura do corredor até a calçada"
+
+[node name="Nome" type="Label" parent="Fachadas/BaixoCentro_0001" unique_id=911002039]
+offset_right = 1110.0
+offset_bottom = 31.0
+theme_override_colors/font_color = Color(1, 0.7, 0.82, 1)
+theme_override_font_sizes/font_size = 18
+text = "cena_baixocentro_0001.png  ·  5 marcações iniciais"
+
+[node name="Imagem" type="Sprite2D" parent="Fachadas/BaixoCentro_0001" unique_id=1371938518]
+position = Vector2(0, 38)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("bg_4")
+centered = false
+
+[node name="Portas" type="Node2D" parent="Fachadas/BaixoCentro_0001" unique_id=2002893415]
+position = Vector2(0, 38)
+scale = Vector2(0.5, 0.5)
+metadata/_editor_description = "As posições destes ReferenceRect são medidas em pixels da imagem original. Selecione um contorno e arraste suas bordas. Inclua a passagem livre até a calçada, não apenas a folha da porta."
+
+[node name="Porta_01" type="ReferenceRect" parent="Fachadas/BaixoCentro_0001/Portas" unique_id=1427492010]
+offset_left = 75.0
+offset_top = 442.0
+offset_right = 165.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_02" type="ReferenceRect" parent="Fachadas/BaixoCentro_0001/Portas" unique_id=586754354]
+offset_left = 520.0
+offset_top = 424.0
+offset_right = 646.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_03" type="ReferenceRect" parent="Fachadas/BaixoCentro_0001/Portas" unique_id=590783539]
+offset_left = 850.0
+offset_top = 423.0
+offset_right = 956.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_04" type="ReferenceRect" parent="Fachadas/BaixoCentro_0001/Portas" unique_id=593391343]
+offset_left = 1305.0
+offset_top = 424.0
+offset_right = 1414.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_05" type="ReferenceRect" parent="Fachadas/BaixoCentro_0001/Portas" unique_id=1187763821]
+offset_left = 1968.0
+offset_top = 420.0
+offset_right = 2081.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="BaixoCentro_0002" type="Node2D" parent="Fachadas" unique_id=855339761]
+position = Vector2(55, 2220)
+metadata/source_background = "res://sprites/background/cena_baixocentro_0002.png"
+metadata/revisao = "rascunho: confirmar entradas e largura do corredor até a calçada"
+
+[node name="Nome" type="Label" parent="Fachadas/BaixoCentro_0002" unique_id=1685433881]
+offset_right = 1110.0
+offset_bottom = 31.0
+theme_override_colors/font_color = Color(1, 0.7, 0.82, 1)
+theme_override_font_sizes/font_size = 18
+text = "cena_baixocentro_0002.png  ·  8 marcações iniciais"
+
+[node name="Imagem" type="Sprite2D" parent="Fachadas/BaixoCentro_0002" unique_id=1449142921]
+position = Vector2(0, 38)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("bg_5")
+centered = false
+
+[node name="Portas" type="Node2D" parent="Fachadas/BaixoCentro_0002" unique_id=381820239]
+position = Vector2(0, 38)
+scale = Vector2(0.5, 0.5)
+metadata/_editor_description = "As posições destes ReferenceRect são medidas em pixels da imagem original. Selecione um contorno e arraste suas bordas. Inclua a passagem livre até a calçada, não apenas a folha da porta."
+
+[node name="Porta_01" type="ReferenceRect" parent="Fachadas/BaixoCentro_0002/Portas" unique_id=482236027]
+offset_left = 145.0
+offset_top = 430.0
+offset_right = 255.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_02" type="ReferenceRect" parent="Fachadas/BaixoCentro_0002/Portas" unique_id=1542378837]
+offset_left = 340.0
+offset_top = 445.0
+offset_right = 520.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_03" type="ReferenceRect" parent="Fachadas/BaixoCentro_0002/Portas" unique_id=1847776776]
+offset_left = 795.0
+offset_top = 425.0
+offset_right = 905.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_04" type="ReferenceRect" parent="Fachadas/BaixoCentro_0002/Portas" unique_id=212646618]
+offset_left = 990.0
+offset_top = 420.0
+offset_right = 1129.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_05" type="ReferenceRect" parent="Fachadas/BaixoCentro_0002/Portas" unique_id=1076013007]
+offset_left = 1285.0
+offset_top = 485.0
+offset_right = 1638.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_06" type="ReferenceRect" parent="Fachadas/BaixoCentro_0002/Portas" unique_id=868186794]
+offset_left = 1690.0
+offset_top = 445.0
+offset_right = 1790.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_07" type="ReferenceRect" parent="Fachadas/BaixoCentro_0002/Portas" unique_id=1889392999]
+offset_left = 1835.0
+offset_top = 425.0
+offset_right = 1945.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_08" type="ReferenceRect" parent="Fachadas/BaixoCentro_0002/Portas" unique_id=726493565]
+offset_left = 1990.0
+offset_top = 427.0
+offset_right = 2100.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Centro_0001" type="Node2D" parent="Fachadas" unique_id=1721354276]
+position = Vector2(55, 2700)
+metadata/source_background = "res://sprites/background/cena_centro_0001.png"
+metadata/revisao = "rascunho: confirmar entradas e largura do corredor até a calçada"
+
+[node name="Nome" type="Label" parent="Fachadas/Centro_0001" unique_id=827773353]
+offset_right = 1110.0
+offset_bottom = 31.0
+theme_override_colors/font_color = Color(1, 0.7, 0.82, 1)
+theme_override_font_sizes/font_size = 18
+text = "cena_centro_0001.png  ·  13 marcações iniciais"
+
+[node name="Imagem" type="Sprite2D" parent="Fachadas/Centro_0001" unique_id=1782035117]
+position = Vector2(0, 38)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("bg_6")
+centered = false
+
+[node name="Portas" type="Node2D" parent="Fachadas/Centro_0001" unique_id=1031362536]
+position = Vector2(0, 38)
+scale = Vector2(0.5, 0.5)
+metadata/_editor_description = "As posições destes ReferenceRect são medidas em pixels da imagem original. Selecione um contorno e arraste suas bordas. Inclua a passagem livre até a calçada, não apenas a folha da porta."
+
+[node name="Porta_01" type="ReferenceRect" parent="Fachadas/Centro_0001/Portas" unique_id=771867781]
+offset_left = 34.0
+offset_top = 445.0
+offset_right = 145.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_02" type="ReferenceRect" parent="Fachadas/Centro_0001/Portas" unique_id=472132443]
+offset_left = 160.0
+offset_top = 457.0
+offset_right = 334.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_03" type="ReferenceRect" parent="Fachadas/Centro_0001/Portas" unique_id=1800605097]
+offset_left = 350.0
+offset_top = 482.0
+offset_right = 440.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_04" type="ReferenceRect" parent="Fachadas/Centro_0001/Portas" unique_id=2146239324]
+offset_left = 560.0
+offset_top = 465.0
+offset_right = 642.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_05" type="ReferenceRect" parent="Fachadas/Centro_0001/Portas" unique_id=91371144]
+offset_left = 670.0
+offset_top = 485.0
+offset_right = 815.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_06" type="ReferenceRect" parent="Fachadas/Centro_0001/Portas" unique_id=602362484]
+offset_left = 918.0
+offset_top = 420.0
+offset_right = 1017.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_07" type="ReferenceRect" parent="Fachadas/Centro_0001/Portas" unique_id=898795135]
+offset_left = 1062.0
+offset_top = 420.0
+offset_right = 1173.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_08" type="ReferenceRect" parent="Fachadas/Centro_0001/Portas" unique_id=1969736010]
+offset_left = 1210.0
+offset_top = 420.0
+offset_right = 1312.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_09" type="ReferenceRect" parent="Fachadas/Centro_0001/Portas" unique_id=358411393]
+offset_left = 1455.0
+offset_top = 476.0
+offset_right = 1545.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_10" type="ReferenceRect" parent="Fachadas/Centro_0001/Portas" unique_id=1793934918]
+offset_left = 1530.0
+offset_top = 478.0
+offset_right = 1602.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_11" type="ReferenceRect" parent="Fachadas/Centro_0001/Portas" unique_id=774394412]
+offset_left = 1760.0
+offset_top = 450.0
+offset_right = 1850.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_12" type="ReferenceRect" parent="Fachadas/Centro_0001/Portas" unique_id=399700092]
+offset_left = 1882.0
+offset_top = 448.0
+offset_right = 1958.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_13" type="ReferenceRect" parent="Fachadas/Centro_0001/Portas" unique_id=569104912]
+offset_left = 2020.0
+offset_top = 452.0
+offset_right = 2126.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Centro_0002" type="Node2D" parent="Fachadas" unique_id=370456427]
+position = Vector2(55, 3180)
+metadata/source_background = "res://sprites/background/cena_centro_0002.png"
+metadata/revisao = "rascunho: confirmar entradas e largura do corredor até a calçada"
+
+[node name="Nome" type="Label" parent="Fachadas/Centro_0002" unique_id=919989476]
+offset_right = 1110.0
+offset_bottom = 31.0
+theme_override_colors/font_color = Color(1, 0.7, 0.82, 1)
+theme_override_font_sizes/font_size = 18
+text = "cena_centro_0002.png  ·  8 marcações iniciais"
+
+[node name="Imagem" type="Sprite2D" parent="Fachadas/Centro_0002" unique_id=1262730275]
+position = Vector2(0, 38)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("bg_7")
+centered = false
+
+[node name="Portas" type="Node2D" parent="Fachadas/Centro_0002" unique_id=2020155395]
+position = Vector2(0, 38)
+scale = Vector2(0.5, 0.5)
+metadata/_editor_description = "As posições destes ReferenceRect são medidas em pixels da imagem original. Selecione um contorno e arraste suas bordas. Inclua a passagem livre até a calçada, não apenas a folha da porta."
+
+[node name="Porta_01" type="ReferenceRect" parent="Fachadas/Centro_0002/Portas" unique_id=695111766]
+offset_left = 240.0
+offset_top = 505.0
+offset_right = 444.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_02" type="ReferenceRect" parent="Fachadas/Centro_0002/Portas" unique_id=450697925]
+offset_left = 655.0
+offset_top = 460.0
+offset_right = 747.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_03" type="ReferenceRect" parent="Fachadas/Centro_0002/Portas" unique_id=203481878]
+offset_left = 750.0
+offset_top = 460.0
+offset_right = 853.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_04" type="ReferenceRect" parent="Fachadas/Centro_0002/Portas" unique_id=79911473]
+offset_left = 860.0
+offset_top = 460.0
+offset_right = 970.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_05" type="ReferenceRect" parent="Fachadas/Centro_0002/Portas" unique_id=270791548]
+offset_left = 1050.0
+offset_top = 470.0
+offset_right = 1140.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_06" type="ReferenceRect" parent="Fachadas/Centro_0002/Portas" unique_id=623807333]
+offset_left = 1490.0
+offset_top = 474.0
+offset_right = 1590.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_07" type="ReferenceRect" parent="Fachadas/Centro_0002/Portas" unique_id=11064514]
+offset_left = 1610.0
+offset_top = 475.0
+offset_right = 1710.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0
+
+[node name="Porta_08" type="ReferenceRect" parent="Fachadas/Centro_0002/Portas" unique_id=1316070980]
+offset_left = 1830.0
+offset_top = 490.0
+offset_right = 1930.0
+offset_bottom = 724.0
+mouse_filter = 2
+border_color = Color(1, 0.25, 0.58, 1)
+border_width = 5.0

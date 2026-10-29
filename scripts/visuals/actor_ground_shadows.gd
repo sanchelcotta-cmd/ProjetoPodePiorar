@@ -3,18 +3,23 @@ extends Node2D
 
 ## Sombras suaves sob entidades, abaixo de StartZone e Hexes. A máscara
 ## radial é criada com ImageTexture nativa: centro opaco, bordas transparentes.
-## Futuro poste: adicione seu PointLight2D ao grupo ppp_streetlight e,
-## opcionalmente, defina a metadata shadow_reach (pixels de alcance).
+## Os postes reais registram seus PointLight2D em ppp_streetlight. Dentro do
+## feixe, a sombra se afasta da lâmpada junto com o movimento do personagem.
 @export var gerencia: GerenciaJogo
 @export var sky: PPPParallaxBackground
 
 const STREETLIGHT_GROUP := "ppp_streetlight"
+const ENTITY_OPACITY_FACTOR := 0.80
 
 var _falloff: Texture2D
 var _frame_bounds: Dictionary = {}
 
 
 func _ready() -> void:
+	_falloff = create_falloff_texture()
+
+
+static func create_falloff_texture() -> Texture2D:
 	var diameter := 96
 	var mask := Image.create(diameter, diameter, false, Image.FORMAT_RGBA8)
 	for y in diameter:
@@ -24,20 +29,10 @@ func _ready() -> void:
 			var radius := normalized.length()
 			var alpha: float = 1.0 - smoothstep(0.48, 1.0, radius)
 			mask.set_pixel(x, y, Color(1.0, 1.0, 1.0, alpha))
-	_falloff = ImageTexture.create_from_image(mask)
+	return ImageTexture.create_from_image(mask)
 
 
-func _process(_delta: float) -> void:
-	# Os sprites se movem por Tween, inclusive durante o Combate.
-	queue_redraw()
-
-
-func _draw() -> void:
-	if _falloff == null or gerencia == null:
-		return
-	var period := gerencia.campaign.round_period
-	var grey := sky != null \
-		and sky.active_set_path.get_file().begins_with("cinzento_")
+static func ambient_shadow_style(period: int, grey: bool) -> Dictionary:
 	var tint := Color("#103453")
 	var opacity := 0.85
 	var stretch := 1.0
@@ -58,9 +53,28 @@ func _draw() -> void:
 				tint = Color("#102747")
 				opacity = 0.84
 				stretch = 1.28
-				# Direção oposta à tarde, mas curta e difusa: sem poste,
-				# a luz do céu noturno não projeta sombra longa.
+				# Direção oposta à tarde, mas curta e difusa.
 				offset.x = -8.0
+	return {"tint": tint, "opacity": opacity,
+		"stretch": stretch, "offset": offset}
+
+
+func _process(_delta: float) -> void:
+	# Os sprites se movem por Tween, inclusive durante o Combate.
+	queue_redraw()
+
+
+func _draw() -> void:
+	if _falloff == null or gerencia == null:
+		return
+	var period := gerencia.campaign.round_period
+	var grey := sky != null \
+		and sky.active_set_path.get_file().begins_with("cinzento_")
+	var style := ambient_shadow_style(period, grey)
+	var tint: Color = style.tint
+	var opacity: float = style.opacity
+	var stretch: float = style.stretch
+	var offset: Vector2 = style.offset
 	for visual in get_tree().get_nodes_in_group("map_entity_visual"):
 		if not visual is Node2D or not visual.is_visible_in_tree():
 			continue
@@ -71,8 +85,10 @@ func _draw() -> void:
 		var actor_offset := offset
 		var actor_stretch := stretch
 		var actor_opacity := opacity
-		if not grey and period == PPPMapGenerator.RoundPeriod.NIGHT:
-			var from_post := _nearby_streetlight(feet)
+		var from_post := {}
+		# Chuva/céu cinzento não apagam os postes acesos à noite.
+		if period == PPPMapGenerator.RoundPeriod.NIGHT:
+			from_post = _nearby_streetlight(feet)
 			if not from_post.is_empty():
 				actor_offset = from_post.offset
 				actor_stretch = from_post.stretch
@@ -80,6 +96,9 @@ func _draw() -> void:
 		var comfort := get_node_or_null("/root/VisualComfort")
 		if comfort != null:
 			actor_opacity = float(comfort.call("cap_shadow_alpha", actor_opacity))
+		actor_opacity *= ENTITY_OPACITY_FACTOR
+		if not from_post.is_empty():
+			_draw_cast_shadow(feet, actor, from_post, actor_opacity)
 		var half_width := _shadow_half_width(actor) * actor_stretch
 		var half_height := maxf(13.0, half_width * 0.38 / actor_stretch)
 		var rect := Rect2(feet + actor_offset - Vector2(half_width, half_height),
@@ -89,30 +108,60 @@ func _draw() -> void:
 
 
 func _nearby_streetlight(feet: Vector2) -> Dictionary:
-	var closest_distance := INF
+	var best_score := INF
 	var chosen := Vector2.ZERO
 	var chosen_reach := 0.0
+	var chosen_delta := Vector2.ZERO
 	for candidate in get_tree().get_nodes_in_group(STREETLIGHT_GROUP):
 		var light := candidate as PointLight2D
 		if light == null or not light.enabled or not light.is_visible_in_tree():
 			continue
 		var light_position := to_local(light.global_position)
-		var reach := maxf(1.0, float(light.get_meta("shadow_reach", 260.0)))
-		var distance := feet.distance_to(light_position)
-		if distance < reach and distance < closest_distance:
-			closest_distance = distance
+		var reach := maxf(1.0, float(light.get_meta("shadow_reach", 500.0)))
+		var delta := feet - light_position
+		if delta.y <= 0.0 or delta.y >= reach:
+			continue
+		var half_width := lerpf(18.0,
+			float(light.get_meta("cone_half_width", 250.0)), delta.y / reach)
+		if absf(delta.x) >= half_width:
+			continue
+		var score := absf(delta.x) / half_width + delta.y / reach * 0.25
+		if score < best_score:
+			best_score = score
 			chosen = light_position
 			chosen_reach = reach
-	if not is_finite(closest_distance):
+			chosen_delta = delta
+	if not is_finite(best_score):
 		return {}
-	var influence := 1.0 - closest_distance / chosen_reach
-	var away := (feet - chosen).normalized()
+	var influence := 1.0 - chosen_delta.y / chosen_reach
+	var away := Vector2(chosen_delta.x * 0.8, chosen_delta.y).normalized()
 	return {
-		"offset": Vector2(away.x * (8.0 + 18.0 * influence),
-			5.0 + away.y * 3.0),
-		"stretch": 1.28 + 0.55 * influence,
+		"offset": away * (9.0 + 15.0 * influence),
+		"stretch": 1.45 + 0.55 * influence,
 		"opacity": 0.84 + 0.09 * influence,
+		"direction": away,
+		"length": 48.0 + 86.0 * influence,
 	}
+
+
+func _draw_cast_shadow(feet: Vector2, actor: Node2D,
+		from_post: Dictionary, opacity: float) -> void:
+	var away := from_post.direction as Vector2
+	var across := Vector2(-away.y, away.x)
+	var width := clampf(_shadow_half_width(actor) * 0.42, 11.0, 23.0)
+	var origin := feet + away * 5.0
+	var tip: Vector2 = feet + away * float(from_post.length)
+	var shadow := Color("#0d1430")
+	var strength := minf(0.52, opacity * 0.48)
+	draw_polygon(PackedVector2Array([
+		origin + across * width, origin - across * width,
+		tip - across * width * 1.25, tip + across * width * 1.25,
+	]), PackedColorArray([
+		Color(shadow.r, shadow.g, shadow.b, strength),
+		Color(shadow.r, shadow.g, shadow.b, strength),
+		Color(shadow.r, shadow.g, shadow.b, 0.0),
+		Color(shadow.r, shadow.g, shadow.b, 0.0),
+	]))
 
 
 func _shadow_half_width(actor: Node2D) -> float:

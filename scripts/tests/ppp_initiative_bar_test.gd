@@ -12,7 +12,7 @@ func _initialize() -> void:
 
 func _run_test() -> void:
 	root.size = Vector2i(1656, 932)
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo
@@ -154,6 +154,30 @@ func _run_test() -> void:
 			.get_shader_parameter("accent") == bar.SPENT_COLOR
 			and (spent_card["portrait"] as TextureRect).material != null,
 			"Após agir, moldura e retrato ficam cinza.")
+	# A terceira entidade morre: o quarto quadro assume imediatamente a
+	# terceira posição. Se voltar à vida, entra no último lugar da fila real.
+	var enemy_entry: Dictionary = {}
+	for entry in combat.initiative_order:
+		if entry.get("entity") == enemy:
+			enemy_entry = entry
+			break
+	combat.initiative_order.erase(enemy_entry)
+	combat.initiative_order.insert(2, enemy_entry)
+	combat.initiative_order_changed.emit()
+	var fourth := combat.initiative_order[3]["entity"] as EntityState
+	var initial_count := combat.initiative_order.size()
+	enemy.current_health = 0
+	check(combat.initiative_order.size() == initial_count - 1
+		and combat.initiative_order[2]["entity"] == fourth
+		and bar._participants.size() == initial_count - 1
+		and bar._participants[2] == fourth
+		and bar._cards.size() == initial_count - 1,
+		"Morte remove o terceiro quadro e o quarto passa à terceira posição.")
+	enemy.current_health = enemy.max_health
+	check(combat.initiative_order.size() == initial_count
+		and combat.initiative_order[-1]["entity"] == enemy
+		and bar._participants[-1] == enemy,
+		"Ressurreição durante o combate entra no fim da fila.")
 	var extra: Array[EntityState] = []
 	for index in 14:
 		var dummy := EntityState.new()

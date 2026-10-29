@@ -98,9 +98,7 @@ func _finish_show_title(request: int, anchor: Vector2) -> void:
 func _input(event: InputEvent) -> void:
 	if not visible:
 		return
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-		hide()
-	elif event is InputEventMouseButton and event.pressed \
+	if event is InputEventMouseButton and event.pressed \
 			and event.button_index == MOUSE_BUTTON_LEFT \
 			and not get_global_rect().has_point(event.position):
 		hide()

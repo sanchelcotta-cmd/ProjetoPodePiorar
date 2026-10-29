@@ -154,7 +154,7 @@ func use_tile_active(actor: EntityState, grant: SkillGrantState, coord: Vector2i
 func get_craft_options(actor: EntityState, grant: SkillGrantState, exploration: Variant) -> Array[Dictionary]:
 	var options: Array[Dictionary] = []
 	if actor == null or grant == null or exploration == null or skill_manager == null \
-			or exploration.current_actor != actor or block_manager == null:
+			or block_manager == null:
 		return options
 	var skill := grant.skill as ActiveSkillData
 	if skill == null:
@@ -178,8 +178,24 @@ func get_craft_options(actor: EntityState, grant: SkillGrantState, exploration: 
 
 
 func use_craft_active(actor: EntityState, grant: SkillGrantState, ingredient_id: StringName, result_id: StringName, exploration: Variant) -> bool:
-	return use_exploration_active(actor, grant, EntityState.UNPLACED, exploration,
-		{"ingredient_id": ingredient_id, "result_id": result_id})
+	if actor == null or grant == null or exploration == null or skill_manager == null \
+			or block_manager == null or block_manager.is_busy() or has_pending_choice() \
+			or not skill_manager.debuff_manager.can_take_action(actor):
+		return false
+	var gerencia := exploration.gerencia as GerenciaJogo
+	if gerencia == null or gerencia.campaign == null \
+			or actor not in gerencia.campaign.active_entity_states:
+		return false
+	var selection := {"ingredient_id": ingredient_id, "result_id": result_id}
+	if not skill_manager.use_exploration_active(actor, actor, grant,
+			gerencia.campaign, EntityState.UNPLACED, block_manager,
+			gerencia.map_view, false, selection):
+		return false
+	# Craft não consome nem reabre o turno de ninguém.
+	exploration.refresh_map_feedback()
+	exploration_active_resolved.emit(actor, grant.skill as ActiveSkillData,
+		EntityState.UNPLACED)
+	return true
 
 
 func consume_extra_movement(actor: EntityState, campaign: CampaignState) -> bool:

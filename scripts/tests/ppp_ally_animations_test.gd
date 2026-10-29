@@ -164,7 +164,7 @@ func _run_test() -> void:
 		check(animation != null and animation.create_sprite_frames().get_frame_count(&"idle") == 6,
 			"Cada duende usa seus seis quadros de 64×64.")
 
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo

@@ -9,7 +9,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	root.size = Vector2i(1440, 810)
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	var visuals := scene.get_node("MapRoot/CatastropheVisualController") as CatastropheVisualController
 	var profile := CatastropheVisualProfile.new()
 	profile.event_id = CampaignState.PORTAIS_INFERNAIS_EVENT_ID

@@ -16,7 +16,7 @@ func _run_test() -> void:
 	var old_scale := float(scale_service.get("ui_factor"))
 	palette.call("set_palette", "padrao", false)
 	scale_service.call("set_ui_scale", 1.0, false)
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var viewport_size := scene.get_viewport_rect().size

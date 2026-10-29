@@ -9,7 +9,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	var audio := root.get_node("GameAudio")
-	for pair in [[&"Ambience", 0.85], [&"GeneralSFX", 1.00],
+	for pair in [[&"Ambience", 0.8075], [&"GeneralSFX", 1.00],
 			[&"CombatSFX", 1.00], [&"SpecialSFX", 1.00],
 			[&"ClickUI", 1.00]]:
 		var index := AudioServer.get_bus_index(pair[0])
@@ -27,7 +27,7 @@ func _run() -> void:
 		"Silenciar Efeitos/UI silencia ambiente sem mexer em Música.")
 	audio.call("set_volume", &"effects", original_effects, false)
 	audio.call("set_volume", &"music", original_music, false)
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var ambient := scene.get_node("GameAmbientAudio") as GameAmbientAudio
@@ -83,6 +83,53 @@ func _run() -> void:
 	_check(ambient._owl_timer.time_left >= GameAmbientAudio.OWL_MIN_SECONDS - 1.0
 		and ambient._owl_timer.time_left <= GameAmbientAudio.OWL_MAX_SECONDS,
 		"Coruja espera entre um e três minutos sobre night-ambience.")
+	owner.inventory_items.append(copy)
+	ambient._refresh()
+	ambient._owl.stream = ambient._stream("owl_hooting")
+	ambient._owl.play()
+	gerencia.campaign.current_map.ppp_map_mode = HexGrid.PPPMapMode.COMBAT
+	ambient._refresh()
+	_check(ambient._base.stream_paused,
+		"Combate pausa o ambiente noturno.")
+	_check(ambient._owl.stream_paused,
+		"Combate pausa a coruja em reprodução.")
+	_check(ambient._owl_timer.paused,
+		"Combate pausa o cronômetro da coruja.")
+	_check(ambient._music_box.stream_paused,
+		"Combate pausa a caixinha de músicas.")
+	owner.inventory_items.erase(copy)
+	ambient._refresh()
+	owner.inventory_items.append(copy)
+	ambient._refresh()
+	_check(ambient._music_box_present and ambient._music_box.stream != null,
+		"Caixinha obtida durante combate prepara sua faixa.")
+	_check(ambient._music_box.stream_paused,
+		"Caixinha obtida durante combate também inicia silenciada.")
+	ambient._base.stop()
+	ambient._set_base_track("bird_park")
+	_check(ambient._base.stream_paused,
+		"Pássaros iniciados durante combate permanecem silenciados.")
+	for rain_track in GameAmbientAudio.RAIN_TRACKS:
+		ambient._base.stop()
+		ambient._set_base_track(rain_track)
+		_check(ambient._base.playing and not ambient._base.stream_paused,
+			"%s continua audível durante combate." % rain_track)
+	gerencia.campaign.current_map.ppp_map_mode = HexGrid.PPPMapMode.EXPLORATION
+	ambient._refresh()
+	ambient._base.stop()
+	ambient._set_base_track("rain_thunder")
+	gerencia.campaign.current_map.ppp_map_mode = HexGrid.PPPMapMode.COMBAT
+	ambient._refresh()
+	_check(ambient._base.playing and not ambient._base.stream_paused,
+		"Chuva que já tocava continua ao começar o combate.")
+	ambient._base.stop()
+	ambient._set_base_track("forest_birds")
+	gerencia.campaign.current_map.ppp_map_mode = HexGrid.PPPMapMode.EXPLORATION
+	ambient._refresh()
+	_check(ambient._base.playing and not ambient._base.stream_paused
+		and not ambient._music_box.stream_paused
+		and not ambient._owl_timer.paused,
+		"Exploração retoma ambiente e camadas antes silenciadas.")
 	scene.queue_free()
 	await process_frame
 	print("PPP_AMBIENT_AUDIO_TEST: %s" % ("PASS" if failures == 0 else "FAIL"))

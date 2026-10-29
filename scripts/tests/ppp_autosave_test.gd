@@ -8,7 +8,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo
@@ -66,7 +66,7 @@ func _run() -> void:
 			own_recovery_time = str(recovery["saved_at"])
 	_check(not own_recovery_time.is_empty(),
 		"Recuperação oferece data e hora após interrupção.")
-	var fresh := load("res://teste.tscn").instantiate() as PPPMapView
+	var fresh := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(fresh)
 	await process_frame
 	var restored := repository.load_autosave(campaign.campaign_id, fresh)

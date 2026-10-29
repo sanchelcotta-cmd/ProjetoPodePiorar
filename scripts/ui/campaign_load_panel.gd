@@ -1,6 +1,7 @@
 extends Control
 
 const DIALOG_STYLE := preload("res://scripts/ui/game_dialog_style.gd")
+const KEYBOARD_NAV := preload("res://scripts/ui/keyboard_button_navigation.gd")
 
 signal load_requested(campaign_id: String, slot_number: int, autosave: bool)
 signal save_requested(slot_number: int, occupied: bool)
@@ -37,6 +38,7 @@ var _summary_dialog: AcceptDialog
 var _summary_text: RichTextLabel
 var _selected_campaign_id := ""
 var _refresh_serial := 0
+var _keyboard_navigation := KEYBOARD_NAV.new()
 
 
 func _ready() -> void:
@@ -275,6 +277,7 @@ func _style_priority_button(button: Button, accent: Color) -> void:
 func open() -> void:
 	show()
 	refresh()
+	_keyboard_navigation.reset(self)
 
 
 func close() -> void:
@@ -770,10 +773,14 @@ func _display_time(value: String) -> String:
 	return value.replace("T", " ") if not value.is_empty() else "Data indisponível"
 
 
-func _unhandled_key_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if _archive_dialog.visible or _delete_dialog.visible \
 			or _abandon_dialog.visible or _summary_dialog.visible:
 		return
-	if visible and event.is_action_pressed("ui_cancel"):
+	if not visible:
+		return
+	if event.is_action_pressed("ui_cancel"):
 		close()
+		get_viewport().set_input_as_handled()
+	elif _keyboard_navigation.handle(event, self):
 		get_viewport().set_input_as_handled()

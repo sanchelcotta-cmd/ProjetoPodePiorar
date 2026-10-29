@@ -63,7 +63,7 @@ func _run() -> void:
 		int(audio.call("get_volume", &"effects")) == 30 and
 		int(audio.call("get_volume", &"music")) == 60,
 		"Os três volumes são recuperados do arquivo na próxima leitura.")
-	var game := load("res://teste.tscn").instantiate() as PPPMapView
+	var game := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(game)
 	await process_frame
 	var bar := game.get_node("CampaignTopBar") as CampaignTopBar

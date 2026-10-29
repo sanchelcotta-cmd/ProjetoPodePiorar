@@ -37,6 +37,7 @@ const CAMERA_SAFE_HEX_MARGIN := 2.0
 @onready var _ponto_zero: Node2D = get_node_or_null("PontoZero") as Node2D
 @onready var _parallax: PPPParallaxBackground = get_node_or_null("ParallaxBackground") as PPPParallaxBackground
 @onready var _map_root: Node2D = $MapRoot
+@onready var _scenic_backdrop: PPPScenicBackdrop = $MapRoot/ScenicBackdrop
 @onready var _background: Sprite2D = $MapRoot/Background
 @onready var _background_copies: Node2D = $MapRoot/BackgroundCopies
 @onready var _ground: Node2D = $MapRoot/Ground
@@ -44,6 +45,7 @@ const CAMERA_SAFE_HEX_MARGIN := 2.0
 @onready var _hexes: Node2D = $MapRoot/Hexes
 @onready var depth_layer: PPPDepthLayer = $MapRoot/DepthSorted
 @onready var _special_event_visuals: Node2D = $MapRoot/DepthSorted/SpecialEventVisuals
+@onready var _decoration_view: PPPDecorationView = get_node_or_null("MapRoot/DepthSorted/Decorations") as PPPDecorationView
 
 var grid := HexGrid.new()
 var _renderer: HexRenderer
@@ -133,6 +135,10 @@ func _ensure_debug_panel() -> void:
 		add_child(debug_panel)
 
 
+func force_decoration_anomaly(kind: StringName) -> bool:
+	return _decoration_view != null and _decoration_view.force_anomaly(kind)
+
+
 func prepare_initial_interface(progress: Callable = Callable()) -> bool:
 	var bar := get_node_or_null("CampaignTopBar") as CampaignTopBar
 	if bar == null:
@@ -163,6 +169,8 @@ func prepare_initial_visuals(progress: Callable = Callable()) -> bool:
 		return true
 	if not _pending_initial_visuals or grid.cells.is_empty():
 		return false
+	if _decoration_view != null:
+		await _decoration_view.prepare_assets(progress)
 	_visual_build_serial += 1
 	var serial := _visual_build_serial
 	_begin_visual_rebuild()
@@ -225,6 +233,12 @@ func _begin_visual_rebuild() -> void:
 	_layout_background(screen_size)
 	_layout_background_copies()
 	_layout_ground(screen_size)
+	if _scenic_backdrop != null:
+		var facades: Array[Sprite2D] = [_background]
+		for copy in _background_copies.get_children():
+			facades.append(copy as Sprite2D)
+		_scenic_backdrop.rebuild(grid, screen_size, _map_root.position,
+			get_ground_screen_top(), facades)
 	_renderer = HexRenderer.new(hex_palette if hex_palette != null else HexPalette.new())
 	var palette_service := get_node_or_null("/root/UIColorManager")
 	_renderer.set_ui_palette(str(palette_service.get("palette_id")) if palette_service != null \
@@ -255,6 +269,9 @@ func _finish_visual_rebuild() -> void:
 		_start_zone.add_child(marker)
 	_refresh_feedback()
 	refresh_special_event_visuals()
+	if _decoration_view != null:
+		_decoration_view.rebuild(grid, _background, _background_copies,
+			get_ground_screen_top(), get_viewport_rect().size)
 	_apply_camera_transform()
 	_refresh_camera_controls()
 
@@ -419,6 +436,11 @@ func cursor_can_pan_at(point: Vector2) -> bool:
 
 func _camera_zoom() -> float:
 	return float(CAMERA_ZOOM_LEVELS[_camera_level])
+
+
+func keyboard_zoom(step: int) -> void:
+	if not _camera_input_blocked():
+		_set_camera_level(_camera_level + step)
 
 
 func _set_camera_level(level: int) -> void:

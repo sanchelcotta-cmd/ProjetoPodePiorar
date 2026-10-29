@@ -1,12 +1,16 @@
-### Projeto Pode Piorar ###
+# Projeto Pode Piorar
+
 > Você saiu de casa procurando respostas.
 > Encontrou alienígenas, cultistas, zumbis dançarinos, pombas homicidas, uma velha fofoqueira armada com um cabo de vassoura e um homem de terno que parece saber exatamente quantas informações você já descobriu.
 
 ## Bem-vindo ao Projeto Pode Piorar
-Projeto Pode Piorar é um digital board game single-player que combina investigação, exploração procedural, gerenciamento de recursos e combate tático em um universo onde humor nonsense, ficção científica, lendas urbanas e horror cósmico coexistem.
+
+Projeto Pode Piorar é um jogo de tabuleiro digital para um jogador que combina investigação, exploração procedural, gerenciamento de recursos e combate tático em um universo onde humor nonsense, ficção científica, lendas urbanas e horror cósmico coexistem.
+
 Ao longo da campanha, o jogador precisa equilibrar risco, planejamento e adaptação para sobreviver em uma cidade onde praticamente qualquer esquina pode esconder uma nova conspiração.
 
 ## Objetivo
+
 Projeto Pode Piorar é um projeto pessoal desenvolvido por um único autor.
 
 A ideia nasceu durante a pandemia como um board game de papel e, com o tempo, evoluiu para um jogo digital. Este repositório registra essa transição e reúne tanto o desenvolvimento do jogo quanto meu aprendizado como desenvolvedor.
@@ -15,12 +19,12 @@ Além do objetivo de transformar essa ideia em realidade, o projeto também func
 
 Se, durante esse caminho, alguém também se divertir explorando um universo cheio de conspirações, humor nonsense e situações completamente improváveis, então o projeto terá cumprido seu papel.
 
-
 ## Principais Características
+
 * Investigue quatro grandes conspirações através da coleta de 20 Informações únicas, capazes de alterar permanentemente o desenvolvimento da campanha.
 * Forme um grupo com 3 dos 7 personagens jogáveis, cada um com atributos, habilidades e funções distintas, incentivando diferentes composições, sinergias e estilos de jogo.
 * Explore mapas gerados proceduralmente, oferecendo novas rotas, desafios e oportunidades a cada campanha.
-* Encare 75 eventos aleatórios, distribuídos entre resultados positivos, negativos e ambíguos, utilizando um sistema de balanceamento para manter a imprevisibilidade sem comprometer a justiça da partida.
+* Encare 85 eventos e efeitos cadastrados, entre acontecimentos aleatórios, efeitos permanentes e armadilhas.
 * Derrote mais de 30 inimigos únicos, cada um com habilidades, comportamentos e padrões próprios de combate.
 * Enfrente uma IA baseada em prioridades e tomada de decisão contextual, permitindo que diferentes situações produzam comportamentos diferentes dos inimigos.
 * Administre condições persistentes como Doença, Terror, Tristeza e Maldições, que afetam combate, exploração e outros sistemas da campanha.
@@ -28,20 +32,35 @@ Se, durante esse caminho, alguém também se divertir explorando um universo che
 * Progrida através do conhecimento. Descobrir a verdade é tão importante quanto vencer combates: novas Informações desbloqueiam chefes, modificam a campanha e alteram a presença de facções inimigas.
 
 ## Princípios de Design
+
 O Projeto Pode Piorar foi desenvolvido com uma premissa central: os sistemas devem interagir entre si.
+
 Informações influenciam eventos. Eventos afetam a exploração. Debuffs modificam a economia da campanha. Chefes derrotados alteram a geração de inimigos. A composição do grupo redefine a forma como o mapa é explorado.
+
 Em vez de construir mecânicas independentes, o objetivo é criar um conjunto de sistemas capazes de produzir consequências emergentes, incentivando planejamento, adaptação e experimentação a cada nova campanha.
+
 Da mesma forma, a aleatoriedade nunca deve substituir estratégia. O inesperado faz parte da experiência, mas o resultado da partida deve refletir principalmente as decisões tomadas pelo jogador.
 
-## Ferramentas
+## Como abrir o projeto
 
-- Godot Engine 4 — desenvolvimento do jogo
-- GDScript — programação
-- Git e GitHub — controle de versão
+Abra `project.godot` na Godot 4.6 e execute o projeto pelo editor. A cena inicial configurada é `scenes/ui/main_menu.tscn`.
 
-- Pixel Studio — criação dos sprites
+## Ferramentas de desenvolvimento
 
-Elementos de UI: SunGraphica — em: itch.io
+- Godot Engine 4.6 e GDScript — desenvolvimento do jogo.
+- Git e GitHub — controle de versão.
+- Pixel Studio — criação e edição de sprites.
+- BandLab — produção e edição dos efeitos sonoros vocalizados.
+
+## Créditos de recursos
+
+- **Elementos de interface:** [SunGraphica](https://sungraphica.itch.io/), no itch.io.
+- **Fundos de céu com paralaxe:** [CraftPix / Free Game Assets](https://free-game-assets.itch.io/), no itch.io.
+- **Músicas e efeitos sonoros do Pixabay:** [freesound_community](https://pixabay.com/users/freesound_community-46691455/), [composiia](https://pixabay.com/users/composiia-38203768/), [MediaHobbyist](https://pixabay.com/pl/users/mediahobbyist-55682075/) e [Turning_Pages](https://pixabay.com/users/turning_pages-50915814/).
+- **Fontes:** Ubuntu Sans e Cutive Mono. Os respectivos textos de licença estão em `fonts/UFL.txt` e `fonts/OFL-CutiveMono.txt`.
+
+Os créditos acima identificam os criadores e ferramentas conhecidos. A correspondência entre cada arquivo de áudio e seu autor ainda precisa ser conferida antes da distribuição pública.
 
 ## Estado do Desenvolvimento
-Implementação da infraestrutura principal.
+
+Em desenvolvimento ativo, com sistemas de campanha, exploração e combate implementados e conteúdo em expansão.

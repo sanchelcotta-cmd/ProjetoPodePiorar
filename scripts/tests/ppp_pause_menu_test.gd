@@ -9,7 +9,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	root.size = Vector2i(1600, 900)
-	var game := load("res://teste.tscn").instantiate() as PPPMapView
+	var game := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(game)
 	current_scene = game
 	await process_frame
@@ -172,12 +172,19 @@ func _run() -> void:
 	pause.close()
 	gerencia.campaign.current_map.ppp_map_mode = HexGrid.PPPMapMode.EXPLORATION
 	bar.refresh()
-	var escape_event := InputEventAction.new()
-	escape_event.action = &"ui_cancel"
+	var escape_event := InputEventKey.new()
+	escape_event.keycode = KEY_ESCAPE
 	escape_event.pressed = true
 	bar._unhandled_key_input(escape_event)
-	_check(paused and pause.is_open(), "Esc também abre a pausa durante a partida.")
-	pause.close()
+	_check(not paused and not pause.is_open(),
+		"Esc não abre a pausa durante a partida.")
+	var pause_event := InputEventKey.new()
+	pause_event.keycode = KEY_P
+	pause_event.pressed = true
+	bar._unhandled_key_input(pause_event)
+	_check(paused and pause.is_open(), "P abre a pausa durante a partida.")
+	pause._input(pause_event)
+	_check(not paused and not pause.is_open(), "P na pausa devolve o controle ao jogo.")
 	var id := gerencia.campaign.campaign_id
 	var blocker := ConfirmationDialog.new()
 	root.add_child(blocker)

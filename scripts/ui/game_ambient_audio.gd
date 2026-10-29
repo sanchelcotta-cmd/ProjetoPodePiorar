@@ -2,7 +2,7 @@ class_name GameAmbientAudio
 extends Node
 
 ## Som decorativo do mapa. RNG próprio: nunca consome resultados da campanha.
-## Os sons passam por Ambience (85%) -> EffectsUI -> Master, nunca por Music.
+## Os sons passam por Ambience (80,75%) -> EffectsUI -> Master, nunca por Music.
 @export var gerencia: GerenciaJogo
 @export var sky: PPPParallaxBackground
 
@@ -18,7 +18,8 @@ const TRACKS := {
 	"thunderstorm": "res://audio/ambience/thunderstorm.mp3",
 	"rain_thunder": "res://audio/ambience/rain_thunder.mp3",
 }
-const BASE_LEVEL := 1.0 # A hierarquia de 85% pertence ao bus Ambience.
+const RAIN_TRACKS := ["rain_thunder", "thunderstorm"]
+const BASE_LEVEL := 1.0 # O ganho de 80,75% pertence ao bus Ambience.
 const OWL_LEVEL := 0.45
 const MUSIC_BOX_LEVEL := 0.35
 const CHANGE_FADE_SECONDS := 0.45
@@ -36,6 +37,7 @@ var _music_box_present := false
 var _base_tween: Tween
 var _pending_track := ""
 var _stream_cache: Dictionary = {}
+var _combat_suppressed := false
 
 
 func _ready() -> void:
@@ -45,10 +47,13 @@ func _ready() -> void:
 	_music_box = _make_player("MusicBoxOverlay", MUSIC_BOX_LEVEL)
 	_base.finished.connect(func() -> void:
 		if _base_track != "" and _base.stream != null:
-			_base.play())
+			_base.play()
+			_base.stream_paused = _combat_suppressed \
+				and _base_track not in RAIN_TRACKS)
 	_music_box.finished.connect(func() -> void:
 		if _music_box_present and _music_box.stream != null:
-			_music_box.play())
+			_music_box.play()
+			_music_box.stream_paused = _combat_suppressed)
 	_owl_timer = Timer.new()
 	_owl_timer.name = "OwlInterval"
 	_owl_timer.one_shot = true
@@ -103,8 +108,21 @@ func _refresh() -> void:
 			_music_box.stream = _stream("music_box")
 			if _music_box.stream != null:
 				_music_box.play()
+				_music_box.stream_paused = _combat_suppressed
 		else:
 			_music_box.stop()
+	_set_combat_suppressed(campaign.current_map.ppp_map_mode \
+		== HexGrid.PPPMapMode.COMBAT)
+
+
+func _set_combat_suppressed(active: bool) -> void:
+	if active == _combat_suppressed:
+		return
+	_combat_suppressed = active
+	_base.stream_paused = active and _base_track not in RAIN_TRACKS
+	_owl.stream_paused = active
+	_music_box.stream_paused = active
+	_owl_timer.paused = active
 
 
 func _choose_base_track(period: int, district: StringName,
@@ -148,6 +166,7 @@ func _start_pending_track() -> void:
 	if _base.stream == null:
 		return
 	_base.play()
+	_base.stream_paused = _combat_suppressed and track_id not in RAIN_TRACKS
 	_base_tween = create_tween()
 	_base_tween.tween_property(_base, "volume_linear", BASE_LEVEL,
 		CHANGE_FADE_SECONDS)
@@ -163,6 +182,9 @@ func _schedule_owl() -> void:
 
 func _play_owl() -> void:
 	if _base_track != "night_ambience":
+		return
+	if _combat_suppressed:
+		_schedule_owl()
 		return
 	_owl.stream = _stream("owl_hooting")
 	if _owl.stream != null:

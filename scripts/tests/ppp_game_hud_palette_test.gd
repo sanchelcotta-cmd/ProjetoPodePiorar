@@ -12,7 +12,7 @@ func _run() -> void:
 	var scale_service := root.get_node("UniversalFontScale")
 	var old_palette := str(palette.get("palette_id"))
 	var old_scale := float(scale_service.get("ui_factor"))
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var bar := scene.get_node("CampaignTopBar") as CampaignTopBar

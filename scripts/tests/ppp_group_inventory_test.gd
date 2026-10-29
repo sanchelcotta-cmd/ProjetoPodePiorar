@@ -9,7 +9,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	root.size = Vector2i(1152, 648)
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo
@@ -205,10 +205,10 @@ func _run() -> void:
 	var escape := InputEventKey.new()
 	escape.keycode = KEY_ESCAPE
 	escape.pressed = true
-	group._unhandled_key_input(escape)
+	group._input(escape)
 	check(not group.details.visible and group.visible,
 		"O primeiro Esc fecha os detalhes, mantendo o inventário aberto.")
-	group._unhandled_key_input(escape)
+	group._input(escape)
 	check(not group.visible, "O segundo Esc fecha o inventário do grupo.")
 	group.close()
 	check(not group.visible, "O X/fechar oculta a janela.")

@@ -17,7 +17,7 @@ func _run() -> void:
 	_check(campaign.start_new_game(party, 41, null,
 		EventCampaignEligibility.Mode.SHORT, [&"orchestra"]),
 		"Campanha de teste foi preparada.")
-	var game := load("res://teste.tscn").instantiate() as PPPMapView
+	var game := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	game.set_meta("defer_preview_map", true)
 	var repository := CampaignSaveRepository.new(
 		"user://ppp_progressive_scene_health_%d" % Time.get_ticks_usec())

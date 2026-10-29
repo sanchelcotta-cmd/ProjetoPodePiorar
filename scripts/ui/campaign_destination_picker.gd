@@ -1,6 +1,8 @@
 class_name CampaignDestinationPicker
 extends CanvasLayer
 
+const KEYBOARD_NAV := preload("res://scripts/ui/keyboard_button_navigation.gd")
+
 ## Seletor de próxima Rodada: usa arte fixa da primeira cena de cada distrito.
 ## As imagens são escaladas pela altura visual média das portas, não por largura.
 signal destination_confirmed(district: StringName)
@@ -32,6 +34,7 @@ var _dividers: Array[ColorRect] = []
 var _available: Array[StringName] = []
 var _selected: StringName = &""
 var _forced_center := false
+var _keyboard_navigation := KEYBOARD_NAV.new()
 
 
 func _ready() -> void:
@@ -47,18 +50,16 @@ func is_open() -> bool:
 	return _root != null and _root.visible
 
 
-func open_picker(options: Array[StringName], current_district: StringName,
+func open_picker(options: Array[StringName], _current_district: StringName,
 		final_center: bool = false) -> void:
 	_available = options.duplicate()
 	_forced_center = final_center
-	_selected = current_district if current_district in _available else \
-		(_available[0] if not _available.is_empty() else &"")
+	_selected = &""
 	_rebuild_rows()
 	_fit_panel()
 	_root.show()
 	_refresh_style()
-	if _selected != &"":
-		(_row_controls[_selected]["button"] as Button).grab_focus()
+	_keyboard_navigation.reset(_root)
 
 
 func close_picker() -> void:
@@ -90,8 +91,13 @@ func displayed_districts() -> Array[StringName]:
 
 
 func _input(event: InputEvent) -> void:
-	if is_open() and event.is_action_pressed("ui_cancel"):
+	if not is_open():
+		return
+	if event is InputEventKey and event.pressed and not event.echo \
+			and event.keycode == KEY_ESCAPE:
 		_on_cancel()
+		get_viewport().set_input_as_handled()
+	elif _keyboard_navigation.handle(event, _root):
 		get_viewport().set_input_as_handled()
 
 

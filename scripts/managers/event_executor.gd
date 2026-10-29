@@ -1715,6 +1715,7 @@ func _reveal_imaginary_friend(context: Dictionary) -> Dictionary:
 		else:
 			grid.reveal_ppp_block(coord)
 		revealed.append(coord)
+	gerencia.campaign.add_imaginary_friend(actor)
 	return {"success": true, "effect": Event_EffectData.EffectType.REVEAL_BLOCKS,
 		"revealed_tiles": revealed, "revealed_count": revealed.size()}
 
@@ -2097,6 +2098,7 @@ func _apply_effect(effect: Event_EffectData, target: EntityState, event: EventDa
 		Event_EffectData.EffectType.APPLY_VISUAL_EFFECT:
 			if effect.visual_effect_id == &"chicken_form":
 				gerencia.campaign.add_temporary_appearance(target, &"chicken_form")
+				gerencia.campaign.galiform_transformation_seen = true
 				return {"success": true, "effect": effect.effect_type,
 					"target": target.instance_id, "appearance": &"chicken_form",
 					"expires_round": gerencia.campaign.get_round_index() + 1}

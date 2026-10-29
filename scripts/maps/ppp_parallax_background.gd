@@ -1,6 +1,8 @@
 class_name PPPParallaxBackground
 extends CanvasLayer
 
+signal visuals_changed(active_path: String)
+
 ## Céu do mapa: escolhe uma pasta uma vez por mapa e desenha seus 1.png,
 ## 2.png... em ordem. orig.png e orig_big.png são apenas prévias.
 ## A camada -100 fica atrás das fachadas, do chão, dos hexes e da interface.
@@ -125,6 +127,7 @@ func _render() -> void:
 	active_set_path = ""
 	active_filter = SkyFilter.NONE
 	if _grid == null:
+		visuals_changed.emit(active_set_path)
 		return
 	match _visual_weather:
 		AURA_FUNEBRE_ID: active_set_path = _grid.ppp_aura_parallax_path
@@ -142,6 +145,7 @@ func _render() -> void:
 	var files := _numbered_layers(active_set_path)
 	if files.is_empty():
 		push_error("PPPParallaxBackground: pasta sem camadas numeradas: %s" % active_set_path)
+		visuals_changed.emit(active_set_path)
 		return
 	var screen := get_viewport().get_visible_rect().size
 	for index in files.size():
@@ -203,6 +207,7 @@ func _render() -> void:
 		overlay.color = overlay_color
 		overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(overlay)
+	visuals_changed.emit(active_set_path)
 
 
 func _show_lightning(lightning_layer: Parallax2D, lightning_timer: Timer) -> void:

@@ -10,7 +10,7 @@ func _initialize() -> void:
 func _run() -> void:
 	root.size = Vector2i(1152, 648)
 	var repository := CampaignSaveRepository.new("user://ppp_pool5_load_confirmation_test")
-	var game := load("res://teste.tscn").instantiate() as PPPMapView
+	var game := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	(game.get_node("GerenciaJogo") as GerenciaJogo).save_repository = repository
 	root.add_child(game)
 	current_scene = game

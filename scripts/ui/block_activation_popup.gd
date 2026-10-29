@@ -40,6 +40,7 @@ const BOLD_FONT := preload("res://fonts/UbuntuSans-Bold.ttf")
 const NARRATIVE_FONT := preload("res://scripts/ui/ui_narrative_font.gd")
 const WHITE_FRAME_SHADER := preload("res://shaders/ui_cyan_to_white_80.gdshader")
 const ITEM_PICKER_SCRIPT := preload("res://scripts/ui/event_item_picker.gd")
+const KEYBOARD_NAV := preload("res://scripts/ui/keyboard_button_navigation.gd")
 const REWARD_DETAILS_SCRIPT := preload("res://scripts/ui/event_reward_details_panel.gd")
 const GENIE_SHEET_PATH := "res://scenes/ui/character_sheet_panel.tscn"
 const HEX_ARRIVAL_PAUSE_SECONDS := 0.5
@@ -77,6 +78,7 @@ var _genie_sheet: CharacterSheetPanel
 var _hex_arrival_token := 0
 var _hex_walk_pending := false
 var _hex_popup_prepared := false
+var _keyboard_navigation := KEYBOARD_NAV.new()
 
 
 func _carreta_visual() -> Node:
@@ -1724,6 +1726,8 @@ func _confirm_information() -> void:
 func _input(event: InputEvent) -> void:
 	if not overlay.visible:
 		return
+	if _catalog_picker != null and _catalog_picker.visible:
+		return
 	if (_reward_details != null and _reward_details.visible) \
 			or (_genie_info_panel != null and _genie_info_panel.visible) \
 			or (_genie_sheet != null and _genie_sheet.visible):
@@ -1732,78 +1736,15 @@ func _input(event: InputEvent) -> void:
 			_hide_reward_item_details()
 			get_viewport().set_input_as_handled()
 		return
-	if _invalid_symbiosis and event is InputEventKey and event.pressed \
-			and not event.echo and event.keycode == KEY_ESCAPE:
-		_complete_invalid_symbiosis()
-		get_viewport().set_input_as_handled()
-		return
 	if _event_die_animating:
 		return
-	if _wooden_doll_prompt:
-		if event is InputEventKey and event.pressed and not event.echo \
-				and event.keycode == KEY_ESCAPE:
-			_confirm_wooden_doll_cancel()
-			get_viewport().set_input_as_handled()
-		elif event is InputEventMouseButton and event.pressed \
-				and event.button_index == MOUSE_BUTTON_LEFT \
-				and not ($Overlay/Center/FrameArea as Control).get_global_rect().has_point(event.position):
-			_confirm_wooden_doll_cancel()
-			get_viewport().set_input_as_handled()
-		return
-	if _post_reveal_warning:
-		if event is InputEventKey and event.pressed and not event.echo \
-				and event.keycode == KEY_ESCAPE:
-			_acknowledge_event_result()
-			get_viewport().set_input_as_handled()
-		elif event is InputEventMouseButton and event.pressed \
-				and event.button_index == MOUSE_BUTTON_LEFT \
-				and not ($Overlay/Center/FrameArea as Control).get_global_rect().has_point(event.position):
-			_acknowledge_event_result()
-			get_viewport().set_input_as_handled()
-		return
-	if _combat_trap_open and event is InputEventKey and event.pressed \
-			and not event.echo and event.keycode == KEY_ESCAPE:
-		if _trap_die_pending:
-			_roll_combat_trap()
-		else:
-			_confirm_combat_trap()
+	# Eventos e avisos só avançam pelos botões exibidos. Um clique fora da
+	# moldura não pode executar, cancelar nem rolar dados por acidente.
+	if event is InputEventKey and event.pressed and not event.echo \
+			and event.keycode == KEY_ESCAPE:
 		get_viewport().set_input_as_handled()
 		return
-	if _combat_conclusion_open and event is InputEventKey and event.pressed \
-			and not event.echo and event.keycode == KEY_ESCAPE:
-		if _pending_loot_decline_confirmation:
-			_cancel_combat_loot_decline()
-		elif combat_manager != null and not combat_manager.call(
-				"get_pending_loot_item").is_empty():
-			_show_feedback("Escolha o destino ou recuse o saque antes de prosseguir.")
-		else:
-			_confirm_combat_conclusion()
-		get_viewport().set_input_as_handled()
-		return
-	if _outcome_reading:
-		if event is InputEventKey and event.pressed and not event.echo \
-				and event.keycode == KEY_ESCAPE:
-			if _event_die_pending:
-				_roll_event_and_execute()
-			else:
-				_execute_prepared_event()
-			get_viewport().set_input_as_handled()
-			return
-		if event is InputEventMouseButton and event.pressed \
-				and event.button_index == MOUSE_BUTTON_LEFT:
-			var frame := $Overlay/Center/FrameArea as Control
-			if not frame.get_global_rect().has_point(event.position):
-				if _event_die_pending:
-					_roll_event_and_execute()
-				else:
-					_execute_prepared_event()
-				get_viewport().set_input_as_handled()
-		return
-	if not event is InputEventKey or not event.pressed \
-			or event.echo or event.keycode != KEY_ESCAPE:
-		return
-	if _context.get("resource") is Informacao:
-		_confirm_information()
+	if _keyboard_navigation.handle(event, buttons):
 		get_viewport().set_input_as_handled()
 
 
@@ -1817,6 +1758,7 @@ func _show_feedback(message: String) -> void:
 
 
 func _clear_buttons() -> void:
+	_keyboard_navigation.reset(buttons)
 	for child in buttons.get_children():
 		buttons.remove_child(child)
 		child.queue_free()

@@ -8,6 +8,7 @@ signal reward_forfeited
 signal details_requested(item: ItemData)
 
 const BOLD_FONT := preload("res://fonts/UbuntuSans-Bold.ttf")
+const KEYBOARD_NAV := preload("res://scripts/ui/keyboard_button_navigation.gd")
 const BORDER := Color(0.996, 0.169, 0.592)
 
 var _grid: GridContainer
@@ -17,6 +18,7 @@ var _forfeit_panel: PanelContainer
 var _choice_name: Label
 var _choice_icon: TextureRect
 var _selected: ItemData
+var _keyboard_navigation := KEYBOARD_NAV.new()
 
 
 func _ready() -> void:
@@ -171,7 +173,7 @@ func _ready() -> void:
 	keep_button.pressed.connect(_cancel_forfeit)
 	forfeit_actions.add_child(keep_button)
 	var forfeit_button := Button.new()
-	forfeit_button.text = "NÃO QUERO A RECOMPENSA"
+	forfeit_button.text = "CONCORDO, DESISTIR"
 	forfeit_button.custom_minimum_size = Vector2(205, 42)
 	forfeit_button.pressed.connect(_confirm_forfeit)
 	forfeit_actions.add_child(forfeit_button)
@@ -233,6 +235,7 @@ func open_catalog(items: Array[ItemData], title: String) -> void:
 		info.pressed.connect(_request_item_details.bind(item))
 		tile.add_child(info)
 	show()
+	_keyboard_navigation.reset(_grid)
 
 
 func _select(item: ItemData) -> void:
@@ -242,11 +245,13 @@ func _select(item: ItemData) -> void:
 	_choice_name.text = "Deseja escolher %s?" % item.display_name
 	_choice_icon.texture = item.icon
 	_choice_panel.show()
+	_keyboard_navigation.reset(_choice_panel)
 
 
 func _go_back() -> void:
 	_selected = null
 	_choice_panel.hide()
+	_keyboard_navigation.reset(_grid)
 
 
 func _ask_forfeit() -> void:
@@ -255,10 +260,12 @@ func _ask_forfeit() -> void:
 	_selected = null
 	_choice_panel.hide()
 	_forfeit_panel.show()
+	_keyboard_navigation.reset(_forfeit_panel)
 
 
 func _cancel_forfeit() -> void:
 	_forfeit_panel.hide()
+	_keyboard_navigation.reset(_grid)
 
 
 func _confirm_forfeit() -> void:
@@ -288,13 +295,15 @@ func _input(event: InputEvent) -> void:
 		return
 	if visible and event is InputEventKey and event.pressed and not event.echo \
 			and event.keycode == KEY_ESCAPE:
-		if _forfeit_panel.visible:
-			_cancel_forfeit()
-		elif _choice_panel.visible:
-			_go_back()
-		else:
+		if not _forfeit_panel.visible:
 			_ask_forfeit()
 		get_viewport().set_input_as_handled()
+		return
+	if visible:
+		var active_root: Control = _forfeit_panel if _forfeit_panel.visible else \
+			_choice_panel if _choice_panel.visible else _grid
+		if _keyboard_navigation.handle(event, active_root):
+			get_viewport().set_input_as_handled()
 
 
 func _info_button() -> Button:

@@ -69,6 +69,33 @@ func _run_test() -> void:
 	check(journal.summary_frame.position.y + journal.summary_frame.size.y \
 		<= root.size.y - 7.0,
 		"O resumo não sai pela borda inferior.")
+	journal.set_tutorial_shortcut_visible(true)
+	var line_selector := journal.summary_frame.find_child("VisibleLines", true,
+		false) as OptionButton
+	line_selector.select(2)
+	line_selector.item_selected.emit(2)
+	check(journal.summary_count == 5,
+		"O seletor do Registro permite mostrar cinco entradas recentes.")
+	for index in 5:
+		campaign.append_journal_entry(&"event_outcome", [{"text":
+			"Um novo acontecimento longo foi registrado na campanha e precisa continuar legível mesmo quando o tutorial ocupa a metade inferior da lateral.",
+			"tone": "text"}])
+	journal._refresh_summary()
+	await process_frame
+	await process_frame
+	journal._summary_user_y = 9999.0
+	journal._layout()
+	check(journal.summary_frame.position.y + journal.summary_frame.size.y \
+		<= root.size.y * 0.52 + 1.0,
+		"Com o T visível, mesmo cinco registros ficam na faixa superior.")
+	journal._set_summary_expanded(false)
+	check(journal.expand_tab.text == "< R",
+		"O resumo recolhido mostra < R.")
+	journal.set_tutorial_shortcut_visible(false)
+	journal._summary_user_y = 9999.0
+	journal._layout()
+	check(journal.expand_tab.position.y > root.size.y * 0.52,
+		"Depois que T sai, < R pode percorrer a metade inferior.")
 	print("PPP_JOURNAL_SUMMARY_DRAG: %s" % \
 		("PASS" if failures == 0 else "%d falhas" % failures))
 	quit(0 if failures == 0 else 1)

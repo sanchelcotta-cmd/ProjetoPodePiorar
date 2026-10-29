@@ -9,6 +9,16 @@ const CATEGORIES := [
 	["active", "Ativas"], ["passive", "Passivas"],
 	["debuff", "Efeitos / debuffs"], ["information", "Informações"],
 	["attribute", "Atributos"], ["time", "Tempo / Rodada"],
+	["anomaly", "Anomalias do mapa"],
+]
+const ANOMALIES := [
+	{"id": &"", "name": "Aleatória"},
+	{"id": &"anomalia_lixo", "name": "Saco de lixo com pés"},
+	{"id": &"anomalia_lixeira", "name": "Duende na lixeira"},
+	{"id": &"anomalia_arvore", "name": "Árvore de fogo"},
+	{"id": &"anomalia_poste", "name": "Mão no poste"},
+	{"id": &"anomalia_galo", "name": "Galo ao fundo"},
+	{"id": &"anomalia_ovni", "name": "OVNI no céu"},
 ]
 const CYAN := Color(0.19, 0.83, 0.92)
 const PINK := Color(0.98, 0.17, 0.59)
@@ -217,14 +227,19 @@ func _selected_outcome() -> StringName:
 
 func _refresh_category() -> void:
 	var kind := _kind_id()
-	_rows = [] if kind == "time" else service.catalog(kind)
+	_rows.clear()
+	if kind == "anomaly":
+		for row in ANOMALIES:
+			_rows.append(row.duplicate(true))
+	elif kind != "time":
+		_rows.assign(service.catalog(kind))
 	_resource.clear()
 	for row in _rows:
 		_resource.add_item("%s  [%s]" % [row["name"], row["id"]])
 		_resource.set_item_tooltip(_resource.item_count - 1,
 			"%s\nID: %s" % [row["name"], row["id"]])
 	_resource.get_parent().visible = kind != "time"
-	_actor.get_parent().visible = kind not in ["time", "information"]
+	_actor.get_parent().visible = kind not in ["time", "information", "anomaly"]
 	_outcome.get_parent().visible = kind == "event"
 	_amount.get_parent().visible = kind == "attribute"
 	_district.get_parent().visible = kind == "time"
@@ -255,6 +270,12 @@ func _refresh_outcomes() -> void:
 
 
 func _refresh_status() -> void:
+	if _kind_id() == "anomaly":
+		_status.text = "Força uma anomalia no mapa atual, inclusive no dia 1. " \
+			+ "A decoração é refeita a partir da mesma semente."
+		_normal.disabled = true
+		_force.disabled = not service.campaign_ready()
+		return
 	if _kind_id() == "time":
 		_status.text = "Avanço normal exige Informação e fase livre. Forçar ignora a exigência de Informação, mas nunca interrompe uma ação."
 		_normal.disabled = not service.campaign_ready() or not service.rounds.can_advance()
@@ -276,7 +297,17 @@ func _refresh_status() -> void:
 
 func _execute(force: bool) -> void:
 	var result: Dictionary
-	if _kind_id() == "time":
+	if _kind_id() == "anomaly":
+		var map_view := get_parent() as PPPMapView
+		var exploration_map := map_view != null and map_view.grid != null \
+			and map_view.grid.ppp_map_mode == HexGrid.PPPMapMode.EXPLORATION
+		var success := force and map_view != null \
+			and map_view.force_decoration_anomaly(_selected_id())
+		result = {"success": success, "reason": "Anomalia forçada no mapa atual." \
+			if success else "Abra um mapa de exploração para forçar a anomalia." \
+			if not exploration_map else "Não foi possível colocar esta anomalia " \
+			+ "sem violar os espaços seguros do mapa."}
+	elif _kind_id() == "time":
 		var districts := [&"suburbio", &"baixo_centro", &"centro"]
 		result = service.advance_time(districts[_district.selected], force)
 	else:
@@ -286,7 +317,7 @@ func _execute(force: bool) -> void:
 	if result.get("success", false):
 		_refresh_actors()
 		_refresh_status()
-		if _kind_id() in ["event", "encounter", "time"]:
+		if _kind_id() in ["event", "encounter", "time", "anomaly"]:
 			close_panel()
 
 

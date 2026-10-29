@@ -9,7 +9,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	root.size = Vector2i(1440, 810)
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo
@@ -37,15 +37,16 @@ func _run() -> void:
 	(popup.buttons.get_child(0) as Button).pressed.emit()
 	_check(gerencia.campaign.has_wooden_doll(actor) and not block.is_busy(),
 		"O Outcome registra a proteção e libera o bloco.")
-	var visual := companions.doll_visuals_by_owner_id.get(actor.instance_id) as EnemySilhouetteVisual
-	_check(visual != null and visual.is_ally and visual.visible,
-		"A silhueta azul provisória aparece junto do dono.")
+	var visual := companions.doll_visuals_by_owner_id.get(actor.instance_id) as EventFollowerVisual
+	_check(visual != null and visual.sprite.sprite_frames.has_animation(&"idle")
+		and visual.sprite.sprite_frames.has_animation(&"walk") and visual.visible,
+		"O sprite original do Bonequinho aparece com Idle e Walk junto do dono.")
 	var destination := Vector2i(1, 0)
 	actor.position = destination
 	await create_timer(0.55).timeout
 	if visual != null:
 		_check(visual.position.distance_to(PPPMapView.reference_hex_position(destination)
-			+ Vector2(-41.0, 3.0)) < 2.0,
+			+ EventFollowerVisual.WOODEN_OFFSET) < 2.0,
 			"O Bonequinho caminha atrás do dono quando ele muda de hex.")
 	var trap := load("res://resources/events/traps/77-minas_explosivas.tres") as EventData
 	grid.set_ppp_block(destination, HexGrid.PPPBlockType.TRAP, trap)

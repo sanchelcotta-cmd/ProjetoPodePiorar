@@ -52,20 +52,30 @@ func _run_test() -> void:
 	player.skill_manager = manager
 	var exploration := ExplorationManager.new()
 	exploration.gerencia = gerencia
+	exploration.player_skill_manager = player
 	exploration.current_actor = teacher
 	root.add_child(gerencia)
 	root.add_child(blocks)
 	root.add_child(player)
 	root.add_child(exploration)
+	# EVA é craft de inventário: a Professora já agiu, e o Cozinheiro está na vez.
+	teacher.turn_state = EntityState.TurnState.INACTIVE
+	cook.turn_state = EntityState.TurnState.TURNING
+	cook.turn_serial = 1
+	exploration.current_actor = cook
 	var craft_options := player.get_craft_options(teacher, grant, exploration)
 	check(craft_options.size() == 1 and craft_options[0]["results"].size() == 3,
-		"A caixa oferece a Faca e deixa escolher entre os três Épicos cadastrados.")
+		"A caixa oferece EVA fora da vez da Professora.")
+	check(CraftAvailability.options_for(teacher, inventory, exploration).size() == 1,
+		"O inventário também oferece EVA fora da vez.")
 	check(not manager.use_exploration_active(teacher, teacher, grant, campaign,
 		EntityState.UNPLACED, null, null, false,
 		{"ingredient_id": knife.id, "result_id": &"nao_existe"}), "Resultado inválido não consome itens.")
 	check(teacher.inventory_items.size() == 2, "Falha não deve remover ingredientes.")
-	check(manager.use_exploration_active(teacher, teacher, grant, campaign,
-		EntityState.UNPLACED, null, null, false, choice), "Artesanato fabrica o Épico escolhido.")
+	check(player.use_craft_active(teacher, grant, knife.id, epic.id, exploration),
+		"Artesanato fabrica o Épico escolhido fora da vez.")
+	check(exploration.current_actor == cook and cook.turn_state == EntityState.TurnState.TURNING,
+		"O craft não consome nem encerra a vez do Cozinheiro.")
 	check(teacher.inventory_items.size() == 1 and teacher.inventory_items[0].data == epic,
 		"Consome as duas cópias e entrega o Épico à Professora.")
 	check(player.get_craft_options(teacher, grant, exploration).is_empty(),

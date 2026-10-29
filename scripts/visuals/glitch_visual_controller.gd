@@ -1,9 +1,9 @@
 class_name GlitchVisualController
 extends Node
 
-## Evento 50: pós-processamento do mundo separado da UI. O pixelate do
-## cenário recebe pixelização mais forte que as entidades; Palette/CRT do
-## mundo incluem todos os sprites.
+## Evento 50: pixelização por sprite e ruído translúcido separado da UI.
+## Não captura a tela inteira: no viewport embutido essa leitura podia
+## receber um quadro branco e encobrir completamente o mapa.
 ## A UI recebe CRT por elemento, exceto botões, que viram terminal.
 
 const WORLD_SHADER := preload("res://shaders/glitch_world.gdshader")
@@ -108,7 +108,8 @@ func _on_comfort_changed(_enabled: bool) -> void:
 
 func _screen_rect(material: ShaderMaterial) -> ColorRect:
 	var rect := ColorRect.new()
-	rect.color = Color.WHITE
+	# Se o shader falhar na GPU, o retângulo nunca pode cobrir o mapa.
+	rect.color = Color(1.0, 1.0, 1.0, 0.01)
 	rect.material = material
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -160,11 +161,14 @@ func _create_terminal_banner() -> Panel:
 func _resize_rects() -> void:
 	for rect in [_world_rect, _flash_rect]:
 		if rect != null:
-			rect.size = get_viewport().get_visible_rect().size
+			# PRESET_FULL_RECT já acompanha o viewport; atribuir size aqui gera
+			# aviso de âncoras opostas ao iniciar ou mudar resolução.
+			rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 
 func start_effect() -> void:
 	active = true
+	_refresh_weather_grade()
 	_turns_until_clear = 2 # Primeiro fim é o do próprio hex que ativou.
 	_next_distortion = _rng.randf_range(10.0, 40.0)
 	_next_gameboy = _rng.randf_range(20.0, 55.0)
@@ -173,6 +177,8 @@ func start_effect() -> void:
 	_scan_elapsed = 0.0
 	_pixel_material.set_shader_parameter("amount", 4.0 if _reduced() else 8.0)
 	_sky_pixel_material.set_shader_parameter("amount", 2.0 if _reduced() else 4.0)
+	_pixel_material.set_shader_parameter("palette_steps", 0.0 if _reduced() else 6.0)
+	_sky_pixel_material.set_shader_parameter("palette_steps", 0.0 if _reduced() else 6.0)
 	if _reduced():
 		# Variante acessível: apenas pixelização estática na cena; nenhum
 		# shader, banner, flash ou substituição de botão da interface.
@@ -192,6 +198,7 @@ func stop_effect() -> void:
 	_world_layer.hide()
 	_flash_layer.hide()
 	_terminal_layer.hide()
+	_refresh_weather_grade()
 	for item in _original_scene_materials:
 		if is_instance_valid(item):
 			(item as CanvasItem).material = _original_scene_materials[item]
@@ -220,6 +227,12 @@ func stop_effect() -> void:
 	var palette := get_node_or_null("/root/UIColorManager")
 	if palette != null:
 		palette.call("set_palette", str(palette.get("palette_id")), false)
+
+
+func _refresh_weather_grade() -> void:
+	var grade := get_parent().get_node_or_null("GreyWeatherGrade")
+	if grade != null:
+		grade.call("_refresh")
 
 
 func _on_turn_finished(_actor: EntityState) -> void:
@@ -280,12 +293,16 @@ func show_preview_mode(mode: int) -> void:
 
 func _set_mode(mode: int) -> void:
 	if _reduced():
+		_pixel_material.set_shader_parameter("distortion_strength", 0.0)
+		_sky_pixel_material.set_shader_parameter("distortion_strength", 0.0)
 		_world_layer.hide()
 		_flash_layer.hide()
 		_terminal_layer.hide()
 		return
 	_world_material.set_shader_parameter("mode", mode)
 	_world_material.set_shader_parameter("distortion_strength", 1.0 if mode == 1 else 0.0)
+	_pixel_material.set_shader_parameter("distortion_strength", 1.0 if mode == 1 else 0.0)
+	_sky_pixel_material.set_shader_parameter("distortion_strength", 1.0 if mode == 1 else 0.0)
 	_ui_material.set_shader_parameter("aberration", 0.006 if mode == 1 else 0.001)
 	_ui_material.set_shader_parameter("scan_line_fac", 2.1 if mode == 1 else 1.2)
 	_ui_text_material.set_shader_parameter("aberration", 0.006 if mode == 1 else 0.001)
@@ -312,6 +329,9 @@ func _scan_visuals() -> void:
 		_pixelate_tree(map_root, _pixel_material)
 		var actors := map_root.get_node_or_null("DepthSorted")
 		if actors != null:
+			var decorations := actors.get_node_or_null("Decorations")
+			if decorations != null:
+				_pixelate_decoration_tree(decorations)
 			for group_name in ["PlayableActors", "CompanionActors", "EnemyActors"]:
 				var group := actors.get_node_or_null(group_name)
 				if group != null:
@@ -320,10 +340,12 @@ func _scan_visuals() -> void:
 		_pixelate_tree(sky, _sky_pixel_material)
 	if _reduced():
 		return
-	for child in scene.get_children():
-		if child is CanvasLayer and (child as CanvasLayer).layer >= 10 \
-				and child != _flash_layer:
-			_style_ui_tree(child, false)
+	# A interface é uma escolha explícita, nunca "toda CanvasLayer acima
+	# de N". Filtros de outros eventos podem ocupar qualquer camada;
+	# substituir seus shaders pelo CRT deixava a Carreta branca.
+	var round_ui := scene.get_node_or_null("RoundUI")
+	if round_ui is CanvasLayer:
+		_style_ui_tree(round_ui, false)
 
 
 func _pixelate_tree(node: Node, pixel_material: ShaderMaterial) -> void:
@@ -347,6 +369,20 @@ func _pixelate_actor_tree(node: Node) -> void:
 				else _actor_pixel_material
 	for child in node.get_children():
 		_pixelate_actor_tree(child)
+
+
+func _pixelate_decoration_tree(node: Node) -> void:
+	# O passe geral ignora DepthSorted; sem esta visita, bancos, árvores,
+	# postes e anomalias continuavam intactos durante o Glitch Atemporal.
+	# Não substituir os materiais dos feixes/halos/sombras: são luzes, não
+	# a arte física da decoração, e precisam conservar seu desenho próprio.
+	if node is AnimatedSprite2D or (node is Sprite2D and node.name == "DecorationSprite"):
+		var item := node as CanvasItem
+		if not _original_scene_materials.has(item):
+			_original_scene_materials[item] = item.material
+			item.material = _pixel_material
+	for child in node.get_children():
+		_pixelate_decoration_tree(child)
 
 
 func _style_ui_tree(node: Node, inside_button: bool) -> void:

@@ -8,8 +8,9 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
+	var created_scenes: Array[PPPMapView] = [scene]
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo
 	var rounds := scene.get_node("RoundManager") as RoundManager
@@ -63,8 +64,9 @@ func _run() -> void:
 	_check(saved.get("success", false), "Combate deve salvar: "
 		+ str(saved.get("reason", "")))
 	if saved.get("success", false):
-		var fresh := load("res://teste.tscn").instantiate() as PPPMapView
+		var fresh := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 		root.add_child(fresh)
+		created_scenes.append(fresh)
 		await process_frame
 		var loaded := repository.load_campaign(gerencia.campaign.campaign_id, 1, fresh)
 		_check(loaded.get("success", false), "Combate deve carregar: "
@@ -103,8 +105,9 @@ func _run() -> void:
 					after_text.substr(difference, 160))
 			_check(after.get("success", false) and before_text == after_text,
 				"Estado de Combate deve ter igualdade semântica após carregar.")
-			var old_format_scene := load("res://teste.tscn").instantiate() as PPPMapView
+			var old_format_scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 			root.add_child(old_format_scene)
+			created_scenes.append(old_format_scene)
 			await process_frame
 			var old_graph: Dictionary = before["graph"].duplicate(true)
 			var codec := CampaignSaveCodec.new()
@@ -132,6 +135,15 @@ func _run() -> void:
 		_check(FileAccess.file_exists(repository._slot_path(
 			gerencia.campaign.campaign_id, 2)),
 			"Combate grava no slot escolhido após o ataque terminar.")
+	for game_scene in created_scenes:
+		game_scene.queue_free()
+	await process_frame
+	await process_frame
+	# Deixar a coroutine soltar suas referências locais antes de encerrar o motor.
+	call_deferred("_finish")
+
+
+func _finish() -> void:
 	print("PPP_SAVE_COMBAT_OK" if failures == 0 else "PPP_SAVE_COMBAT_FAILED")
 	quit(0 if failures == 0 else 1)
 

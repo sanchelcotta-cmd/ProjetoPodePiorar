@@ -21,6 +21,7 @@ var _queued_moves: Dictionary = {}
 var _movement_voices: Dictionary = {}
 var _attack_voices: Array[Dictionary] = []
 var _hurt_voices: Array[Dictionary] = []
+var _idle_players: Array[AudioStreamPlayer] = []
 var _pending_hits: Dictionary = {}
 var _death_echoes: Array[Dictionary] = []
 var _delayed_hurts: Array[Dictionary] = []
@@ -74,6 +75,10 @@ func _ready() -> void:
 
 func _exit_tree() -> void:
 	_stop_all()
+	for player in _idle_players:
+		if is_instance_valid(player):
+			player.queue_free()
+	_idle_players.clear()
 	for actor in _known.values():
 		_unbind(actor as EntityState)
 	_known.clear()
@@ -87,7 +92,6 @@ func _process(delta: float) -> void:
 	if _last_mode != -1 and mode != _last_mode:
 		_stop_all()
 	_last_mode = mode
-	_sync_entities()
 	for pending in _queued_moves.values():
 		var actor := pending.get("actor") as EntityState
 		if actor != null and actor.current_health > 0:
@@ -233,8 +237,13 @@ func _on_combat_action(actor: EntityState, action: StringName,
 			_launch_generic_projectile(actor, target, details)
 		elif damaged and not _has_attack_animation(actor):
 			# Defensivo para entidades sem visual vinculado ao mapa.
-			get_tree().create_timer(0.16).timeout.connect(
-				func() -> void: _on_attack_contact_frame(actor, target))
+			# O agendamento pertence a esta cena: encerrar a partida cancela
+			# o callback e libera as referências ao atacante e ao alvo.
+			var fallback := create_tween()
+			fallback.tween_interval(0.16)
+			fallback.tween_callback(func() -> void:
+				if is_inside_tree():
+					_on_attack_contact_frame(actor, target))
 
 
 func _on_hit_prepared(target: EntityState) -> void:
@@ -373,7 +382,11 @@ func _has_playable_projectile(actor: EntityState,
 			or playable_view == null or not (&"jogavel" in actor.data.tags):
 		return false
 	var equipped := actor.primary_equipped(ItemData.EquipmentSlot.WEAPON)
-	return equipped != null and equipped.data != null and equipped.data.id in [
+	if equipped == null or equipped.data == null:
+		return false
+	if actor.temporary_appearance == &"chicken_form":
+		return equipped.data.mastery_granted == EntityData.Mastery.RANGED
+	return equipped.data.id in [
 		&"aa_00002", &"aa_00004", &"aa_00009", &"aa_00010"]
 
 
@@ -440,12 +453,31 @@ func _play_attack(actor: EntityState, target: EntityState = null,
 
 func _new_player(bus_name: StringName, gain: float,
 		stream_override: AudioStream = null) -> AudioStreamPlayer:
-	var player := AudioStreamPlayer.new()
-	player.stream = stream_override if stream_override != null else _sheet
+	var source := stream_override if stream_override != null else _sheet
+	var player: AudioStreamPlayer
+	for index in range(_idle_players.size() - 1, -1, -1):
+		if _idle_players[index].stream == source:
+			player = _idle_players[index]
+			_idle_players.remove_at(index)
+			break
+	if player == null:
+		player = AudioStreamPlayer.new()
+		player.stream = source
+		add_child(player)
 	player.bus = bus_name
 	player.volume_linear = gain
-	add_child(player)
+	player.pitch_scale = 1.0
 	return player
+
+
+func _recycle_player(player: AudioStreamPlayer) -> void:
+	if not is_instance_valid(player):
+		return
+	player.stop()
+	if _idle_players.size() < 16 and not player in _idle_players:
+		_idle_players.append(player)
+	else:
+		player.queue_free()
 
 
 func _update_movement(delta: float) -> void:
@@ -468,8 +500,7 @@ func _update_attacks() -> void:
 				and player.get_playback_position() < float(entry["end"]):
 			continue
 		if player != null:
-			player.stop()
-			player.queue_free()
+			_recycle_player(player)
 		_attack_voices.remove_at(index)
 		for victim in entry.get("hurt_targets", []):
 			if victim is EntityState:
@@ -527,8 +558,7 @@ func _update_hurts(delta: float) -> void:
 				and player.get_playback_position() < float(entry["end"]):
 			continue
 		if player != null:
-			player.stop()
-			player.queue_free()
+			_recycle_player(player)
 		_hurt_voices.remove_at(index)
 
 
@@ -537,8 +567,7 @@ func _stop_movement(key: int) -> void:
 		return
 	var player := _movement_voices[key].get("player") as AudioStreamPlayer
 	if player != null:
-		player.stop()
-		player.queue_free()
+		_recycle_player(player)
 	_movement_voices.erase(key)
 
 
@@ -554,12 +583,10 @@ func _stop_all() -> void:
 	for entry in _attack_voices:
 		var player := entry.get("player") as AudioStreamPlayer
 		if player != null:
-			player.stop()
-			player.queue_free()
+			_recycle_player(player)
 	_attack_voices.clear()
 	for entry in _hurt_voices:
 		var player := entry.get("player") as AudioStreamPlayer
 		if player != null:
-			player.stop()
-			player.queue_free()
+			_recycle_player(player)
 	_hurt_voices.clear()

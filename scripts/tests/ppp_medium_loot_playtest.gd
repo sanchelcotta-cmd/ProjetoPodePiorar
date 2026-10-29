@@ -21,7 +21,7 @@ func _run() -> void:
 
 func _play_campaign(use_loot: bool) -> void:
 	root.size = Vector2i(1656, 932)
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	# A HUD visual nao participa das escolhas do bot; remove-la evita que
 	# hover/ficha visual influenciem um teste headless de regras e combate.
 	var hud := scene.get_node_or_null("PartyStatusHUD")

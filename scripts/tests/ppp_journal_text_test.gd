@@ -8,7 +8,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var game := load("res://teste.tscn").instantiate() as PPPMapView
+	var game := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(game)
 	await process_frame
 	var gerencia := game.get_node("GerenciaJogo") as GerenciaJogo

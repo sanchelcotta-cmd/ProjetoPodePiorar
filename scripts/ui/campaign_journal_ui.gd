@@ -20,6 +20,7 @@ var summary_count := 2
 var summary_expanded := true
 var summary_frame: PanelContainer
 var summary_rows: VBoxContainer
+var summary_scroll: ScrollContainer
 var expand_tab: Button
 var info_hint: PanelContainer
 var backdrop: ColorRect
@@ -33,10 +34,12 @@ var book_context: Label
 var book_pages: Array[Dictionary] = []
 var book_page_index := -1
 var _summary_dragging := false
+var _summary_layout_pending := false
 var _summary_user_y := -1.0
 var _tab_dragging := false
 var _tab_was_dragged := false
 var _tab_drag_distance := 0.0
+var _tutorial_shortcut_visible := false
 
 
 func _ready() -> void:
@@ -56,6 +59,13 @@ func bind_campaign(value: CampaignState) -> void:
 	if campaign != null:
 		campaign.journal_entry_added.connect(_on_entry_added)
 	_refresh()
+
+
+func set_tutorial_shortcut_visible(value: bool) -> void:
+	if _tutorial_shortcut_visible == value:
+		return
+	_tutorial_shortcut_visible = value
+	_layout()
 
 
 func open_book() -> void:
@@ -157,16 +167,22 @@ func _build_summary() -> void:
 	header.add_child(minimize)
 	var separator := HSeparator.new()
 	stack.add_child(separator)
+	summary_scroll = ScrollContainer.new()
+	summary_scroll.name = "SummaryScroll"
+	summary_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	summary_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	stack.add_child(summary_scroll)
 	summary_rows = VBoxContainer.new()
+	summary_rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	summary_rows.add_theme_constant_override("separation", 5)
-	stack.add_child(summary_rows)
+	summary_scroll.add_child(summary_rows)
 	expand_tab = Button.new()
 	expand_tab.name = "ExpandJournalSummary"
-	expand_tab.text = "‹"
+	expand_tab.text = "< R"
 	expand_tab.tooltip_text = "Clique para mostrar; segure e arraste para mover"
 	expand_tab.mouse_default_cursor_shape = Control.CURSOR_MOVE
-	expand_tab.custom_minimum_size = Vector2(29, 40)
-	expand_tab.add_theme_font_size_override("font_size", 23)
+	expand_tab.custom_minimum_size = Vector2(55, 42)
+	expand_tab.add_theme_font_size_override("font_size", 16)
 	expand_tab.add_theme_color_override("font_color", CYAN)
 	expand_tab.add_theme_stylebox_override("normal", _box(PANEL_BG, CYAN, 1, 5))
 	expand_tab.add_theme_stylebox_override("hover", _box(Color(0.05, 0.17, 0.21, 0.98), WHITE, 1, 5))
@@ -286,7 +302,16 @@ func _refresh_summary() -> void:
 
 func _settle_summary_layout() -> void:
 	_layout()
-	await get_tree().process_frame
+	if _summary_layout_pending or not is_inside_tree():
+		return
+	_summary_layout_pending = true
+	# Uma conexão de quadro único é descartada ao liberar esta UI; não há
+	# coroutine tentando retomar sobre uma instância destruída.
+	get_tree().process_frame.connect(_finish_summary_layout, CONNECT_ONE_SHOT)
+
+
+func _finish_summary_layout() -> void:
+	_summary_layout_pending = false
 	if is_inside_tree() and summary_frame != null:
 		_layout()
 
@@ -438,15 +463,23 @@ func _layout() -> void:
 	var viewport_size := get_viewport_rect().size
 	var width := clampf(viewport_size.x * 0.225, 282.0, 380.0)
 	var default_top := clampf(viewport_size.y * 0.28, 106.0, 275.0)
+	# Com o T em cena, o resumo fica inteiramente na metade superior.
+	# Registros longos rolam dentro da caixa, sem invadir a faixa do T.
+	var region_bottom := viewport_size.y * 0.52 if _tutorial_shortcut_visible \
+		else viewport_size.y - 8.0
+	var rows_limit := maxf(50.0, region_bottom - 60.0 - 100.0)
+	if summary_scroll != null and summary_rows != null:
+		summary_scroll.custom_minimum_size.y = minf(
+			summary_rows.get_combined_minimum_size().y, rows_limit)
 	summary_frame.custom_minimum_size.x = width
 	summary_frame.reset_size()
-	var visible_height := summary_frame.size.y if summary_expanded else 40.0
+	var visible_height := summary_frame.size.y if summary_expanded else 42.0
 	var top := clampf(_summary_user_y if _summary_user_y >= 0.0 else default_top,
-		60.0, maxf(60.0, viewport_size.y - visible_height - 8.0))
+		60.0, maxf(60.0, region_bottom - visible_height))
 	if _summary_user_y >= 0.0:
 		_summary_user_y = top
 	summary_frame.position = Vector2(viewport_size.x - width - 18.0, top)
-	expand_tab.position = Vector2(viewport_size.x - 32.0, top)
+	expand_tab.position = Vector2(viewport_size.x - 64.0, top)
 	info_hint.size = Vector2(minf(width, 315.0), 0)
 	info_hint.reset_size()
 	info_hint.position = Vector2(viewport_size.x - width - 18.0,

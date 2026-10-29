@@ -18,11 +18,17 @@ func _run() -> void:
 	root.add_child(board)
 	var fixed := board.get_node("ReguasFixas") as Node2D
 	var pets := board.get_node("Companheiros") as Node2D
+	var event_followers := board.get_node("SeguidoresEventos") as Node2D
 	var gnomes := board.get_node("Duendes") as Node2D
+	var transformations := board.get_node("Transformacoes") as Node2D
 	var pending := board.get_node("EntidadesPendentes") as Node2D
 	_check(fixed.get_child_count() == 7, "Há sete jogáveis fixos.")
 	_check(pets.get_child_count() == 5, "Há quatro gatos e um cachorro.")
+	_check(event_followers.get_child_count() == 1,
+		"Bonequinho e Amigo Imaginário compartilham uma única régua.")
 	_check(gnomes.get_child_count() == 1, "Só o Duende 1 serve de régua.")
+	_check(transformations.get_child_count() == 1,
+		"A forma galiforme tem uma referência própria.")
 	var expected_entities: Dictionary = {}
 	for file_name in DirAccess.get_files_at("res://resources/entities/entities_general"):
 		if file_name.ends_with(".tres"):
@@ -37,7 +43,7 @@ func _run() -> void:
 		_check(empty_sprite.texture == null and entry.has_meta("pending_sprite"),
 			"%s está reservado, ainda sem arte inventada." % entry.name)
 	_check(expected_entities.is_empty(), "Nenhuma entidade geral ficou sem espaço.")
-	for group in [fixed, pets, gnomes]:
+	for group in [fixed, pets, event_followers, gnomes, transformations]:
 		for entry in group.get_children():
 			var sprite := entry.get_node("Sprite") as Sprite2D
 			_check(sprite.texture != null and sprite.region_enabled
@@ -57,6 +63,18 @@ func _run() -> void:
 	var reference_height := gnome_sprite.region_rect.size.y * gnome_sprite.scale.y
 	_check(is_equal_approx(ORIENTATION_SCALE.gnome_reference_height(),
 		reference_height), "A altura salva do Duende 1 é lida diretamente da cena.")
+	var chicken_sprite := transformations.get_node("Galinha/Sprite") as Sprite2D
+	_check(is_equal_approx(chicken_sprite.scale.x, chicken_sprite.scale.y),
+		"Galinha conserva a proporção definida pela altura no editor.")
+	_check(is_equal_approx(ORIENTATION_SCALE.chicken_reference_scale(),
+		chicken_sprite.scale.y),
+		"Escala oficial da galinha é lida da cena de orientação.")
+	var follower_sprite := event_followers.get_node("BonequinhoAmigo/Sprite") as Sprite2D
+	_check(is_equal_approx(follower_sprite.region_rect.size.y * follower_sprite.scale.y,
+		chicken_sprite.region_rect.size.y * chicken_sprite.scale.y),
+		"O seguidor tem a mesma altura visual da galinha.")
+	_check(is_equal_approx(ORIENTATION_SCALE.event_follower_reference_scale(),
+		follower_sprite.scale.y), "Escala do seguidor é lida da cena de orientação.")
 	var pet_sprite := pets.get_node("GatoLaranja/Sprite") as Sprite2D
 	var original_scale := pet_sprite.scale
 	pet_sprite.scale = Vector2(original_scale.x, original_scale.y + 0.25)

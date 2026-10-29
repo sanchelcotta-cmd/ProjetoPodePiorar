@@ -16,7 +16,7 @@ func _run() -> void:
 	var old_size := DisplayServer.window_get_size()
 	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	await process_frame
-	var game := load("res://teste.tscn").instantiate() as PPPMapView
+	var game := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(game)
 	current_scene = game
 	await process_frame

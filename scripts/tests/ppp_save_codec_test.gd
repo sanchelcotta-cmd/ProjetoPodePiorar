@@ -8,7 +8,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo
@@ -134,7 +134,7 @@ func _run() -> void:
 						and listed_slot["valid"] and listed_slot["backup_only"])
 			_check(recovered_in_catalog,
 				"Catálogo identifica o backup válido como recuperação do slot.")
-		var fresh := load("res://teste.tscn").instantiate() as PPPMapView
+		var fresh := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 		root.add_child(fresh)
 		await process_frame
 		var loaded_scene := repository.load_campaign(campaign.campaign_id, 3, fresh)

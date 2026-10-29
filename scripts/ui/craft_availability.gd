@@ -16,12 +16,11 @@ static func options_for(actor: EntityState, inventory: InventoryManager,
 		record["required_copies"] = 3
 		record["eva_grant"] = null
 		options.append(record)
-	# A ativa da Professora só contempla peças que ELA carrega/usa e apenas
-	# quando é possível ativá-la agora. Se já há três cópias, o craft normal
+	# A ativa da Professora só contempla peças que ELA carrega/usa. Não depende
+	# de ser a vez dela. Se já há três cópias, o craft normal
 	# preserva o uso diário; a ativa continua acessível pelo botão próprio.
 	if exploration != null and exploration.player_skill_manager != null \
-			and exploration.player_skill_manager.skill_manager != null \
-			and exploration.current_actor == actor:
+			and exploration.player_skill_manager.skill_manager != null:
 		for grant in exploration.player_skill_manager.skill_manager.get_active_grants(actor):
 			if grant == null or not grant.skill is ActiveSkillData \
 					or (grant.skill as ActiveSkillData).id != &"playable_active_005":

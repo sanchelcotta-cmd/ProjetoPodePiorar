@@ -80,7 +80,7 @@ func _run() -> void:
 	selection.queue_free()
 	await process_frame
 	await process_frame
-	var game_scene := load("res://teste.tscn") as PackedScene
+	var game_scene := load("res://scenes/game/campaign_game.tscn") as PackedScene
 	_mark("map load")
 	await process_frame
 	await process_frame

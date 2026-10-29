@@ -17,6 +17,7 @@ const YELLOW := Color(0.60, 0.43, 0.06)
 const RED := Color(0.62, 0.10, 0.16)
 const BLACK := Color(0.07, 0.08, 0.10)
 const FONT := preload("res://fonts/UbuntuSans-Regular.ttf")
+const KEYBOARD_NAV := preload("res://scripts/ui/keyboard_button_navigation.gd")
 
 var actor: EntityState
 var entry: InventoryItemState
@@ -43,6 +44,7 @@ var _cancel_button: Button
 var _discard_button: Button
 var _inventory := InventoryManager.new()
 var _equipment := EquipmentManager.new()
+var _keyboard_navigation := KEYBOARD_NAV.new()
 
 
 func _ready() -> void:
@@ -244,6 +246,7 @@ func open_equipped_collection(owner: EntityState,
 
 
 func close() -> void:
+	_keyboard_navigation.clear()
 	actor = null
 	entry = null
 	companion_mode = false
@@ -258,13 +261,10 @@ func close() -> void:
 func _input(event: InputEvent) -> void:
 	if not visible:
 		return
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
-		if confirm_box.visible:
-			_cancel_discard()
-		else:
-			close()
+	if _keyboard_navigation.handle(event, confirm_box if confirm_box.visible else menu):
 		get_viewport().set_input_as_handled()
-	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		return
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if confirm_box.visible:
 			return
 		if not menu.get_global_rect().has_point(event.position) \

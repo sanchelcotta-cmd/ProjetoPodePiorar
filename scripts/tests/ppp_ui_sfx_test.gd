@@ -44,9 +44,9 @@ func _run() -> void:
 	sfx.call("play", &"hover")
 	_check(is_equal_approx((sfx.get("_hover_voice") as AudioStreamPlayer).volume_linear,
 		0.2925), "Hover usa metade do ganho de 58,5% anterior.")
-	button.queue_free()
+	button.free()
 	print("PPP_UI_SFX_TEST: %s" % ("PASS" if failures == 0 else "FAIL"))
-	quit(0 if failures == 0 else 1)
+	sfx.call("quit_game", 0 if failures == 0 else 1)
 
 
 func _check(condition: bool, message: String) -> void:

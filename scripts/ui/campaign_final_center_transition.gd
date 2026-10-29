@@ -3,6 +3,7 @@ extends CanvasLayer
 
 ## Cena intermediária provisória. A arte/cutscene definitiva entra em Artwork.
 signal continue_requested
+const KEYBOARD_NAV := preload("res://scripts/ui/keyboard_button_navigation.gd")
 
 @export var artwork: Texture2D
 
@@ -11,6 +12,7 @@ signal continue_requested
 @onready var _continue: Button = $Screen/Content/Continue
 
 var _was_paused := false
+var _keyboard_navigation := KEYBOARD_NAV.new()
 
 
 func _ready() -> void:
@@ -26,7 +28,7 @@ func open() -> void:
 	_was_paused = get_tree().paused
 	_screen.show()
 	get_tree().paused = true
-	_continue.grab_focus.call_deferred()
+	_keyboard_navigation.reset(_screen)
 
 
 func close() -> void:
@@ -41,6 +43,5 @@ func is_open() -> bool:
 
 
 func _input(event: InputEvent) -> void:
-	if is_open() and event.is_action_pressed("ui_cancel"):
+	if is_open() and _keyboard_navigation.handle(event, _screen):
 		get_viewport().set_input_as_handled()
-		continue_requested.emit()

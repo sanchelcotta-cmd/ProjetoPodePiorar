@@ -22,6 +22,11 @@ signal journal_entry_added(entry: Dictionary)
 var journal_entries: Array[Dictionary] = []
 var next_journal_serial: int = 1
 var day: int = 1
+## Convite visto uma vez por campanha; o atalho do Dia 1 pode ser dispensado.
+var tutorial_invitation_seen: bool = false
+var tutorial_day_one_shortcut_dismissed: bool = false
+var tutorial_shortcut_y_ratio: float = 0.66
+var tutorial_shortcut_collapsed: bool = false
 # Evento 32: o templo anula itens amaldiçoados somente no Dia da visita.
 var sacred_temple_blessing_day: int = 0
 # Valor provisório seguro até a seleção de modo/desfechos do próximo item.
@@ -35,6 +40,10 @@ var round_period: int = PPPMapGenerator.RoundPeriod.MORNING
 var district: StringName = &"suburbio"
 var current_map: HexGrid
 var generated_map_count: int = 0
+## Escalonamento da chance ambiental; persiste no save da campanha.
+var anomaly_reset_day: int = 2
+var anomaly_high_tier_misses: int = 0
+var galiform_transformation_seen: bool = false
 ## A introdução do último mapa é persistida; pending permite retomá-la após carregar.
 var final_center_intro_seen: bool = false
 var final_center_intro_pending: bool = false
@@ -360,10 +369,17 @@ func start_new_game(selected: Array[EntityData], initial_inventory_capacity: int
 	active_ending_ids = chosen_endings
 	campaign_status = CampaignStatus.ACTIVE
 	day = 1
+	tutorial_invitation_seen = false
+	tutorial_day_one_shortcut_dismissed = false
+	tutorial_shortcut_y_ratio = 0.66
+	tutorial_shortcut_collapsed = false
 	round_period = PPPMapGenerator.RoundPeriod.MORNING
 	district = &"suburbio"
 	current_map = null
 	generated_map_count = 0
+	anomaly_reset_day = 2
+	anomaly_high_tier_misses = 0
+	galiform_transformation_seen = false
 	final_center_intro_seen = false
 	final_center_intro_pending = false
 	active_catastrophes.clear()
@@ -517,6 +533,30 @@ func add_temporary_appearance(target: EntityState, appearance: StringName) -> vo
 	temporary_event_effects.append({"kind": &"appearance", "target": target,
 		"appearance": appearance, "expires_round": get_round_index() + 1})
 	temporary_event_changed.emit()
+
+
+func add_imaginary_friend(target: EntityState) -> void:
+	if target == null:
+		return
+	var expires_round := get_round_index() + 1
+	for entry in temporary_event_effects:
+		if entry.get("kind") == &"imaginary_friend" and entry.get("target") == target:
+			entry["expires_round"] = expires_round
+			temporary_event_changed.emit()
+			return
+	temporary_event_effects.append({"kind": &"imaginary_friend", "target": target,
+		"expires_round": expires_round})
+	temporary_event_changed.emit()
+
+
+func has_imaginary_friend(target: EntityState) -> bool:
+	if target == null:
+		return false
+	for entry in temporary_event_effects:
+		if entry.get("kind") == &"imaginary_friend" and entry.get("target") == target \
+				and get_round_index() < int(entry.get("expires_round", 0)):
+			return true
+	return false
 
 
 func add_day_status_immunity(target: EntityState, status_id: StringName) -> void:
@@ -1372,6 +1412,18 @@ func get_events_on_standby(at_round_index: int = -1) -> Array[String]:
 
 
 ## Chamar só depois de o gerador devolver um mapa completo.
+func decoration_anomaly_chance(target_day: int) -> float:
+	var information_count := obtained_information_ids.size()
+	if campaign_mode == EventCampaignEligibility.Mode.COMPLETE and information_count >= 16:
+		return 0.90
+	if campaign_mode == EventCampaignEligibility.Mode.COMPLETE and information_count >= 12:
+		return minf(1.0, 0.50 + 0.10 * anomaly_high_tier_misses)
+	if target_day < 2:
+		return 0.0
+	return minf(1.0, 0.05 * (maxi(target_day - anomaly_reset_day, 0) + 1))
+
+
+## Chamar só depois de o gerador devolver um mapa completo.
 func record_generated_map(new_map: HexGrid) -> void:
 	if new_map == null:
 		return
@@ -1384,6 +1436,12 @@ func record_generated_map(new_map: HexGrid) -> void:
 		solo_map = new_map
 		_replace_solo_encounters()
 	generated_map_count += 1
+	if new_map.ppp_anomaly_planned:
+		anomaly_reset_day = day
+		anomaly_high_tier_misses = 0
+	elif campaign_mode == EventCampaignEligibility.Mode.COMPLETE \
+			and obtained_information_ids.size() >= 12:
+		anomaly_high_tier_misses += 1
 	information_obtained_on_current_map = false
 	for coord in new_map.cells:
 		var event := new_map.get_ppp_block_resource(coord) as EventData

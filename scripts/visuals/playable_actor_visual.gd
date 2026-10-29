@@ -15,6 +15,7 @@ signal projectile_arrived(actor: EntityState, target: EntityState)
 @onready var active_arrow: Polygon2D = $ActiveArrow
 const DEBUFF_MARKER_SCRIPT := preload("res://scripts/visuals/entity_debuff_marker.gd")
 const DEATH_BLINK := preload("res://scripts/visuals/death_blink.gd")
+const CHICKEN_ANIMATION := preload("res://resources/entities/animations/galinha_animation.tres")
 const HEX_MOVE_SECONDS := 0.225
 const DETOUR_HALF_SECONDS := 0.15
 const MAX_HEX_MOVE_SECONDS := DETOUR_HALF_SECONDS * 2.0
@@ -41,33 +42,32 @@ var _projectile_launched := false
 var _thrown_in_flight := false
 var _attack_contact_sent := false
 var _combat_hit_held := false
+var _bound_animation: PlayableAnimationData
+static var _egg_texture: Texture2D
 
 
-func _draw() -> void:
-	if state == null or state.temporary_appearance != &"chicken_form" \
-			or state.temporarily_absent_from_map:
-		return
-	# Silhueta azul provisória; substituir aqui pelos frames da Galinha quando houver arte.
-	var blue := Color(0.21, 0.64, 0.94)
-	var outline := Color(0.035, 0.13, 0.25)
-	draw_circle(Vector2(0, -31), 26, outline)
-	draw_circle(Vector2(0, -31), 22, blue)
-	draw_circle(Vector2(13, -64), 16, outline)
-	draw_circle(Vector2(13, -64), 13, blue)
-	draw_colored_polygon(PackedVector2Array([Vector2(23, -67),
-		Vector2(42, -61), Vector2(23, -56)]), Color(0.49, 0.85, 1.0))
-	draw_line(Vector2(-9, -10), Vector2(-11, 1), outline, 4)
-	draw_line(Vector2(10, -10), Vector2(12, 1), outline, 4)
-	draw_circle(Vector2(18, -68), 2.5, outline)
+func _animation_data() -> PlayableAnimationData:
+	if state != null and state.temporary_appearance == &"chicken_form":
+		return CHICKEN_ANIMATION
+	return data.playable_animation if data != null else null
+
+
+func _is_chicken_form() -> bool:
+	return state != null and state.temporary_appearance == &"chicken_form"
 
 
 func refresh_temporary_visual() -> void:
 	visible = state == null or state.current_health > 0 \
 		and not state.temporarily_absent_from_map
-	animated_sprite.visible = state == null or state.temporary_appearance != &"chicken_form"
+	var animation := _animation_data()
+	if animation != null and animation != _bound_animation:
+		_bound_animation = animation
+		animated_sprite.sprite_frames = animation.create_sprite_frames()
+		set_visual_scale(_scale_factor)
+		play_idle()
+	animated_sprite.visible = true
 	_update_held_weapon()
 	_position_head_indicators()
-	queue_redraw()
 
 
 func _ready() -> void:
@@ -84,7 +84,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if data != null and data.playable_animation != null:
+	if _animation_data() != null:
 		_position_head_indicators()
 	if not active_arrow.visible:
 		return
@@ -106,7 +106,8 @@ func bind_data(character: EntityData) -> void:
 	if character == null or character.playable_animation == null:
 		push_warning("PlayableActorVisual: personagem sem animação vinculada.")
 		return
-	animated_sprite.sprite_frames = character.playable_animation.create_sprite_frames()
+	_bound_animation = character.playable_animation
+	animated_sprite.sprite_frames = _bound_animation.create_sprite_frames()
 	_held_texture_cache.clear()
 	set_visual_scale(_scale_factor)
 	play_idle()
@@ -143,16 +144,20 @@ func bind_state(entity: EntityState) -> void:
 func _on_appearance_changed() -> void:
 	if state != null:
 		bind_data(state.visual_data())
+		refresh_temporary_visual()
 
 
 func set_visual_scale(factor: float) -> void:
 	_scale_factor = maxf(factor, 0.1)
-	animated_sprite.scale = Vector2.ONE * _scale_factor
+	var sprite_scale := SpriteOrientationReference.chicken_reference_scale() \
+		if _is_chicken_form() else _scale_factor
+	animated_sprite.scale = Vector2.ONE * sprite_scale
 	var height := 96
-	if data != null and data.playable_animation != null:
-		height = data.playable_animation.frame_size.y
+	var animation := _animation_data()
+	if animation != null:
+		height = animation.frame_size.y
 	# O pé do quadro fica no centro do hex; não usamos a cabeça como âncora.
-	animated_sprite.position = Vector2(0.0, -float(height) * 0.5 * _scale_factor)
+	animated_sprite.position = Vector2(0.0, -float(height) * 0.5 * sprite_scale)
 	# A ponta da seta fica acima da cabeça, não no rosto do personagem.
 	_position_head_indicators()
 	_update_weapon_hand_bone()
@@ -160,11 +165,10 @@ func set_visual_scale(factor: float) -> void:
 
 func _position_head_indicators() -> void:
 	var height := 96
-	if data != null and data.playable_animation != null:
-		height = data.playable_animation.frame_size.y
-	var head_top := -float(height) * _scale_factor
-	if state != null and state.temporary_appearance == &"chicken_form":
-		head_top = -82.0
+	var animation := _animation_data()
+	if animation != null:
+		height = animation.frame_size.y
+	var head_top := -float(height) * animated_sprite.scale.y
 	debuff_marker.position = Vector2(0.0, head_top - 13.0)
 	active_arrow.position = Vector2(0.0,
 		head_top - (42.0 if bool(debuff_marker.call("has_debuffs")) else 17.0))
@@ -207,7 +211,8 @@ func play_attack(weapon: ItemData = null, target: EntityState = null,
 			_walk_tween.kill()
 		if state != null and state.position != EntityState.UNPLACED:
 			position = PPPMapView.reference_hex_position(state.position)
-	var clip := attack_clip_for_weapon(weapon)
+	var clip := &"attack_blade" if _is_chicken_form() \
+		else attack_clip_for_weapon(weapon)
 	if not animated_sprite.sprite_frames.has_animation(clip):
 		clip = &"attack_blade"
 	if not animated_sprite.sprite_frames.has_animation(clip):
@@ -243,13 +248,16 @@ func _on_attack_frame_changed() -> void:
 		if state != null and _pending_attack_target != null:
 			attack_contact_frame.emit(state, _pending_attack_target)
 	if _projectile_launched or animated_sprite.animation not in [
-			&"attack_impact", &"attack_ranged"]:
+			&"attack_blade", &"attack_impact", &"attack_ranged"]:
 		return
 	if _pending_attack_weapon == null or _pending_attack_target == null \
-			or _pending_attack_weapon.id not in [&"aa_00002", &"aa_00004",
-				&"aa_00009", &"aa_00010"]:
+			or not (_is_chicken_form() and _pending_attack_weapon.mastery_granted \
+				== EntityData.Mastery.RANGED) \
+			and (_pending_attack_weapon.id not in [&"aa_00002", &"aa_00004",
+				&"aa_00009", &"aa_00010"] or animated_sprite.animation \
+				== &"attack_blade"):
 		return
-	var release_frame := 2 if _pending_attack_weapon.id in [
+	var release_frame := 2 if _is_chicken_form() or _pending_attack_weapon.id in [
 		&"aa_00004", &"aa_00009"] else 3
 	if animated_sprite.frame != release_frame:
 		return
@@ -259,31 +267,36 @@ func _on_attack_frame_changed() -> void:
 
 func _launch_weapon_projectile(weapon: ItemData, target: EntityState) -> void:
 	var layer := get_parent() as Node2D
-	if layer == null or weapon_hand_bone == null:
+	if layer == null:
 		return
 	var projectile := Sprite2D.new()
 	projectile.name = "WeaponProjectile"
 	projectile.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	projectile.z_index = 4
-	match weapon.id:
-		&"aa_00002":
-			projectile.texture = WeaponHandVisual.arrow_texture(0)
-			projectile.scale = Vector2.ONE * 1.40
-		&"aa_00010":
-			projectile.texture = WeaponHandVisual.sling_ball_texture()
-			projectile.scale = Vector2.ONE * 0.72
-		_:
-			projectile.texture = WeaponHandVisual.make_projectile_texture(
-				WeaponHandVisual.variant(weapon.id))
-			projectile.scale = Vector2.ONE * WeaponHandVisual.held_scale(weapon.id)
-			_thrown_in_flight = true
-			_update_held_weapon()
+	if _is_chicken_form():
+		projectile.texture = _chicken_egg_texture()
+		projectile.scale = Vector2.ONE * 1.5
+	else:
+		match weapon.id:
+			&"aa_00002":
+				projectile.texture = WeaponHandVisual.arrow_texture(0)
+				projectile.scale = Vector2.ONE * 1.40
+			&"aa_00010":
+				projectile.texture = WeaponHandVisual.sling_ball_texture()
+				projectile.scale = Vector2.ONE * 0.72
+			_:
+				projectile.texture = WeaponHandVisual.make_projectile_texture(
+					WeaponHandVisual.variant(weapon.id))
+				projectile.scale = Vector2.ONE * WeaponHandVisual.held_scale(weapon.id)
+				_thrown_in_flight = true
+				_update_held_weapon()
 	layer.add_child(projectile)
-	var origin := layer.to_local(weapon_hand_bone.global_position)
+	var origin := layer.to_local(to_global(Vector2(20.0, -48.0))) \
+		if _is_chicken_form() else layer.to_local(weapon_hand_bone.global_position)
 	var destination := PPPMapView.reference_hex_position(target.position) \
 		+ Vector2(0.0, -42.0)
 	projectile.position = origin
-	var curved := weapon.id in [&"aa_00004", &"aa_00009"]
+	var curved := _is_chicken_form() or weapon.id in [&"aa_00004", &"aa_00009"]
 	if not curved:
 		projectile.rotation = (destination - origin).angle()
 	var flight := projectile.create_tween()
@@ -306,10 +319,26 @@ func _launch_weapon_projectile(weapon: ItemData, target: EntityState) -> void:
 				projectile_arrived.emit(state, target))
 
 
+static func _chicken_egg_texture() -> Texture2D:
+	if _egg_texture != null:
+		return _egg_texture
+	var pixels := Image.create(12, 8, false, Image.FORMAT_RGBA8)
+	pixels.fill(Color.TRANSPARENT)
+	for y in 8:
+		for x in 12:
+			var dx := (float(x) - 5.5) / 5.5
+			var dy := (float(y) - 3.5) / 3.5
+			if dx * dx + dy * dy <= 1.0:
+				pixels.set_pixel(x, y, Color("#f4f0da") if y > 4 \
+					else Color.WHITE)
+	_egg_texture = ImageTexture.create_from_image(pixels)
+	return _egg_texture
+
+
 func _update_weapon_hand_bone() -> void:
-	if weapon_hand_bone == null or data == null or data.playable_animation == null:
+	var animation := _animation_data()
+	if weapon_hand_bone == null or animation == null:
 		return
-	var animation := data.playable_animation
 	var points := animation.hand_bone_points(animated_sprite.animation,
 		animated_sprite.frame)
 	if points.is_empty():
@@ -388,7 +417,7 @@ func _update_held_weapon() -> void:
 
 
 func _update_sling_elastic() -> void:
-	var animation := data.playable_animation
+	var animation := _animation_data()
 	if animation == null or animation.sling_rear_hand_frame3.x < 0:
 		return
 	var rear := Vector2(animation.sling_rear_hand_frame3)
@@ -457,8 +486,12 @@ func _play_reduced_hurt(version: int) -> void:
 	animated_sprite.animation = &"hurt"
 	animated_sprite.pause()
 	var frame_count := animated_sprite.sprite_frames.get_frame_count(&"hurt")
-	var red_frame := mini(data.playable_animation.death_hurt_frame, frame_count - 1) \
-		if data != null and data.playable_animation != null else frame_count - 1
+	var animation := _animation_data()
+	var red_frame := mini(animation.death_hurt_frame, frame_count - 1) \
+		if animation != null else frame_count - 1
+	# A coroutine abaixo espera temporizadores; não deve reter o Resource
+	# de animação se a cena for fechada durante esse intervalo.
+	animation = null
 	for frame_index in [0, mini(1, frame_count - 1), red_frame]:
 		if not _can_continue_hurt_blink(version):
 			return
@@ -521,7 +554,10 @@ func _visual_detour(origin: Vector2, destination: Vector2) -> Vector2:
 	var closest_distance := INF
 	var blocker_offset := Vector2.ZERO
 	var crossing := 0.0
-	for other in get_tree().get_nodes_in_group("map_entity_visual"):
+	var blocker_radius := 38.0
+	var blockers := get_tree().get_nodes_in_group("map_entity_visual")
+	blockers.append_array(get_tree().get_nodes_in_group("map_walk_obstacle"))
+	for other in blockers:
 		if other == self or not other is Node2D or not other.visible:
 			continue
 		var other_local: Vector2 = get_parent().to_local((other as Node2D).global_position)
@@ -529,15 +565,17 @@ func _visual_detour(origin: Vector2, destination: Vector2) -> Vector2:
 		if progress <= 0.12 or progress >= 0.88:
 			continue
 		var offset: Vector2 = other_local - origin.lerp(destination, progress)
-		if offset.length() < 38.0 and offset.length() < closest_distance:
+		var radius := float(other.get_meta("walk_radius", 38.0))
+		if offset.length() < radius and offset.length() < closest_distance:
 			closest_distance = offset.length()
 			blocker_offset = offset
 			crossing = progress
+			blocker_radius = radius
 	if closest_distance == INF:
 		return Vector2.INF
 	var side := -1.0 if direction.cross(blocker_offset) > 0.0 else 1.0
 	var perpendicular := Vector2(-direction.y, direction.x).normalized() * side
-	return origin.lerp(destination, crossing) + perpendicular * 38.0
+	return origin.lerp(destination, crossing) + perpendicular * (blocker_radius + 10.0)
 
 
 func _face_walk(face_left: bool) -> void:
@@ -589,11 +627,15 @@ func _on_hurt_frame_changed() -> void:
 	var comfort := get_node_or_null("/root/VisualComfort")
 	if comfort != null and bool(comfort.get("enabled")):
 		return
+	var animation := _animation_data()
 	if _dying or _hurt_blinking or animated_sprite.animation != &"hurt" \
-			or data == null or data.playable_animation == null:
+			or animation == null:
 		return
-	if animated_sprite.frame != data.playable_animation.death_hurt_frame:
+	if animated_sprite.frame != animation.death_hurt_frame:
 		return
+	# A espera assíncrona não deve manter o spritesheet carregado após
+	# a cena sair da árvore durante o breve piscar do dano.
+	animation = null
 	_hurt_blinking = true
 	var version := _hurt_blink_version
 	animated_sprite.pause()
@@ -635,8 +677,8 @@ func _start_death() -> void:
 		# reescrever a lógica da morte.
 		animated_sprite.animation = &"hurt"
 		animated_sprite.stop()
-		var death_frame := data.playable_animation.death_hurt_frame \
-			if data != null and data.playable_animation != null else 0
+		var animation := _animation_data()
+		var death_frame := animation.death_hurt_frame if animation != null else 0
 		animated_sprite.frame = mini(death_frame,
 			animated_sprite.sprite_frames.get_frame_count(&"hurt") - 1)
 	_death_tween = DEATH_BLINK.start(self)

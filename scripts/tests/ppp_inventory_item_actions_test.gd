@@ -9,7 +9,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	root.size = Vector2i(1152, 648)
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo
@@ -32,8 +32,8 @@ func _run() -> void:
 	var copy := InventoryItemState.new(weapon)
 	actor.inventory_items.append(copy)
 	panel.refresh()
-	var cell := (panel.columns[0]["grid"] as GridContainer).get_child(0) as Button
-	cell.pressed.emit()
+	if not _press_inventory_entry(panel, copy):
+		return
 	check(panel.item_menu.visible and panel.item_menu.entry == copy,
 		"Clique abre menu da cópia selecionada.")
 	check(panel.item_menu.menu.size.y <= 260.0,
@@ -63,9 +63,13 @@ func _run() -> void:
 	_find_button(panel.item_menu.rows, "Desequipar").pressed.emit()
 	check(copy in actor.inventory_items and actor.primary_equipped(ItemData.EquipmentSlot.WEAPON) == null,
 		"Desequipar devolve a cópia ao inventário.")
+	# A arma inicial aleatória pode ter sido devolvida à mochila quando o
+	# estilingue foi equipado. Mantenha só a cópia alvo deste teste.
+	actor.inventory_items.clear()
+	actor.inventory_items.append(copy)
 	panel.refresh()
-	cell = (panel.columns[0]["grid"] as GridContainer).get_child(0) as Button
-	cell.pressed.emit()
+	if not _press_inventory_entry(panel, copy):
+		return
 	_find_button(panel.item_menu.rows, "Transferir para").pressed.emit()
 	check(_has_button(panel.item_menu.rows, recipient.data.display_name),
 		"Transferir para oferece os outros personagens do grupo.")
@@ -80,8 +84,8 @@ func _run() -> void:
 	actor.inventory_items.append(food_copy)
 	actor.current_health = actor.max_health - 5
 	panel.refresh()
-	cell = (panel.columns[0]["grid"] as GridContainer).get_child(0) as Button
-	cell.pressed.emit()
+	if not _press_inventory_entry(panel, food_copy):
+		return
 	check(_has_button(panel.item_menu.rows, "Consumir")
 		and _has_button(panel.item_menu.rows, "Transferir para")
 		and not _has_button(panel.item_menu.rows, "Equipar"),
@@ -96,8 +100,8 @@ func _run() -> void:
 	actor.inventory_items.append(coffee_copy)
 	var base_stamina := actor.max_stamina
 	panel.refresh()
-	cell = (panel.columns[0]["grid"] as GridContainer).get_child(0) as Button
-	cell.pressed.emit()
+	if not _press_inventory_entry(panel, coffee_copy):
+		return
 	_find_button(panel.item_menu.rows, "Consumir").pressed.emit()
 	check(actor.max_stamina == base_stamina + 2 and coffee_copy not in actor.inventory_items
 		and actor.consumable_timed_modifiers.size() == 1,
@@ -118,8 +122,8 @@ func _run() -> void:
 	var another := InventoryItemState.new(food)
 	actor.inventory_items.append(another)
 	panel.refresh()
-	cell = (panel.columns[0]["grid"] as GridContainer).get_child(0) as Button
-	cell.pressed.emit()
+	if not _press_inventory_entry(panel, another):
+		return
 	_find_button(panel.item_menu.rows, "Descartar").pressed.emit()
 	var confirm_style := panel.item_menu.confirm_box.get_theme_stylebox("panel") as StyleBoxFlat
 	check(panel.item_menu.confirm_box.visible and confirm_style.bg_color.a == 1.0
@@ -135,8 +139,8 @@ func _run() -> void:
 	var curse_copy := InventoryItemState.new(curse)
 	actor.inventory_items.append(curse_copy)
 	panel.refresh()
-	cell = (panel.columns[0]["grid"] as GridContainer).get_child(0) as Button
-	cell.pressed.emit()
+	if not _press_inventory_entry(panel, curse_copy):
+		return
 	check(not _has_button(panel.item_menu.rows, "Descartar")
 		and not _has_button(panel.item_menu.rows, "Transferir para"),
 		"Maldição não oferece descarte nem transferência comuns.")
@@ -144,8 +148,8 @@ func _run() -> void:
 	var holy_copy := InventoryItemState.new(holy)
 	actor.inventory_items.append(holy_copy)
 	panel.refresh()
-	cell = (panel.columns[0]["grid"] as GridContainer).get_child(1) as Button
-	cell.pressed.emit()
+	if not _press_inventory_entry(panel, holy_copy):
+		return
 	_find_button(panel.item_menu.rows, "Consumir").pressed.emit()
 	check(_has_button(panel.item_menu.rows, curse.display_name),
 		"Água Benta pede a escolha da maldição.")
@@ -180,6 +184,19 @@ func _find_button(container: VBoxContainer, caption: String) -> Button:
 		if child is Button and (child as Button).text == caption:
 			return child as Button
 	return null
+
+
+func _press_inventory_entry(panel: GroupInventoryPanel,
+		selected: InventoryItemState) -> bool:
+	var grid := panel.columns[0]["grid"] as GridContainer
+	for child in grid.get_children():
+		if child is InventorySlotButton and (child as InventorySlotButton).entry == selected:
+			(child as InventorySlotButton).pressed.emit()
+			return true
+	check(false, "A cópia esperada não está visível no inventário: %s" %
+		selected.data.display_name)
+	quit(1)
+	return false
 
 
 func check(condition: bool, message: String) -> void:

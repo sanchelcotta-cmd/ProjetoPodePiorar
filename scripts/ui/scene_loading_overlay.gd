@@ -4,6 +4,7 @@ extends CanvasLayer
 ## Indicador simples para transições fora do resumo de campanha. A barra
 ## representa etapas concluídas; não há porcentagem nem avanço por cronômetro.
 const BAR_TEXTURE := preload("res://sprites/ui/uielementx_00003.png")
+const BAR_WIDTH := 360.0
 
 var _progress: TextureProgressBar
 var _completed_steps := 0
@@ -20,13 +21,15 @@ func _ready() -> void:
 	veil.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(veil)
 	var footer := CenterContainer.new()
+	footer.name = "LoadingFooter"
 	footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	footer.offset_top = -80.0
-	footer.offset_bottom = -18.0
+	footer.offset_top = -100.0
+	footer.offset_bottom = -30.0
 	footer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(footer)
 	var content := VBoxContainer.new()
-	content.custom_minimum_size.x = 440.0
+	content.name = "LoadingContent"
+	content.custom_minimum_size.x = BAR_WIDTH
 	content.add_theme_constant_override("separation", 9)
 	footer.add_child(content)
 	var caption := Label.new()
@@ -36,12 +39,19 @@ func _ready() -> void:
 	caption.add_theme_color_override("font_color", Color(0.78, 0.88, 0.92))
 	content.add_child(caption)
 	var track := ColorRect.new()
+	track.name = "LoadingTrack"
 	track.custom_minimum_size.y = 9.0
 	track.color = Color(0.06, 0.15, 0.19, 0.85)
 	content.add_child(track)
 	_progress = TextureProgressBar.new()
+	_progress.name = "LoadingProgress"
 	_progress.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_progress.texture_progress = BAR_TEXTURE
+	# O PNG original tem 1220 px: sem nove-patches, seu tamanho mínimo
+	# empurra a barra para fora da tela apesar do CenterContainer.
+	_progress.nine_patch_stretch = true
+	_progress.stretch_margin_left = 10
+	_progress.stretch_margin_right = 10
 	_progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	track.add_child(_progress)
 

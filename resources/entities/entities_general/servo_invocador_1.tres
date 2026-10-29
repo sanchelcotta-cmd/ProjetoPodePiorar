@@ -1,8 +1,9 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://b5720oer5q1a5"]
 
 [ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_6yegx"]
+[ext_resource type="Script" uid="uid://d4h5vr8s5voli" path="res://scripts/resources/entities/sprite_sheet_animation_data.gd" id="1_7tjir"]
 [ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_7tjir"]
-[ext_resource type="Resource" path="res://resources/skills/actives/enemies/servo_invocador/invocar_sombra_disforme.tres" id="2_s8yfy"]
+[ext_resource type="Resource" uid="uid://bi555vfva4bqb" path="res://resources/skills/actives/enemies/servo_invocador/invocar_sombra_disforme.tres" id="2_s8yfy"]
 [ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="3_7tjir"]
 [ext_resource type="Resource" uid="uid://c4ueuiwdrdl42" path="res://resources/skills/passives/protecao_25.tres" id="4_h5bjy"]
 [ext_resource type="Resource" uid="uid://caiivasaq352w" path="res://resources/skills/passives/charme_passivo.tres" id="5_gcoga"]
@@ -12,7 +13,7 @@ script = ExtResource("1_6yegx")
 id = &"en_00028"
 display_name = "Servo Invocador 1"
 description = "Nos turnos 3, 6, 9 (todos os múltiplos de 3), invoca uma Sombra Disforme. Podem existir, no máximo, 3 Sombras Disformes vivas em campo invocadas por este Servo. Caso esse limite já tenha sido atingido, em vez de invocar, realiza um ataque normalmente."
-narrative_description = "Ele abre um livro escrito numa língua impossível e começa a ler em voz alta. O pior não é ele conseguir pronunciar aquilo. O pior é quando uma sombra surge para corrigir a pronúncia."
+narrative_description = "Ele abre um livro escrito numa língua impossível e começa a ler em voz alta. O pior não é ele conseguir pronunciar aquilo. O pior é quando uma sombra surge para corrigir sua pronúncia."
 vida_base = 40
 ataque_base = 5
 stamina_base = 5

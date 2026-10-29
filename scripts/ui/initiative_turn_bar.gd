@@ -60,8 +60,7 @@ func _ready() -> void:
 		combat_manager.combat_prepared.connect(_on_combat_prepared)
 		combat_manager.turn_started.connect(_on_turn_started)
 		combat_manager.turn_finished.connect(_on_turn_finished)
-		combat_manager.enemy_summoned.connect(_on_enemy_summoned)
-		combat_manager.ally_revived.connect(_on_ally_revived)
+		combat_manager.initiative_order_changed.connect(_reload_participants)
 		combat_manager.enemy_inspected.connect(_select_enemy)
 		combat_manager.combat_finished.connect(_on_combat_finished)
 		if combat_manager.map_view != null:
@@ -221,21 +220,24 @@ func _on_turn_finished(actor: EntityState) -> void:
 	_refresh_cards()
 
 
-func _on_enemy_summoned(_enemy: EntityState, _summoner: EntityState,
-		_acts_immediately: bool) -> void:
-	_reload_participants()
-
-
-func _on_ally_revived(_ally: EntityState) -> void:
-	_reload_participants()
-
-
 func _reload_participants() -> void:
 	_participants.clear()
 	for entry in combat_manager.initiative_order:
 		var actor := entry.get("entity") as EntityState
-		if actor != null:
+		if actor != null and actor.current_health > 0:
 			_participants.append(actor)
+	if _current_actor != null and _current_actor not in _participants:
+		_current_actor = null
+		_action_menu.hide()
+	if _selected_enemy != null and _selected_enemy not in _participants:
+		_selected_enemy = null
+		_tooltip.hide()
+		if combat_manager.map_view != null:
+			combat_manager.map_view.clear_enemy_hex_highlight()
+	if _hover_actor != null and _hover_actor not in _participants:
+		_hover_actor = null
+		_tooltip.hide()
+		_map_tooltip.hide()
 	_ensure_current_visible()
 	_render()
 
@@ -609,9 +611,7 @@ func _add_action_button(caption: String, action: Callable) -> void:
 func _input(event: InputEvent) -> void:
 	if _action_menu == null or not _action_menu.visible:
 		return
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-		_action_menu.hide()
-	elif event is InputEventMouseButton and event.pressed \
+	if event is InputEventMouseButton and event.pressed \
 			and event.button_index == MOUSE_BUTTON_LEFT \
 			and not _action_menu.get_global_rect().has_point(event.position):
 		_action_menu.hide()

@@ -16,6 +16,7 @@ const YELLOW := Color(0.95, 0.82, 0.35)
 const WHITE := Color(0.92, 0.95, 0.96)
 const MUTED := Color(0.64, 0.73, 0.77)
 const BACK := Color(0.018, 0.029, 0.038, 1.0)
+const KEYBOARD_NAV := preload("res://scripts/ui/keyboard_button_navigation.gd")
 const ERROR_TEXT := "Trecho corrompido//arquivo perdido. ERRO de registro"
 const EMPTY_REFERENCE_TEXT := "Erro de registro - Fonte de referência não localizada"
 const ENDING_NAMES := {
@@ -49,6 +50,7 @@ var _line_next: Button
 var _selected_campaign: Dictionary = {}
 var _selected_line_index := 0
 var _refresh_serial := 0
+var _keyboard_navigation := KEYBOARD_NAV.new()
 
 
 func _ready() -> void:
@@ -72,6 +74,7 @@ func open() -> void:
 	_veil.hide()
 	show()
 	_refresh()
+	_keyboard_navigation.reset(self)
 
 
 func close() -> void:
@@ -375,6 +378,7 @@ func _select_folder(archive: Dictionary) -> void:
 	_confirm.show()
 	_veil.show()
 	_layout()
+	_keyboard_navigation.reset(_confirm)
 
 
 func _open_book() -> void:
@@ -382,12 +386,14 @@ func _open_book() -> void:
 	_book.show()
 	_render_book()
 	_layout()
+	_keyboard_navigation.reset(_book)
 
 
 func _close_overlay() -> void:
 	_confirm.hide()
 	_book.hide()
 	_veil.hide()
+	_keyboard_navigation.reset(self)
 
 
 func _change_line(direction: int) -> void:
@@ -578,11 +584,15 @@ func _margins(container: MarginContainer, left: int, right: int, top: int, botto
 	container.add_theme_constant_override("margin_bottom", bottom)
 
 
-func _unhandled_key_input(event: InputEvent) -> void:
-	if not visible or not event.is_action_pressed("ui_cancel"):
+func _input(event: InputEvent) -> void:
+	if not visible:
 		return
-	if _veil.visible:
-		_close_overlay()
-	else:
-		back_requested.emit()
-	get_viewport().set_input_as_handled()
+	if event.is_action_pressed("ui_cancel"):
+		if _veil.visible and _book.visible:
+			_close_overlay()
+			get_viewport().set_input_as_handled()
+		return
+	var active_root: Control = _book if _book.visible else \
+		_confirm if _confirm.visible else self
+	if _keyboard_navigation.handle(event, active_root):
+		get_viewport().set_input_as_handled()

@@ -11,8 +11,8 @@ extends CanvasModulate
 @export_group("Paleta")
 @export var afternoon_base: Color = Color("#e09470")
 @export_range(0.0, 1.0, 0.01) var afternoon_strength: float = 0.44
-@export var night_base: Color = Color("#85649e")
-@export_range(0.0, 1.0, 0.01) var night_strength: float = 0.65
+@export var night_base: Color = Color("#745c89")
+@export_range(0.0, 1.0, 0.01) var night_strength: float = 0.82
 @export var grey_base: Color = Color("#aeb4bf")
 @export_range(0.0, 1.0, 0.01) var grey_strength: float = 0.55
 @export_range(0.0, 2.0, 0.05) var transition_seconds: float = 0.55

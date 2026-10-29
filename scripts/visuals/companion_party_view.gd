@@ -8,6 +8,7 @@ signal attack_contact_frame(actor: EntityState, target: EntityState)
 ## Instancia o visual dos companheiros sem colocá-los nas vagas Playable_1/2/3.
 const ACTOR_SCENE := preload("res://scenes/visuals/companion_actor_visual.tscn")
 const DOLL_SCRIPT := preload("res://scripts/visuals/wooden_doll_visual.gd")
+const IMAGINARY_SCRIPT := preload("res://scripts/visuals/event_follower_visual.gd")
 const SILHOUETTE_SCRIPT := preload("res://scripts/visuals/enemy_silhouette_visual.gd")
 
 @export var gerencia: GerenciaJogo
@@ -18,6 +19,7 @@ const SILHOUETTE_SCRIPT := preload("res://scripts/visuals/enemy_silhouette_visua
 var visuals_by_id: Dictionary = {}
 var ground_silhouettes_by_id: Dictionary = {}
 var doll_visuals_by_owner_id: Dictionary = {}
+var imaginary_visuals_by_owner_id: Dictionary = {}
 
 
 func _ready() -> void:
@@ -69,6 +71,8 @@ func _on_map_entered(_map: HexGrid) -> void:
 	_refresh()
 	for visual in doll_visuals_by_owner_id.values():
 		(visual as Node2D).call("reset_for_map")
+	for visual in imaginary_visuals_by_owner_id.values():
+		(visual as Node2D).call("reset_for_map")
 
 
 func _on_wooden_doll_changed(_owner_id: StringName, _present: bool) -> void:
@@ -82,6 +86,9 @@ func _on_exploration_actor_moved(actor: EntityState, path: Array[Vector2i],
 	var visual := doll_visuals_by_owner_id.get(actor.instance_id) as Node2D
 	if visual != null:
 		visual.call("follow_path", path)
+	var imaginary_visual := imaginary_visuals_by_owner_id.get(actor.instance_id) as Node2D
+	if imaginary_visual != null:
+		imaginary_visual.call("follow_path", path)
 
 
 func _on_exploration_actor_teleported(actor: EntityState, _destination: Vector2i) -> void:
@@ -90,6 +97,9 @@ func _on_exploration_actor_teleported(actor: EntityState, _destination: Vector2i
 	var visual := doll_visuals_by_owner_id.get(actor.instance_id) as Node2D
 	if visual != null:
 		visual.call("reset_for_map")
+	var imaginary_visual := imaginary_visuals_by_owner_id.get(actor.instance_id) as Node2D
+	if imaginary_visual != null:
+		imaginary_visual.call("reset_for_map")
 
 
 func _on_companion_registered(companion: EntityState) -> void:
@@ -135,6 +145,7 @@ func _refresh() -> void:
 				old.queue_free()
 			visuals_by_id.erase(id)
 	_refresh_dolls()
+	_refresh_imaginary_friends()
 
 
 func _refresh_dolls() -> void:
@@ -145,17 +156,41 @@ func _refresh_dolls() -> void:
 		if not gerencia.campaign.has_wooden_doll(owner):
 			continue
 		present[owner.instance_id] = true
-		var visual := doll_visuals_by_owner_id.get(owner.instance_id) as EnemySilhouetteVisual
+		var visual := doll_visuals_by_owner_id.get(owner.instance_id) as EventFollowerVisual
 		if visual == null:
-			visual = DOLL_SCRIPT.new() as EnemySilhouetteVisual
+			visual = DOLL_SCRIPT.new() as EventFollowerVisual
 			visual.name = "WoodenDoll_%s" % owner.instance_id
 			add_child(visual)
 			doll_visuals_by_owner_id[owner.instance_id] = visual
-			visual.call("bind_owner", owner)
+			visual.bind_owner(owner)
 	for owner_id in doll_visuals_by_owner_id.keys():
 		if not present.has(owner_id):
-			var old := doll_visuals_by_owner_id[owner_id] as EnemySilhouetteVisual
+			var old := doll_visuals_by_owner_id[owner_id] as EventFollowerVisual
 			doll_visuals_by_owner_id.erase(owner_id)
+			if old != null:
+				old.queue_free()
+
+
+func _refresh_imaginary_friends() -> void:
+	if gerencia == null or gerencia.campaign.current_map == null:
+		return
+	var present: Dictionary = {}
+	for owner in gerencia.campaign.active_entity_states:
+		if not gerencia.campaign.has_imaginary_friend(owner):
+			continue
+		present[owner.instance_id] = true
+		var visual := imaginary_visuals_by_owner_id.get(owner.instance_id) \
+			as EventFollowerVisual
+		if visual == null:
+			visual = IMAGINARY_SCRIPT.new() as EventFollowerVisual
+			visual.name = "ImaginaryFriend_%s" % owner.instance_id
+			add_child(visual)
+			imaginary_visuals_by_owner_id[owner.instance_id] = visual
+			visual.bind_owner(owner, true)
+	for owner_id in imaginary_visuals_by_owner_id.keys():
+		if not present.has(owner_id):
+			var old := imaginary_visuals_by_owner_id[owner_id] as EventFollowerVisual
+			imaginary_visuals_by_owner_id.erase(owner_id)
 			if old != null:
 				old.queue_free()
 

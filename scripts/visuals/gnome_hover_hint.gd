@@ -99,11 +99,7 @@ func _on_sprite(mouse: Vector2, sprite: AnimatedSprite2D) -> bool:
 func _input(event: InputEvent) -> void:
 	if not _hint.visible:
 		return
-	if event.is_action_pressed("ui_cancel"):
-		_suppressed_visual_id = _hovered_visual_id
-		_hint.hide()
-		get_viewport().set_input_as_handled()
-	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT \
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT \
 			and event.pressed and _visual_under_mouse(event.position) == null:
 		_outside_clicks += 1
 		if _outside_clicks >= 2:

@@ -10,7 +10,10 @@ func _initialize() -> void:
 
 func _run() -> void:
 	root.size = Vector2i(1440, 810)
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var comfort := root.get_node("VisualComfort")
+	var comfort_before := bool(comfort.get("enabled"))
+	comfort.call("set_enabled", false, false)
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo
@@ -59,6 +62,27 @@ func _run() -> void:
 		if item is AnimatedSprite2D:
 			actor_sprites += 1
 	_check(actor_sprites >= 3, "Entidades também recebem pixelização e bordas cromáticas.")
+	var decoration_sprites := 0
+	for item in controller._original_scene_materials:
+		if item is Sprite2D and item.name == "DecorationSprite":
+			decoration_sprites += 1
+	_check(decoration_sprites >= 3,
+		"Objetos decorativos também recebem o filtro do Glitch Atemporal.")
+	var decoration := scene.get_node("MapRoot/DepthSorted/Decorations") as PPPDecorationView
+	var decoration_rng := RandomNumberGenerator.new()
+	for fixture in [
+		{"kind": "lixeira_latao", "group": "A", "x": -1000.0, "y": 0.0},
+		{"kind": "quaresmeira", "group": "B", "x": -1100.0, "y": 0.0},
+		{"kind": "poste_tradicional", "group": "C", "x": -1200.0, "y": 0.0},
+		{"kind": "lixeira_brasileira", "group": "A", "x": -1300.0,
+			"y": 0.0, "anomaly": "anomalia_lixeira"},
+	]:
+		decoration._render_entry(fixture, decoration_rng)
+		var root_item := decoration.get_child(decoration.get_child_count() - 1)
+		controller._scan_visuals()
+		var art := root_item.get_child(0) as CanvasItem
+		_check(art != null and art.material == controller._pixel_material,
+			"Glitch altera a decoração %s." % fixture["kind"])
 	_check(controller._actor_pixel_material.get_shader_parameter("amount") == 2.0
 		and controller._sky_pixel_material.get_shader_parameter("amount") == 4.0
 		and controller._pixel_material.get_shader_parameter("amount") == 8.0,
@@ -75,14 +99,76 @@ func _run() -> void:
 		var path := "%s/%s.png" % [output_dir, name]
 		_check(image != null and image.save_png(path) == OK,
 			"Captura %s deve ser gravada." % name)
+	var carreta := scene.get_node("CarretaVisualController") as CarretaVisualController
+	var rainbow_veil := carreta._veil
+	var rainbow_material := rainbow_veil.material
+	var weather_grade := scene.get_node("GreyWeatherGrade/ColorRect") as ColorRect
+	var weather_material := weather_grade.material
+	carreta.start_effect()
+	controller._scan_visuals()
+	_check(rainbow_veil.material == rainbow_material
+		and weather_grade.material == weather_material,
+		"Glitch não substitui os shaders de outros filtros do cenário.")
+	for frame in 3:
+		await process_frame
+	_check(_map_is_visible(root.get_texture().get_image()),
+		"Glitch e Carreta juntos não podem deixar o mapa branco.")
+	grid.ppp_parallax_path = "res://sprites/background/fundosparalax/cinzento_0001"
+	var sky := scene.get_node("ParallaxBackground") as PPPParallaxBackground
+	sky.show_generated_map(grid)
+	controller.show_preview_mode(0)
+	for frame in 5:
+		await process_frame
+	var rain := scene.get_node("GreySkyRain") as GreySkyRain
+	_check(rain._raining, "Céu cinzento ativa a chuva no teste de Glitch.")
+	_check(_map_is_visible(root.get_texture().get_image()),
+		"Chuva, Glitch e Carreta juntos não podem deixar o mapa branco.")
+	carreta.stop_effect()
+	for rainy_mode in 3:
+		controller.show_preview_mode(rainy_mode)
+		for frame in 3:
+			await process_frame
+		var rainy_image := root.get_texture().get_image()
+		if rainy_mode == 0:
+			_check(rainy_image != null and rainy_image.save_png(
+				"%s/chuva.png" % output_dir) == OK,
+				"Captura de Glitch com chuva deve ser gravada.")
+		if rainy_image != null:
+			var white_samples := 0
+			var total_samples := 0
+			for y in range(180, 730, 55):
+				for x in range(380, 1320, 55):
+					var color := rainy_image.get_pixel(x, y)
+					total_samples += 1
+					if color.r > 0.96 and color.g > 0.96 and color.b > 0.96:
+						white_samples += 1
+			_check(white_samples < total_samples / 2,
+				"Glitch com chuva não pode tornar o mapa branco no modo %d." % rainy_mode)
 	controller._on_turn_finished(actor)
 	_check(controller.active, "Glitch permanece durante o próximo turno.")
 	controller._on_turn_finished(actor)
 	_check(not controller.active and controller._original_scene_materials.is_empty(),
 		"Fim do turno restaura os materiais anteriores.")
+	await process_frame
+	_check((scene.get_node("GreyWeatherGrade/ColorRect") as ColorRect).visible,
+		"Película cinzenta retorna depois que o Glitch termina.")
+	await process_frame
+	var restored_image := root.get_texture().get_image()
+	if restored_image != null:
+		var white_after := 0
+		var sampled_after := 0
+		for y in range(180, 730, 55):
+			for x in range(380, 1320, 55):
+				var color := restored_image.get_pixel(x, y)
+				sampled_after += 1
+				if color.r > 0.96 and color.g > 0.96 and color.b > 0.96:
+					white_after += 1
+		_check(white_after < sampled_after / 2,
+			"Mapa com chuva também deve permanecer visível após o Glitch.")
 	_check(not controller._terminal_layer.visible,
 		"Letreiro desaparece junto com o filtro.")
 	print("PPP_GLITCH_PREVIEW_OK" if failures == 0 else "PPP_GLITCH_PREVIEW_FAILED:%d" % failures)
+	comfort.call("set_enabled", comfort_before, false)
 	quit(0 if failures == 0 else 1)
 
 
@@ -90,3 +176,17 @@ func _check(condition: bool, message: String) -> void:
 	if not condition:
 		failures += 1
 		push_error(message)
+
+
+func _map_is_visible(image: Image) -> bool:
+	if image == null:
+		return false
+	var white := 0
+	var total := 0
+	for y in range(180, 730, 55):
+		for x in range(380, 1320, 55):
+			var color := image.get_pixel(x, y)
+			total += 1
+			if color.r > 0.96 and color.g > 0.96 and color.b > 0.96:
+				white += 1
+	return white < total / 2

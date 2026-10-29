@@ -24,7 +24,7 @@ func _run() -> void:
 		float(comfort.call("cap_shadow_alpha", 0.9)) <= 0.32 and
 		float(comfort.call("cap_particle_alpha", 0.9)) <= 0.22,
 		"Luzes, sombras e partículas obedecem aos tetos somente quando ativada.")
-	var game := load("res://teste.tscn").instantiate() as PPPMapView
+	var game := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(game)
 	current_scene = game
 	await process_frame

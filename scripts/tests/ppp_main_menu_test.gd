@@ -37,7 +37,12 @@ func _run() -> void:
 		"Carregar jogo abre o carregamento existente.")
 	(menu.get("_load_panel") as Control).call("close")
 	(menu.get_node("MenuArea/NewGame") as Button).pressed.emit()
-	await create_timer(0.3).timeout
+	# Novo Jogo aguarda a animação do botão e o pré-carregamento do catálogo;
+	# o tempo varia conforme a máquina, então esperamos a troca de cena real.
+	for attempt in 100:
+		if current_scene is PlayableSelectionScreen:
+			break
+		await create_timer(0.05).timeout
 	var selection := current_scene as PlayableSelectionScreen
 	_check(selection != null, "Novo Jogo abre a seleção.")
 	if selection != null:

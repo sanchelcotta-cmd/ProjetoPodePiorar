@@ -68,13 +68,26 @@ func _exit_tree() -> void:
 	var tree := get_tree()
 	if tree != null and tree.node_added.is_connected(_register_node):
 		tree.node_added.disconnect(_register_node)
+	stop_all_playback()
+	_streams.clear()
+
+
+func stop_all_playback() -> void:
 	for player in [_click_voice, _notice_voice, _panel_voice, _hover_voice]:
 		if player != null:
 			player.stop()
 			player.stream = null
-	_streams.clear()
 	_pending_kind = &""
+	_pending_priority = -1
 	_flush_scheduled = false
+
+
+func quit_game(exit_code: int = 0) -> void:
+	stop_all_playback()
+	# O mixer trabalha em outra thread; um quadro isolado ainda pode terminar
+	# antes de ela soltar os playbacks MP3.
+	await get_tree().create_timer(0.1).timeout
+	get_tree().quit(exit_code)
 
 
 func _voice(node_name: String) -> AudioStreamPlayer:

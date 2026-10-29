@@ -12,7 +12,7 @@ func _initialize() -> void:
 
 func _run_test() -> void:
 	root.size = Vector2i(1656, 932)
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo
@@ -152,7 +152,8 @@ func _run_test() -> void:
 		var visual := (scene.get_node("MapRoot/DepthSorted/PlayableActors") as PlayablePartyView) \
 			.visuals_by_slot[actor.playable_slot_id] as PlayableActorVisual
 		check(visual._walking, "O sprite do jogável entra na animação de caminhada em Combate.")
-		await create_timer(0.27 * combat._steps_moved + 0.08).timeout
+		await create_timer(combat._visual_move_wait(actor, combat._steps_moved)
+			+ 0.06).timeout
 		check(visual.position.distance_to(PPPMapView.reference_hex_position(destination)) < 1.0,
 			"O sprite caminha até o hex lógico, sem ficar parado na origem.")
 		check(not combat.can_player_move(destination),

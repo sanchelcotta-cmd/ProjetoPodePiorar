@@ -49,6 +49,7 @@ var _inactive_style: StyleBoxFlat
 var _dead_style: StyleBoxFlat
 var _inactive_material: ShaderMaterial
 var _current_turn := false
+var _keyboard_highlighted := false
 var _debuff_signature := ""
 var _is_dead_slot := false
 
@@ -209,9 +210,16 @@ func _on_action_button_pressed() -> void:
 func set_current_turn(is_current: bool) -> void:
 	_current_turn = is_current
 	var inactive := not is_available()
-	add_theme_stylebox_override("panel", _dead_style if _is_dead_slot else \
+	var panel_style := _dead_style if _is_dead_slot else \
 		(_inactive_style if inactive else \
-		(_active_style if is_current else _empty_style)))
+		(_active_style if is_current else _empty_style))
+	if _keyboard_highlighted:
+		panel_style = panel_style.duplicate() as StyleBoxFlat
+		panel_style.border_color = Color(0.38, 1.0, 0.94)
+		panel_style.set_border_width_all(3)
+		panel_style.shadow_color = Color(0.19, 0.96, 0.87, 0.45)
+		panel_style.shadow_size = 7
+	add_theme_stylebox_override("panel", panel_style)
 	var palette := get_node_or_null("/root/UIColorManager")
 	if palette != null:
 		palette.call("bind_control_style", self, "panel", "surface",
@@ -235,6 +243,13 @@ func set_current_turn(is_current: bool) -> void:
 	info_button.disabled = state == null
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if state != null \
 		else Control.CURSOR_ARROW
+
+
+func set_keyboard_highlight(highlighted: bool) -> void:
+	if _keyboard_highlighted == highlighted:
+		return
+	_keyboard_highlighted = highlighted
+	set_current_turn(_current_turn)
 
 
 func _bind_palette() -> void:

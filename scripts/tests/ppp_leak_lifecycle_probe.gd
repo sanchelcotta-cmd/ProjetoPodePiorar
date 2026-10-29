@@ -8,7 +8,7 @@ func _initialize() -> void:
 func _run() -> void:
 	var args := OS.get_cmdline_user_args()
 	if "scene" in args:
-		var scene := load("res://teste.tscn").instantiate() as PPPMapView
+		var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 		root.add_child(scene)
 		await process_frame
 		if "campaign" in args:

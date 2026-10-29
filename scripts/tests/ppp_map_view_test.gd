@@ -11,13 +11,17 @@ func _initialize() -> void:
 func _run_test() -> void:
 	# Sem janela, o Godot usa 64×64; teste o tamanho real da cena-modelo.
 	root.size = Vector2i(1152, 648)
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
-	check(scene != null, "teste.tscn precisa usar PPPMapView")
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
+	check(scene != null, "scenes/game/campaign_game.tscn precisa usar PPPMapView")
 	if scene == null:
 		quit(1)
 		return
+	# A cena oficial não depende mais de uma prévia temporária na entrada;
+	# este teste monta explicitamente o mapa-modelo que deseja inspecionar.
+	scene.grid.generate_ppp_exploration_map()
 	root.add_child(scene)
 	await process_frame
+	scene.show_generated_map(scene.grid)
 	var anchor := scene.get_node_or_null("PontoZero") as Node2D
 	var hexes := scene.get_node_or_null("MapRoot/Hexes") as Node2D
 	var start_zone := scene.get_node_or_null("MapRoot/StartZone") as Node2D
@@ -26,7 +30,12 @@ func _run_test() -> void:
 	var depth := scene.get_node_or_null("MapRoot/DepthSorted") as PPPDepthLayer
 	var parallax := scene.get_node_or_null("ParallaxBackground") as PPPParallaxBackground
 	check(anchor != null, "PontoZero deve existir")
-	check(hexes != null and hexes.get_child_count() == 40, "Devem existir 40 hexágonos")
+	var hex_count := 0
+	if hexes != null:
+		for child in hexes.get_children():
+			if child.name.begins_with("Hex_"):
+				hex_count += 1
+	check(hex_count == 40, "Devem existir 40 hexágonos")
 	check(start_zone != null and start_zone.get_child_count() == 3, "StartZone deve ter 3 posições")
 	check(ground != null and ground.get_child_count() >= 1, "O chão deve se repetir até cobrir a largura visível")
 	check(background != null and background.texture != null, "O cenário do distrito deve aparecer atrás do chão")
@@ -69,6 +78,8 @@ func _run_test() -> void:
 				"Linha seguinte deve descer 55 px e deslocar 47 px")
 	for hex in hexes.get_children():
 		var hex_node := hex as Node2D
+		if not hex_node.name.begins_with("Hex_"):
+			continue
 		var outline := hex_node.get_node_or_null("Outline") as Sprite2D
 		var size := Vector2(outline.texture.get_size()) * outline.scale
 		var bounds := Rect2(hex_node.global_position - size * 0.5, size)
@@ -82,6 +93,8 @@ func _run_test() -> void:
 		var ground_top := first_tile.global_position.y - tile_size.y * 0.5
 		for hex in hexes.get_children():
 			var hex_node := hex as Node2D
+			if not hex_node.name.begins_with("Hex_"):
+				continue
 			var outline := hex_node.get_node("Outline") as Sprite2D
 			var hex_top := hex_node.global_position.y \
 				- float(outline.texture.get_height()) * outline.scale.y * 0.5

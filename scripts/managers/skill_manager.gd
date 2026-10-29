@@ -253,6 +253,8 @@ func _dispatch_status_applied(target: EntityState, status_id: StringName,
 func is_status_immune(target: EntityState, debuff_id: StringName) -> bool:
 	if target == null:
 		return false
+	if target.is_innately_immune_to_status(debuff_id):
+		return true
 	if debuff_id in target.permanent_status_immunities \
 			or debuff_id in target.temporary_status_immunities \
 			or target.has_divine_amulet_status_immunity(debuff_id):
@@ -1082,10 +1084,14 @@ func can_use_exploration_active(
 		return false
 	var grid := campaign.current_map
 	var skill := grant.skill as ActiveSkillData
+	var turnless_craft := skill != null and skill.id == &"playable_active_005" \
+		and actor == turn_owner and skill.effects.any(func(effect: SkillEffectData) -> bool:
+			return effect.effect_type == SkillEffectData.EffectType.MODIFY_CRAFT_COST)
 	var off_turn_companion := actor != turn_owner and skill.usable_while_owner_inactive \
 		and actor in campaign.companion_states \
 		and actor.owner_instance_id == turn_owner.instance_id
-	if (turn_owner.turn_state != EntityState.TurnState.TURNING and not off_turn_companion) \
+	if (turn_owner.turn_state != EntityState.TurnState.TURNING \
+			and not off_turn_companion and not turnless_craft) \
 			or actor.current_health <= 0 \
 			or grid.ppp_map_mode != HexGrid.PPPMapMode.EXPLORATION \
 			or skill.use_context == ActiveSkillData.UseContext.COMBAT \

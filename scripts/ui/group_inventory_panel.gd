@@ -19,6 +19,7 @@ const SLOT_BUTTON_SCRIPT := preload("res://scripts/ui/inventory_slot_button.gd")
 const EQUIPMENT_SLOT_BUTTON_SCRIPT := preload("res://scripts/ui/group_equipment_slot_button.gd")
 const CRAFT_PANEL_SCRIPT := preload("res://scripts/ui/epic_craft_panel.gd")
 const CRAFT_HINT_SCRIPT := preload("res://scripts/ui/craft_hint_popup.gd")
+const KEYBOARD_NAV := preload("res://scripts/ui/keyboard_button_navigation.gd")
 const BLUE := Color(0.13, 0.74, 0.94)
 const PINK := Color(0.996, 0.169, 0.592)
 const TEXT := Color(0.9, 0.93, 0.95)
@@ -66,6 +67,7 @@ var _title_label: Label
 var _equipment_manager := EquipmentManager.new()
 var craft_panel: EpicCraftPanel
 var craft_hint: CraftHintPopup
+var _keyboard_navigation := KEYBOARD_NAV.new()
 
 
 func _ready() -> void:
@@ -91,6 +93,7 @@ func open() -> void:
 	show()
 	_layout_window()
 	window.grab_focus()
+	_keyboard_navigation.reset(window)
 
 
 func open_craft_for(actor: EntityState = null, item: ItemData = null) -> void:
@@ -109,13 +112,36 @@ func open_craft_for(actor: EntityState = null, item: ItemData = null) -> void:
 	window.hide()
 
 
+func can_open_craft() -> bool:
+	return preferred_craft_actor() != null
+
+
+func preferred_craft_actor() -> EntityState:
+	if gerencia == null or gerencia.campaign == null or skill_manager == null \
+			or _exchange_owner != null or _death_owner != null \
+			or craft_panel == null:
+		return null
+	var party := gerencia.campaign.active_entity_states
+	if party.is_empty():
+		return null
+	var start := party.find(exploration.current_actor) if exploration != null else -1
+	if start < 0:
+		start = 0
+	for offset in party.size():
+		var actor := party[(start + offset) % party.size()] as EntityState
+		if not CraftAvailability.options_for(actor,
+				skill_manager.inventory_manager, exploration).is_empty():
+			return actor
+	return null
+
+
 func _on_craft_closed() -> void:
 	if visible and _exchange_owner == null and _death_owner == null:
 		window.show()
 
 
 ## Recebimento pendente: transferências entre jogáveis são provisórias até
-## confirmar; Voltar/Esc restaura os inventários e conserva o item pendente.
+## confirmar; Voltar restaura os inventários e conserva o item pendente.
 func begin_exchange(owner: EntityState, incoming: ItemData,
 		on_confirm: Callable, on_decline: Callable, allow_decline: bool = true) -> bool:
 	if owner == null or incoming == null or not on_confirm.is_valid() \
@@ -132,7 +158,7 @@ func begin_exchange(owner: EntityState, incoming: ItemData,
 	_close_button.show()
 	_close_button.text = "← VOLTAR"
 	_close_button.custom_minimum_size.x = 100
-	_close_button.tooltip_text = "Cancelar esta tentativa de troca e voltar ao item (Esc)"
+	_close_button.tooltip_text = "Cancelar esta tentativa de troca e voltar ao item"
 	_exchange_bar.show()
 	_exchange_cancel_button.show()
 	_exchange_confirmation.hide()
@@ -217,22 +243,6 @@ func close(force: bool = false) -> void:
 		begin_death_cleanup.call_deferred(next_owner)
 
 
-func _unhandled_key_input(event: InputEvent) -> void:
-	if not visible or not event is InputEventKey or not event.pressed \
-			or event.echo or event.keycode != KEY_ESCAPE:
-		return
-	if craft_panel != null and craft_panel.visible:
-		craft_panel.close()
-	elif _exchange_confirmation.visible:
-		_exchange_confirmation.hide()
-	elif details.visible:
-		details.hide()
-		details_link.hide()
-	else:
-		close()
-	get_viewport().set_input_as_handled()
-
-
 func _snapshot_exchange_inventories() -> void:
 	_exchange_inventory_snapshot.clear()
 	for actor in gerencia.campaign.active_entity_states:
@@ -268,15 +278,22 @@ func _input(event: InputEvent) -> void:
 			and event.keycode == KEY_ESCAPE:
 		if craft_panel != null and craft_panel.visible:
 			craft_panel.close()
-		elif _exchange_owner != null:
-			close()
 		elif _exchange_confirmation.visible:
-			_exchange_confirmation.hide()
+			pass # Sem X: a confirmação exige um dos botões visíveis.
 		elif details.visible:
 			details.hide()
 			details_link.hide()
-		else:
+		elif _exchange_owner == null and _death_owner == null:
 			close()
+		get_viewport().set_input_as_handled()
+		return
+	if craft_panel != null and craft_panel.visible:
+		return
+	if item_menu != null and item_menu.visible:
+		return
+	var active_root: Control = _exchange_confirmation if _exchange_confirmation.visible else \
+		details if details.visible else window
+	if _keyboard_navigation.handle(event, active_root):
 		get_viewport().set_input_as_handled()
 		return
 	if _window_resizing:

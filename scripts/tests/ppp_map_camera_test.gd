@@ -8,7 +8,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	await process_frame
@@ -113,7 +113,7 @@ func _run() -> void:
 		var viewport := SubViewport.new()
 		viewport.size = window_size
 		root.add_child(viewport)
-		var resized := load("res://teste.tscn").instantiate() as PPPMapView
+		var resized := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 		viewport.add_child(resized)
 		await process_frame
 		await process_frame

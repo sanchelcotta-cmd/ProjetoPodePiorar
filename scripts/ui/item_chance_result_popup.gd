@@ -63,7 +63,3 @@ func show_message(message: String) -> void:
 	_ok.grab_focus()
 
 
-func _unhandled_key_input(event: InputEvent) -> void:
-	if visible and event.is_action_pressed("ui_cancel"):
-		hide()
-		get_viewport().set_input_as_handled()

@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://uee7rthfqc0t"]
 
 [ext_resource type="Script" uid="uid://8ma4cswg5n35" path="res://scripts/resources/entities/entity_data.gd" id="1_hdqm7"]
+[ext_resource type="Script" uid="uid://d4h5vr8s5voli" path="res://scripts/resources/entities/sprite_sheet_animation_data.gd" id="1_soeoy"]
 [ext_resource type="Script" uid="uid://c6mkwdy3ih6pd" path="res://scripts/resources/skills/passive_skill_data.gd" id="2_e50il"]
 [ext_resource type="Script" uid="uid://c3s14bqybert" path="res://scripts/resources/skills/active_skill_data.gd" id="2_pw4ei"]
 [ext_resource type="Resource" uid="uid://c8xfj7mnvbnt3" path="res://resources/skills/passives/voar_afastar.tres" id="3_hdqm7"]

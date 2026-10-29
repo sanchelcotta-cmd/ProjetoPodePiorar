@@ -9,7 +9,7 @@ func _initialize() -> void:
 
 func _render() -> void:
 	root.size = Vector2i(1440, 810)
-	var game := load("res://teste.tscn").instantiate() as PPPMapView
+	var game := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(game)
 	current_scene = game
 	await process_frame

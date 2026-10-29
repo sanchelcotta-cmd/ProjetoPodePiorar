@@ -1,0 +1,936 @@
+{
+  "version": 1,
+  "pages": [
+    {
+      "id": "tutorial_primeiros_bem_vindo",
+      "category": "PRIMEIROS PASSOS",
+      "title": "Bem-vindo ao PPP",
+      "body": "Você conduz três personagens por uma campanha dividida em dias.\n\nCada mapa traz caminhos, itens, Informações e surpresas. O PPP é um jogo de tabuleiro digital: você escolhe ações, resolve acontecimentos e administra o grupo até chegar ao desfecho da campanha.\n\nHá dois modos principais.\n\nNa Exploração: você percorre hexágonos e descobre o que existe neles.\n\nNo Combate: personagens e hostis agem em uma ordem definida, com movimento, ataques, habilidades e um dado de seis faces. As decisões de um modo continuam importando no outro.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Bem-vindo. Eu conheço as regras; o mapa, por outro lado, é cheio de surpresas.”",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_primeiros_primeiro_movimento",
+      "category": "PRIMEIROS PASSOS",
+      "title": "O primeiro movimento",
+      "body": "Olhe os cards do grupo à esquerda. O personagem da vez é quem pode conduzir a próxima ação de Exploração. Abra suas ações, escolha ANDAR ATÉ e clique em um hexágono alcançável. Confirme o destino para caminhar. Ao chegar, o bloco revela seu conteúdo e você resolve o que ele pedir antes de continuar.\n\nVocê também pode consultar a ficha, abrir o inventário e verificar habilidades disponíveis. Não precisa aprender tudo de uma vez. Se um botão estiver indisponível, termine a escolha ou o acontecimento pendente e confira novamente.",
+      "example": "",
+      "controls": "Enter ou Espaço abre as ações do personagem da vez; o destino e os alvos no mapa são escolhidos com o mouse.",
+      "face_line": "",
+      "expression": "neutro"
+    },
+    {
+      "id": "tutorial_primeiros_relogio",
+      "category": "PRIMEIROS PASSOS",
+      "title": "Dias rodadas e distritos",
+      "body": "Cada dia passa por Manhã, Tarde e Noite. Cada período é uma Rodada com seu próprio mapa. Quando o grupo encontra uma Informação e conclui as pendências da Rodada, pode escolher o próximo distrito e avançar. Você pode permanecer onde está ou ir a um distrito vizinho; a campanha começa no Subúrbio, e os outros distritos são Baixo-Centro e Centro.\n\nAvançar para a Manhã depois da Noite inicia um novo dia. A escolha do distrito gera outro mapa; o anterior não fica aberto para voltar e recolher o que faltou.",
+      "example": "",
+      "controls": "",
+      "face_line": "“É rodada atrás de rodada. Dia atrás de dia. Cada um carrega um mapa.”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_atalhos_resumo",
+      "category": "ATALHOS DE TECLADO",
+      "title": "Atalhos rápidos",
+      "body": "Enter ou Espaço: se nada estiver destacado, destaca um botão; com ele destacado, confirma.\nTab: alterna entre cards e barra superior. Setas ou W/A/S/D: navegam pela interface.\nEsc: fecha quando permitido ou abre a confirmação necessária.\nI: inventário. R: registros. Q: ficha do card destacado ou, fora dos cards, Informações.\nP: pausa. T: tutorial no Dia 1. E: criação de Épicos, quando disponível.\nHome / End: aproxima / afasta o zoom. M ou N: muta / desmuta. 1 a 9: escolhe uma rádio disponível.\nMouse: seleciona hexes, destinos, alvos e opções clicáveis no mapa.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_interface_tela",
+      "category": "INTERFACE E HUD",
+      "title": "Conhecendo a tela",
+      "body": "Os cards à esquerda mostram seu grupo, Vida, Ataque, Estamina e equipamentos. Na faixa superior ficam INFORMAÇÕES, INVENTÁRIO e REGISTROS, além do Dia, período, distrito, modo atual e controle de áudio. O mapa ocupa o centro: seus contornos hexagonais indicam as casas de jogo.\n\nEm Combate, a faixa de iniciativa mostra quem age agora e quem vem depois. O card do personagem da vez abre suas ações; um botão cinza ou bloqueado indica que aquela ação não pode ser usada naquele momento.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Parece muita coisa. Comece pelo personagem da vez...”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_interface_acoes",
+      "category": "INTERFACE E HUD",
+      "title": "Ações e botões",
+      "body": "Na Exploração, ANDAR ATÉ inicia a escolha de um destino. ATIVA reúne as habilidades que podem ser usadas no contexto atual. INVENTÁRIO mostra e organiza os itens. Algumas escolhas abrem uma segunda caixa: selecione a opção desejada e confirme antes de voltar ao mapa.\n\nNo Combate, JOGAR DADO prepara o ciclo de ação. Depois disso, REPOSICIONAR move o personagem, ATACAR escolhe um alvo válido e PASSAR O TURNO encerra a vez. Habilidades e itens aparecem quando as regras deles permitem o uso. Clicar num hostil pode abrir as opções para aquele alvo.",
+      "example": "",
+      "controls": "",
+      "face_line": "“O botão existe para uma tarefa. Se está bloqueado, é porque não dá pra usar no momento, mesmo que seja inconveniente.”",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_interface_caixas",
+      "category": "INTERFACE E HUD",
+      "title": "Caixas escolhas e confirmações",
+      "body": "Uma caixa de evento pode pedir uma resposta, uma rolagem ou apenas que você reconheça o resultado. Leia o texto antes de confirmar: a consequência pode afetar só quem ativou o bloco ou todo o grupo\n\nEntre botões de uma caixa, Tab, setas ou W A S D mudam o destaque. Se nada estiver destacado, Enter ou Espaço destaca uma opção; com ela destacada, pressione novamente para escolhê-la. Nos menus principal e de pausa, Enter ou Espaço também confirma.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Leia antes do OK. Eu aviso isso por experiência – dos outros.”",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_interface_consultas",
+      "category": "INTERFACE E HUD",
+      "title": "Informações e registros",
+      "body": "INFORMAÇÕES reúne as descobertas que ajudam a campanha a avançar.\n\nREGISTROS permite reler ações e resultados já anotados. O resumo curto na tela dá uma pista do que aconteceu recentemente, enquanto o livro mostra a sequência com mais detalhe. Use essas janelas quando quiser recuperar um nome, um resultado ou a ordem dos acontecimentos.",
+      "example": "",
+      "controls": "Q abre INFORMAÇÕES no mapa; R abre REGISTROS. Os botões da faixa superior fazem o mesmo pelo mouse.",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_personagens_grupo",
+      "category": "PERSONAGENS",
+      "title": "Seu grupo",
+      "body": "Você escolhe três personagens jogáveis diferentes ao começar. Cada um tem atributos, Maestrias, habilidades e itens próprios. Os três ocupam vagas fixas do grupo; companheiros encontrados durante a campanha acompanham seus donos sem tomar uma dessas vagas. Conhecer as diferenças entre eles ajuda a decidir quem explora, quem guarda recursos e quem entra em confronto.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Três pessoas, três opiniões sobre quem devia ter levado a mochila.”",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_personagens_ficha",
+      "category": "PERSONAGENS",
+      "title": "A ficha do personagem",
+      "body": "Abra a ficha pelo botão de informação no card para consultar atributos, Maestrias, habilidades, equipamentos e condições. A ficha é o lugar certo para conferir o que um personagem faz antes de gastar uma ação ou um item. Um efeito adquirido durante a campanha pode alterar os números mostrados ali; vale olhar de novo depois de receber uma condição ou trocar equipamento.",
+      "example": "",
+      "controls": "Com o foco do teclado nos cards, Q abre a ficha do card destacado. Sem esse foco, Q abre o painel geral de INFORMAÇÕES.",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_personagens_atributos",
+      "category": "PERSONAGENS",
+      "title": "Vida ataque e estamina",
+      "body": "Vida mostra quanto o personagem ainda aguenta e qual é seu máximo. Se chegar a zero, ele deixa de atuar e o grupo terá de lidar com a perda. Ataque participa do potencial de dano e, no caso de ataques à distância, também pode ampliar o alcance. Estamina limita quantos passos podem ser dados; cada passo normal por hex custa uma unidade (salvo regras especiais).\n\nNo Combate, jogar o dado restaura a Estamina do ciclo de ação. O valor do dado aumenta o potencial de ataque, não o número de passos que a Estamina permite. Equipamentos, habilidades e condições podem alterar esses números; confira o valor atual antes de decidir.",
+      "example": "Com 4 de Estamina, um caminho normal de 3 hexes cabe no limite e deixa 1. O mesmo valor no dado não acrescentaria passos extras.",
+      "controls": "",
+      "face_line": "“Estamina é distância. O dado não aumenta isso.”",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_personagens_vez",
+      "category": "PERSONAGENS",
+      "title": "Quem está na vez",
+      "body": "O personagem ativo conduz a ação atual.\n\nNa Exploração, ações usadas por ele podem comprometer sua vez antes do movimento, então não conte com uma troca de personagem depois de começar.\n\nEm Combate, a iniciativa define quem age; você não escolhe livremente outra posição da fila. Os cards continuam disponíveis para consulta, mesmo quando outro membro está agindo.",
+      "example": "",
+      "controls": "Tab alterna o foco entre cards e faixa superior. Nos cards, Cima e Baixo mudam o destaque; Enter ou Espaço abre as ações do personagem da vez, mesmo que outro card esteja destacado.",
+      "face_line": "“Olhar a ficha de alguém não rouba a vez de quem está jogando.”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_habilidades_tipos",
+      "category": "HABILIDADES",
+      "title": "Ativas e passivas",
+      "body": "Uma habilidade ativa precisa ser escolhida quando está disponível. Uma passiva funciona quando sua condição acontece: ao atacar, receber dano, começar um turno ou em outro momento descrito nela.\n\nAlgumas habilidades valem só na Exploração, outras só no Combate, e algumas funcionam nos dois modos. Consulte a descrição antes de usar; o nome sozinho nem sempre conta tudo.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_habilidades_uso",
+      "category": "HABILIDADES",
+      "title": "Como usar uma ativa",
+      "body": "Abra as ações do personagem da vez e procure ATIVA. Escolha a habilidade, confira se há custo, limite de uso ou alvo exigido e siga a indicação da interface. Algumas pedem um personagem; outras pedem um hexágono. Quando for preciso apontar no mapa, use o mouse para escolher o alvo e confirme a ação.\n\nSe a habilidade estiver bloqueada, verifique o modo atual, a vez do personagem, o alvo e os recursos disponíveis. Um botão indisponível não consome nada.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_habilidades_origem",
+      "category": "HABILIDADES",
+      "title": "Habilidades de origem e adquiridas",
+      "body": "Algumas habilidades pertencem ao personagem desde o começo. Outras chegam por eventos, equipamentos ou progresso da campanha.\n\nA ficha reúne essas informações para que você veja o que ainda está disponível e de onde veio cada benefício. Um item pode conceder uma habilidade enquanto estiver equipado; tirá-lo pode retirar esse acesso.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Se a habilidade sumiu depois de trocar o acessório, investigue o acessório.”",
+      "expression": "confuso discreto."
+    },
+    {
+      "id": "tutorial_habilidades_regras",
+      "category": "HABILIDADES",
+      "title": "Custos e restrições",
+      "body": "Leia quatro coisas na descrição de uma ativa: quando pode ser usada, quem ou o que ela alcança, o que consome e quando seu efeito termina. A mesma habilidade pode ter uma restrição por turno ou por combate.\n\nAlgumas dependem de uma escolha pendente; termine essa escolha antes de tentar outra ação. Passivas também têm condições: elas não disparam fora do momento descrito.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Regras pequenas costumam morar nas letras pequenas.”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_exploracao_movimento",
+      "category": "EXPLORAÇÃO",
+      "title": "Como explorar",
+      "body": "Abra ANDAR ATÉ, escolha com o mouse um hexágono ao alcance e confirme o destino. O caminho pode passar por blocos já resolvidos, mas termina em um bloco ativável e livre de outro personagem. O custo aparece antes da confirmação. Depois da caminhada, resolva o conteúdo do bloco de chegada.\n\nCada personagem tem sua própria Estamina restante. O movimento não devolve Estamina só porque você clicou em outro hexágono. Se houver uma habilidade especial de movimento, a interface mostrará a oportunidade de usá-la.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Cada passo cobra Estamina.”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_exploracao_mapa",
+      "category": "EXPLORAÇÃO",
+      "title": "Lendo o mapa",
+      "body": "Cada hex é uma casa de jogo. Um destino válido precisa ter conteúdo, estar desocupado e poder ser alcançado pelo personagem.\n\nOs contornos e destaques ajudam a separar hexes disponíveis, ocupados e indisponíveis. Se o destino não aceitar o clique, verifique Estamina, caminho, ocupação e efeitos que limitam movimento.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Quarenta hexes. Não prometi quarenta boas ideias.”",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_exploracao_estamina",
+      "category": "EXPLORAÇÃO",
+      "title": "Estamina e caminho",
+      "body": "O custo normal é o número de passos do caminho até o destino, um ponto de Estamina por hex percorrido. A distância em linha reta nem sempre representa o caminho disponível; personagens e restrições podem impedir uma rota.\n\nQuem voa ou recebe movimento especial pode seguir uma regra diferente, indicada pela habilidade ou efeito.",
+      "example": "Um personagem com 3 de Estamina pode percorrer um caminho normal de 3 passos. Um destino que exige 4 passos não cabe nessa ação.",
+      "controls": "",
+      "face_line": "",
+      "expression": "confuso discreto."
+    },
+    {
+      "id": "tutorial_exploracao_chegada",
+      "category": "EXPLORAÇÃO",
+      "title": "O bloco de chegada",
+      "body": "Ao chegar a um bloco, você pode encontrar um evento, item, armadilha, Informação ou encontro. A caixa de abertura apresenta a situação. Siga as escolhas, rolagens e confirmações que aparecerem; o movimento só termina de ser resolvido quando essa sequência acaba. Leia também o resultado: ele pode alterar Vida, itens, condições ou a situação do mapa.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "surpreso discreto."
+    },
+    {
+      "id": "tutorial_exploracao_depois",
+      "category": "EXPLORAÇÃO",
+      "title": "Depois da descoberta",
+      "body": "Depois que o bloco termina, o jogo passa ao próximo passo da Rodada. Você pode consultar o grupo e organizar itens antes da vez seguinte, mas uma ação pendente precisa ser concluída antes de abrir outra. Quando todos os personagens disponíveis terminarem e houver puma Informação da Rodada, a opção de avançar poderá abrir a escolha do próximo distrito.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Um resultado por vez. O mapa já se esforça o bastante para ser confuso.”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_eventos_aleatorios",
+      "category": "EVENTOS E DESCOBERTAS",
+      "title": "Eventos aleatórios",
+      "body": "Um evento apresenta uma situação e resolve suas consequências. Alguns pedem que você escolha; outros sorteiam um resultado ou acontecem automaticamente. O texto de abertura conta o que o personagem percebeu, e o resultado mostra o que de fato mudou.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Confira se a consequência atinge o ativador, outro alvo ou o grupo inteiro.”",
+      "expression": "surpreso discreto."
+    },
+    {
+      "id": "tutorial_eventos_itens",
+      "category": "EVENTOS E DESCOBERTAS",
+      "title": "Itens encontrados",
+      "body": "Alguns blocos concedem itens. O item precisa caber no inventário de quem vai recebê-lo; quando a entrega pedir outro destinatário ou uma troca, termine essa decisão antes de seguir. Abra a descrição do item para conhecer seu uso, espaço ocupado, efeitos e possíveis restrições. Equipamentos só produzem seus benefícios quando a regra deles está ativa.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Encontrar uma coisa e conseguir carregá-la são coisas diferentes.”",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_eventos_armadilhas",
+      "category": "EVENTOS E DESCOBERTAS",
+      "title": "Armadilhas",
+      "body": "Armadilhas são blocos que podem causar dano, aplicar uma condição ou iniciar outro problema. Algumas atingem só quem chegou; outras alcançam hexes próximos. A caixa informa. Consulte a ficha depois para verificar efeitos que continuam além da abertura.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Se o chão fizer clique, depois vem um ‘bum!’.”",
+      "expression": "surpreso discreto."
+    },
+    {
+      "id": "tutorial_eventos_permanentes",
+      "category": "EVENTOS E DESCOBERTAS",
+      "title": "Efeitos duradouros",
+      "body": "Nem toda consequência acaba quando a caixa fecha. Uma condição pode durar turnos, Rodadas, dias ou até ser curada. Algumas mudanças permanecem na campanha. A descrição do resultado e a ficha do personagem ajudam a distinguir um efeito temporário de uma alteração duradoura.\n\nSe houver uma duração, observe quando ela é contada: no turno do afetado, na virada de Rodada ou na virada de Dia.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_eventos_informacoes",
+      "category": "EVENTOS E DESCOBERTAS",
+      "title": "Informações",
+      "body": "Informações são descobertas importantes para avançar na campanha. Encontrar uma na Rodada habilita a próxima fase quando não há ações pendentes.\n\nO painel INFORMAÇÕES permite rever o que já foi obtido; o contador mostra o progresso da campanha escolhida. Uma Informação pode vir do mapa ou de outros efeitos, conforme o resultado apresentado.",
+      "example": "",
+      "controls": "",
+      "face_line": "“O objetivo desse jogo é sobre conseguir essas Informações – se ainda não ficou claro.”",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_eventos_encontros",
+      "category": "EVENTOS E DESCOBERTAS",
+      "title": "Encontros indesejados",
+      "body": "Um Encontro Indesejado coloca o grupo diante de hostis e pode iniciar um Combate. A caixa apresenta o acontecimento antes da mudança de modo. Quando o confronto começa, veja a ordem de iniciativa, o posicionamento e as ações disponíveis.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "confuso discreto."
+    },
+    {
+      "id": "tutorial_eventos_catastrofes",
+      "category": "EVENTOS E DESCOBERTAS",
+      "title": "Catástrofes",
+      "body": "Catástrofes podem alterar o ambiente e as regras de uma parte da campanha. Observe o aviso que aparece e confira seus efeitos antes de mover ou usar itens. Algumas consequências permanecem por um período; outras se encerram quando o relógio da campanha avança.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "surpreso discreto."
+    },
+    {
+      "id": "tutorial_inventario_visao",
+      "category": "INVENTÁRIO",
+      "title": "Suas coisas",
+      "body": "INVENTÁRIO abre os itens dos três personagens lado a lado. Cada coluna mostra os objetos carregados, os equipamentos e o espaço usado.\n\nClique em um item para ver as ações disponíveis e abra seus detalhes para ler a descrição. Itens iguais podem existir em cópias diferentes, inclusive com melhorias próprias.",
+      "example": "",
+      "controls": "I abre o inventário do grupo quando o mapa está livre de caixas e escolhas. O botão INVENTÁRIO da faixa superior também abre o painel.",
+      "face_line": "“Aqui ficam as coisas que você guardou para usar depois. Para os acumuladores de plantão: há limites!”",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_inventario_usar",
+      "category": "INVENTÁRIO",
+      "title": "Usando um item",
+      "body": "Selecione a cópia do item e escolha a ação de uso. Leia o efeito e confira quem será beneficiado ou atingido antes de confirmar. Um consumível sai do inventário quando é consumido; um equipamento precisa ser vestido para conceder seus efeitos.\n\nCondições como Impedido de Consumir podem bloquear o uso mesmo quando o item está disponível na mochila.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_inventario_transferir",
+      "category": "INVENTÁRIO",
+      "title": "Transferindo e organizando",
+      "body": "Arraste um item carregado para outra vaga da mesma coluna para reorganizá-lo. Para entregá-lo a outro jogável, arraste a cópia até a coluna de destino; a transferência só é aceita se o novo dono puder recebê-la e tiver espaço.\n\nItens amaldiçoados não seguem essa troca comum.\n\nUm equipamento carregado também pode ser arrastado para uma vaga compatível de equipamento.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_inventario_espaco",
+      "category": "INVENTÁRIO",
+      "title": "Espaço da mochila",
+      "body": "Cada jogável começa com 12 espaços. Itens ou outros efeitos podem mudar a capacidade. O indicador mostra espaço ocupado e limite atual; uma seta revela vagas extras – quando existem.\n\nEquipamentos vestidos não ocupam vagas no inventário, mas voltam a precisar de espaço quando são retirados.\n\nObservação: Tirar uma mochila equipada reduz a capacidade para o padrão. Se os itens restantes não couberem, o jogo impede a troca até você liberar espaço.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Uma mochila equipada aumenta o limite. Tirar ela, tira o limite.”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_inventario_tipos",
+      "category": "INVENTÁRIO",
+      "title": "Tipos de item",
+      "body": "Consumíveis são usados e podem acabar.\n\nArmas, armaduras e acessórios são equipamentos com vagas próprias.\n\nAlguns itens têm regras especiais de criação, uso ou permanência; leia a descrição da cópia encontrada.\n\nItens amaldiçoados exigem atenção extra e não podem ser tratados como uma troca comum entre personagens.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "confuso discreto."
+    },
+    {
+      "id": "tutorial_equipamentos_vestir",
+      "category": "EQUIPAMENTOS",
+      "title": "Vestir e retirar",
+      "body": "No inventário, selecione um equipamento ou arraste sua cópia até a vaga correspondente: arma, armadura ou acessório. O item sai da mochila e passa a contar como equipado. Ao retirar, ele volta a ocupar espaço.\n\nSe não houver lugar para recebê-lo, organize a mochila antes de tentar de novo. A ficha mostra os bônus e habilidades que estão valendo agora.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_equipamentos_armas",
+      "category": "EQUIPAMENTOS",
+      "title": "Armas e Maestrias",
+      "body": "Uma arma pode mudar o Ataque, o tipo de golpe e a Maestria usada. Lâmina, Impacto e Distância têm comportamentos diferentes em Combate. A Maestria só traz seu benefício quando o personagem sabe usá-la; confira a ficha e a descrição da arma.\n\nSem arma, o personagem ainda pode atacar, mas não recebe os efeitos críticos de Maestria por estar desarmado.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_equipamentos_armaduras",
+      "category": "EQUIPAMENTOS",
+      "title": "Armaduras",
+      "body": "Armaduras ocupam sua própria vaga e podem conceder atributos, habilidades ou defesa, conforme a descrição. Uma armadura retirada deixa de conceder seus efeitos.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_equipamentos_acessorios",
+      "category": "EQUIPAMENTOS",
+      "title": "Acessórios",
+      "body": "Acessórios podem aumentar atributos, abrir espaços na mochila, conceder habilidades ou impor uma regra especial.\n\nLeia a descrição antes de transferir um acessório: alguns benefícios dependem de quem o usa ou de uma escolha feita uma única vez. Ao desequipar, o personagem perde os benefícios que exigem o item vestido.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Pequeno no slot, grande na letra miúda.”",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_equipamentos_defesas",
+      "category": "EQUIPAMENTOS",
+      "title": "Proteção e esquiva",
+      "body": "Esquiva tenta evitar o golpe antes de calcular o dano recebido. Se ela funciona, o dano daquele ataque é zero.\n\nProteção deixa o golpe acontecer, mas reduz a parte de dano indicada pelo efeito. Quando várias reduções se aplicam, cada uma atua sobre o que restou, e o jogo arredonda no fim. Um golpe positivo que atravessa a defesa normalmente causa pelo menos 1 de dano.",
+      "example": "Um golpe de 10 com proteção de 50% deixa 5. Duas proteções de 50% deixam 2 após arredondar 10 × 0,5 × 0,5 para baixo, respeitando o mínimo de 1.",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_epicos_regra",
+      "category": "CRIAÇÃO DE ÉPICOS",
+      "title": "Três iguais um Épico",
+      "body": "Três cópias do mesmo item comum elegível podem virar um equipamento Épico previsto para ele. As três cópias precisam pertencer ao mesmo personagem; itens de colegas não entram automaticamente na conta. Cópias equipadas também podem contar e serão consumidas na criação.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Nem me pergunte como três facas viram uma espada que pega fogo.",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_epicos_como_criar",
+      "category": "CRIAÇÃO DE ÉPICOS",
+      "title": "Como criar",
+      "body": "Abra o inventário e escolha CRIAR EQUIPAMENTO ÉPICO no card de quem tem as cópias. A tela mostra ingredientes e resultados possíveis. Se houver mais de um resultado, escolha qual deseja; leia os detalhes e confirme.\n\nAo criar, as cópias de origem são consumidas e o novo item entra na mochila do criador.\n\nO atalho E abre a criação para um personagem apto. Criar não exige que o criador seja o personagem da vez, desde que os requisitos estejam prontos.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_epicos_resultado",
+      "category": "CRIAÇÃO DE ÉPICOS",
+      "title": "O resultado",
+      "body": "Antes de confirmar, compare o item de origem com o Épico mostrado. Nome, atributos e efeitos podem mudar conforme a receita cadastrada.\n\nAs melhorias de Ataque, Vida e Estamina presentes nas cópias usadas são somadas ao novo item. Depois da criação, abra a descrição da cópia resultante para decidir quem deve equipá-la.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_epicos_bloqueios",
+      "category": "CRIAÇÃO DE ÉPICOS",
+      "title": "Quando não dá para criar",
+      "body": "A criação pode ser impedida por cópias insuficientes, espaço insuficiente, se os itens não estão no mesmo inventário, ou restrição própria do resultado. Se o botão não aparecer, confira as cópias de um mesmo personagem e os detalhes da receita. Não transfira itens sem verificar quem ficará com as três cópias.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "confuso discreto."
+    },
+    {
+      "id": "tutorial_combate_entrada",
+      "category": "COMBATE",
+      "title": "Entrando em combate",
+      "body": "Um encontro pode transformar a Exploração em Combate. O grupo e os hostis aparecem nos hexes do mapa; a faixa de iniciativa mostra a sequência das vezes.\n\nEnquanto o confronto estiver ativo, escolha ações para o participante da vez e resolva as respostas dos inimigos. O objetivo é sobreviver e encerrar o encontro. Vida, itens, condições e resultados permanecem na campanha depois da luta.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "surpreso discreto."
+    },
+    {
+      "id": "tutorial_combate_iniciativa",
+      "category": "COMBATE",
+      "title": "Ordem de iniciativa",
+      "body": "Iniciativa é a fila de atuação, mostrada durante o Combate. Para cada participante, o jogo usa uma base e soma vários resultados de dado. A base de um jogável é sua Estamina máxima; para um hostil, é seu Ataque limitado a 6. O número de dados rolados é igual a essa base, e o total da iniciativa é base mais soma dos dados. Empates consideram Estamina máxima mais Ataque.\n\nQuando alguém morre, sua posição sai da faixa e as seguintes se aproximam. Se esse participante voltar à vida no mesmo combate, entra no fim da fila, não na posição antiga.",
+      "example": "Com Estamina máxima 3 e dados 2, 4 e 5, um jogável recebe iniciativa 3 + 2 + 4 + 5 = 14.",
+      "controls": "",
+      "face_line": "“Proibido furar fila aqui.”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_combate_turno",
+      "category": "COMBATE",
+      "title": "A sua vez",
+      "body": "Quando a vez é de um personagem do grupo, jogue o dado antes de escolher movimento ou ataque. Ele recebe sua Estamina máxima para o ciclo de ação. Você pode se mover dentro desse limite, atacar um alvo válido, usar uma habilidade permitida, consumir um item quando a regra permitir ou passar o turno. Mover-se diminui o potencial do ataque daquele ciclo. Algumas habilidades ou itens concedem um ataque extra; nesse caso, o próximo ciclo pede outra rolagem.",
+      "example": "",
+      "controls": "Destaque JOGAR DADO e confirme com Enter ou Espaço. Hexes e alvos continuam sendo escolhidos com clique.",
+      "face_line": "“Jogar o dado primeiro evita reclamar de um botão cinza depois.”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_combate_dado",
+      "category": "COMBATE",
+      "title": "O dado de combate",
+      "body": "O dado tem seis faces. Seu resultado entra no cálculo do ataque; ele não aumenta os passos disponíveis. Em um ciclo normal, o jogo usa a rolagem para verificar alcance e potencial de dano. Um 6 pode ativar um efeito crítico conforme a Maestria da arma; desarmado, um 6 acrescenta 2 ao potencial antes das reduções.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_combate_dano",
+      "category": "COMBATE",
+      "title": "De onde vem o dano",
+      "body": "Para um ataque comum do jogador, comece com o Ataque atual do personagem, some o dado e os bônus que disparam antes do golpe. Se estiver desarmado e tirar 6, some mais 2. Subtraia os hexes percorridos no ciclo e, num ataque à distância, subtraia também a distância até o alvo menos 1.\n\nAlguns efeitos retiram essa penalidade de distância. Multiplique pelos modificadores de dano do atacante, arredonde para baixo e não deixe o potencial ficar negativo.\n\nDepois, o alvo pode esquivar. Se não esquivar, proteções e outras reduções multiplicam o dano restante; o jogo arredonda para baixo uma vez após essas reduções.\n\nUm golpe positivo que não foi evitado causa pelo menos 1, limitado pela Vida que o alvo ainda possui. Habilidades, passivas e situações especiais podem mudar etapas específicas, por isso a prévia de ataque é a melhor conferência para o alvo escolhido.\n\nExemplo prático A: Ataque 8, dado 4, dois hexes percorridos e alvo adjacente, sem outros efeitos: 8 + 4 − 2 = 10 de potencial. Sem esquiva nem proteção, são 10 de dano.\n\nExemplo prático B: Ataque 9, dado 5, um hex percorrido e alvo a três hexes, sem efeito que ignore distância: 9 + 5 − 1 − (3 − 1) = 11. Se um efeito multiplicar o ataque por 0,5, o potencial vira 5 após arredondar para baixo. Com proteção de 50% sobre o restante, o dano final é 2. Os percentuais deste exemplo servem para mostrar a ordem das contas, não são bônus garantidos de um equipamento.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Não precisa usar calculadora. O jogo faz os cálculos. Relaxa –“",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_combate_movimento",
+      "category": "COMBATE",
+      "title": "Caminhando no combate",
+      "body": "Depois da rolagem, REPOSICIONAR mostra hexes alcançáveis. Cada passo normal gasta Estamina; você não pode terminar sobre um hex ocupado.\n\nSe um inimigo ainda estiver longe demais para atacar, APROXIMAR pode levar o personagem pelo melhor caminho disponível sem gastar o ataque.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_combate_alcance",
+      "category": "COMBATE",
+      "title": "Alcance dos golpes",
+      "body": "Golpes corpo a corpo alcançam um alvo em hex vizinho. Para ataques à distância comuns, o teto de alcance usa Ataque atual mais o resultado do dado; quanto mais longe o alvo, maior costuma ser a penalidade de distância no dano.\n\nAlgumas habilidades ignoram o teto ou a penalidade, mas só quando sua descrição diz isso. Clique no alvo para ver se ATACAR está disponível e conferir a prévia do golpe.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_combate_defesas",
+      "category": "COMBATE",
+      "title": "Defesas e acerto",
+      "body": "Esquiva, proteção e imunidade não são a mesma coisa.\n\nA esquiva tenta evitar o golpe inteiro.\n\nA proteção reduz o dano de um golpe que passou. Uma imunidade impede um efeito específico, como uma condição, quando sua regra se aplica. A descrição do item ou habilidade informa quando cada defesa funciona.",
+      "example": "Se a esquiva funcionar contra um potencial de 12, o dano é zero. Se não funcionar e houver uma proteção de 25%, restam 9 antes de outras reduções.",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_combate_desfecho",
+      "category": "COMBATE",
+      "title": "Vitória derrota e fuga",
+      "body": "O combate termina quando o encontro chega a uma conclusão.\n\nSe o grupo vencer, o jogo registra o resultado e pode oferecer recompensas.\n\nSe alguém chegar a zero de Vida, sai da iniciativa; as consequências para o grupo dependem de quem ainda está vivo e das regras da campanha.\n\nO combate comum não oferece um botão geral de FUGIR. Uma habilidade ou um acontecimento especial pode alterar a saída do confronto; nesse caso, leia a opção e suas condições na própria caixa.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_aliados_grupo",
+      "category": "ALIADOS EM COMBATE",
+      "title": "Combatendo em grupo",
+      "body": "Companheiros também podem participar, cada um com suas regras de atuação. A iniciativa reúne os participantes vivos em uma fila. A ação de um aliado pode abrir espaço, proteger outro ou mudar a posição dos hostis; observe o mapa antes de escolher um alvo.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_aliados_vezes",
+      "category": "ALIADOS EM COMBATE",
+      "title": "Alternando as vezes",
+      "body": "Você não avança livremente para a vez de outro aliado. A ordem de iniciativa decide quem age em seguida. O card do personagem atual abre as ações que ele pode realizar; os outros cards servem para consultar estado, ficha e itens. Ao terminar a vez, a fila avança para o próximo participante vivo.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Espera a vez de cada um agir. Personagem e aliados são coisas diferentes. Cada um tem seu lugar na fila.”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_aliados_posicao",
+      "category": "ALIADOS EM COMBATE",
+      "title": "Posição e apoio",
+      "body": "Um aliado não pode terminar o movimento no hex de outra entidade.\n\nAproximar-se pode colocar um inimigo ao alcance de um golpe corpo a corpo, enquanto recuar pode melhorar a posição para um ataque à distância. Habilidades de apoio e itens podem pedir um alvo aliado; clique no personagem permitido e confirme quando a interface solicitar.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_aliados_queda",
+      "category": "ALIADOS EM COMBATE",
+      "title": "Quando alguém cai",
+      "body": "Um participante que chega a zero de Vida deixa de agir e sai da fila de iniciativa. A perda de um jogável pode exigir uma substituição ou outra decisão depois do confronto; acompanhe as caixas apresentadas antes de seguir.\n\nSe um personagem estiver impedido de agir por um efeito de Exploração, consulte a condição: essa proteção especial contra alvos hostis não vale automaticamente para incapacitações causadas por entidades.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "triste discreto."
+    },
+    {
+      "id": "tutorial_aliados_consequencias",
+      "category": "ALIADOS EM COMBATE",
+      "title": "Efeitos no grupo",
+      "body": "Alguns acontecimentos atingem o grupo inteiro, enquanto outros afetam apenas um alvo.\n\nUma condição como Tristeza pode surgir após perdas e reduzir atributos durante um tempo. Confira cada card e ficha quando terminar uma luta: não presuma que todos saíram com o mesmo estado. Itens e habilidades de apoio também dependem do alvo permitido por sua descrição.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_condicoes_geral",
+      "category": "CONDIÇÕES E EFEITOS",
+      "title": "Lendo uma condição",
+      "body": "Condições alteram atributos, causam dano recorrente ou limitam ações. A ficha mostra o que está ativo; a descrição informa o efeito. Observe a origem e a duração. Um turno conta a vez do personagem afetado; uma Rodada muda quando Manhã, Tarde ou Noite avança; um dia muda depois da Noite. Uma condição pode atingir jogáveis ou hostis se a fonte permitir.\n\nImunidade impede uma condição específica de entrar. Remover uma condição já ativa exige um efeito que cure ou retire aquele estado; não basta ficar imune depois.\n\nAlgumas regras especiais podem limpar efeitos existentes ao ativar a imunidade.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_condicoes_doenca_leve",
+      "category": "CONDIÇÕES E EFEITOS",
+      "title": "Doença Leve",
+      "body": "Doença Leve reduz a Vida máxima em 2. Na virada de cada Rodada, tenta transmitir Doença Leve ao aliado mais próximo com 20% de chance. Na próxima virada de Dia, evolui para o estágio seguinte se não for curada. Ela pode vir de eventos, armadilhas ou efeitos de inimigos; a fonte concreta aparece no resultado que a aplicou. Curar a Doença remove a perda de Vida máxima daquele estágio.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "confuso discreto."
+    },
+    {
+      "id": "tutorial_condicoes_doenca",
+      "category": "CONDIÇÕES E EFEITOS",
+      "title": "Doença",
+      "body": "No estágio Doença, a Vida máxima cai 3 e o Ataque cai 2. A cada virada de Rodada, há 25% de chance de transmitir Doença Leve ao aliado mais próximo. Na virada de Dia seguinte, evolui para Doença Grave se continuar ativa. A condição dura até ser curada. A cura devolve os pontos de Vida máxima que a condição retirou, mas não repõe automaticamente toda a Vida atual perdida em outros golpes.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "triste discreto."
+    },
+    {
+      "id": "tutorial_condicoes_doenca_grave",
+      "category": "CONDIÇÕES E EFEITOS",
+      "title": "Doença Grave",
+      "body": "Doença Grave reduz a Vida máxima em 5 e o Ataque em 3. A partir da virada de Dia posterior à entrada neste estágio, tira mais 2 de Vida máxima por dia até ser curada. Na virada de cada Rodada, tem 40% de chance de transmitir Doença Leve ao aliado mais próximo. Ao curar, a perda de Vida máxima causada por essa condição é devolvida.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Melhor procurar uma cura logo!”",
+      "expression": "triste discreto."
+    },
+    {
+      "id": "tutorial_condicoes_tristeza",
+      "category": "CONDIÇÕES E EFEITOS",
+      "title": "Tristeza",
+      "body": "Tristeza reduz Ataque em 2, Estamina em 1 e o bônus de consumíveis em 2. Ela pode vir de acontecimentos ou da perda de alguém, conforme a fonte. Sua duração é contada em dias: consulte a condição ativa para saber quanto resta no caso atual. Ao terminar ou ser removida, os modificadores deixam de valer.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "triste discreto."
+    },
+    {
+      "id": "tutorial_condicoes_terror",
+      "category": "CONDIÇÕES E EFEITOS",
+      "title": "Terror",
+      "body": "Terror reduz o Ataque em 3. No começo da vez do afetado, existe uma chance base de 50% de resistir e encerrar a condição. Se falhar, ele precisa se afastar da origem do medo naquele turno. Resistências bem-sucedidas aumentam a chance contra a mesma origem em encontros futuros.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "surpreso discreto."
+    },
+    {
+      "id": "tutorial_condicoes_charme",
+      "category": "CONDIÇÕES E EFEITOS",
+      "title": "Charme",
+      "body": "Charme impede atacar, causar dano e escolher um hostil como alvo. Na próxima vez do afetado, ele caminha automaticamente em direção a quem causou o efeito, até metade de sua Estamina, e encerra a vez.\n\nO efeito normal dura um turno. A regra vale para o alvo que receber a condição, seja ele do grupo ou um hostil quando a aplicação permitir.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "confuso discreto."
+    },
+    {
+      "id": "tutorial_condicoes_atordoado",
+      "category": "CONDIÇÕES E EFEITOS",
+      "title": "Atordoamento",
+      "body": "Atordoado faz o personagem perder a vez afetada. A duração comum é de um turno, mas a fonte pode defini-la de outra forma, como um resultado de dado ou até o fim da Rodada.\n\nLeia a caixa que aplicou o efeito para saber o tempo exato.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "confuso discreto."
+    },
+    {
+      "id": "tutorial_condicoes_enraizado",
+      "category": "CONDIÇÕES E EFEITOS",
+      "title": "Enraizamento",
+      "body": "Enraizado impede movimento, mas não equivale, por si só, a perder todas as ações. O efeito comum dura um turno; a fonte pode estipular outra duração. Se ainda houver uma ação permitida sem deslocamento, confira o botão correspondente.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Não se mover as vezes não significa não poder agir.”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_condicoes_queimadura",
+      "category": "CONDIÇÕES E EFEITOS",
+      "title": "Queimadura",
+      "body": "Queimadura causa dano no início das vezes afetadas. O valor cai 1 antes de cada novo dano; ao chegar a zero, o efeito acaba. O dano inicial depende da fonte que aplicou a condição, então consulte o resultado da armadilha ou habilidade.\n\nEla também termina na próxima virada de Rodada se ainda estiver ativa.",
+      "example": "Se o valor inicial foi 4, os danos das próximas vezes são 3, depois 2, depois 1.",
+      "controls": "",
+      "face_line": "",
+      "expression": "surpreso discreto."
+    },
+    {
+      "id": "tutorial_condicoes_sangramento",
+      "category": "CONDIÇÕES E EFEITOS",
+      "title": "Sangramento",
+      "body": "Sangramento causa 1 de dano no início de cada vez afetada. A quantidade de turnos vem do resultado bruto do dado que o causou, não do dano final daquele ataque. Cada ação de movimento acrescenta 2 de dano. Se ainda estiver ativo na virada de Rodada, termina ali. Um golpe crítico de Lâmina pode aplicá-lo quando o alvo não for imune.",
+      "example": "Se o dado que aplicou Sangramento mostrou 4, a duração é de até quatro turnos afetados, mas pode acabar antes na virada de Rodada.",
+      "controls": "",
+      "face_line": "",
+      "expression": "triste discreto."
+    },
+    {
+      "id": "tutorial_condicoes_sem_consumivel",
+      "category": "CONDIÇÕES E EFEITOS",
+      "title": "Impedido de Consumir",
+      "body": "Impedido de Consumir bloqueia itens Consumíveis enquanto durar. A versão comum dura um turno, embora a fonte possa mudar esse prazo. Equipamentos e outras ações não ficam automaticamente bloqueados por esta condição; consulte a própria interface para ver o que ainda é permitido.",
+      "example": "",
+      "controls": "",
+      "face_line": "“O lanche está ali. O efeito diz que não.”",
+      "expression": "confuso discreto."
+    },
+    {
+      "id": "tutorial_condicoes_inimigos",
+      "category": "CONDIÇÕES E EFEITOS",
+      "title": "Condições em inimigos",
+      "body": "Condições não pertencem só ao grupo. Se uma habilidade ou ataque puder atingir hostis, o mesmo ícone pode aparecer neles. Um crítico de Impacto, por exemplo, tenta aplicar Atordoado; um crítico de Lâmina pode causar Sangramento. Imunidades e regras da fonte ainda são verificadas antes da aplicação. Use a descrição do efeito para saber se o alvo escolhido é permitido.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_radio_abrir",
+      "category": "RÁDIO E MÚSICA",
+      "title": "O rádio",
+      "body": "O botão ♪ abre os controles do rádio na barra superior. Ali você escolhe uma estação e ajusta o que quer ouvir sem mexer nas ações dos personagens. A trilha pode mudar entre exploração e combate. O rádio acompanha a partida; não é uma ação de turno.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_radio_volume",
+      "category": "RÁDIO E MÚSICA",
+      "title": "Volume sem mistério",
+      "body": "No painel de áudio, Volume geral controla a saída inteira. Música controla as trilhas; Efeitos/UI controla os efeitos sonoros e sons da interface.\n\nReduzir Música não silencia automaticamente os golpes, e reduzir Efeitos/UI não desliga a trilha. Ajuste cada controle até a mistura ficar confortável para você.",
+      "example": "Para ouvir os golpes com menos música, diminua Música e deixe Efeitos/UI como está. Para silenciar tudo de uma vez, use Volume geral ou o atalho de mudo.",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_radio_estacoes",
+      "category": "RÁDIO E MÚSICA",
+      "title": "Mudando de estação",
+      "body": "Escolha a estação no painel do rádio ou pressione 1, 2 ou 3 para ir direto às três estações disponíveis. As teclas numéricas da fileira superior e do teclado lateral servem. A estação escolhida continua sendo a sua escolha quando a trilha troca de exploração para combate.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Três estações, várias maneiras de fingir que o perigo não está vindo.”",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_radio_mudo",
+      "category": "RÁDIO E MÚSICA",
+      "title": "Silenciando",
+      "body": "M e N fazem a mesma coisa: alternam o mudo do Volume geral. Pressione uma vez para silenciar tudo; pressione novamente para recuperar o volume anterior. Se quiser apenas reduzir uma parte do som, abra o painel ♪ e use o controle correspondente.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Silêncio total também é uma escolha de trilha.”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_campanhas_tipos",
+      "category": "CAMPANHAS E PROGRESSO",
+      "title": "Tipos de campanha",
+      "body": "Antes de começar, escolha Campanha Curta, Campanha Média ou Campanha Completa. Elas mudam quanto progresso é necessário para chegar ao desfecho. A Curta pede 5 Informações; a Média, 10; a Completa exige um percurso maior e também as condições do desfecho escolhido. A escolha é feita no Novo Jogo e pertence àquela campanha.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Curta não significa tranquila.”",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_campanhas_grupo",
+      "category": "CAMPANHAS E PROGRESSO",
+      "title": "Escolhendo o grupo",
+      "body": "Uma campanha nova começa com três personagens jogáveis diferentes. Conheça suas fichas antes de confirmar: cada um traz atributos, Maestrias, habilidades e equipamento inicial próprios. Depois da escolha, o grupo entra no Subúrbio, no primeiro dia, pela manhã. A ordem de escolha manda na ordem da Exploração",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_campanhas_progresso",
+      "category": "CAMPANHAS E PROGRESSO",
+      "title": "Avançando na campanha",
+      "body": "Explorar rende acontecimentos e pode trazer Informações. Elas são parte da progressão e também liberam a passagem para a próxima etapa quando a regra da Rodada exigir. Manhã, tarde e noite formam o dia; depois da noite, começa um novo dia. A passagem pode manter o grupo no distrito ou levá-lo a um distrito vizinho permitido. Os objetivos do desfecho aparecem conforme a campanha avança.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_campanhas_escolhas",
+      "category": "CAMPANHAS E PROGRESSO",
+      "title": "Decisões e consequências",
+      "body": "Nem todo encontro tem uma resposta certa. Algumas escolhas gastam recursos, outras dão recompensas, mudam condições ou abrem um caminho novo.\n\nLeia o texto da caixa e o que cada botão realmente promete antes de confirmar. Este manual explica as regras, mas não entrega as surpresas da história.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_salvamento_manual",
+      "category": "SALVAMENTO E REGISTROS",
+      "title": "Salvando a campanha",
+      "body": "Abra o menu de pausa e escolha Salvar jogo. Selecione um dos três slots manuais desta campanha e confirme. Salvar preserva o estado atual para continuar depois; não avança o tempo da partida.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Guardar um ponto de retorno é uma forma respeitável de prudência.”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_salvamento_carregar",
+      "category": "SALVAMENTO E REGISTROS",
+      "title": "Carregando um save",
+      "body": "Use Carregar jogo no menu principal ou de pausa, escolha a campanha e depois o save específico que deseja abrir. Confira o dia, período, distrito e personagens para saber qual ponto está escolhendo.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_salvamento_registros",
+      "category": "SALVAMENTO E REGISTROS",
+      "title": "Registros da partida",
+      "body": "Registros reúne os acontecimentos que a campanha guardou: decisões, resultados e outras mudanças importantes. Abra pelo botão Registros na barra superior ou pressione R quando a partida estiver livre de caixas que precisam de resposta. Consulte o histórico para lembrar por que alguém está ferido, equipado de um jeito estranho ou desconfiando de um gnomo.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_salvamento_historias",
+      "category": "SALVAMENTO E REGISTROS",
+      "title": "Histórias de campanhas",
+      "body": "Registros de Campanhas, no menu principal, permite consultar histórias de campanhas guardadas. Durante a partida, o menu de pausa também oferece Registros de Histórias. Esses livros servem para reler o caminho percorrido; não são botões para continuar um save. Para retomar a partida, escolha Carregar jogo.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_salvamento_restricoes",
+      "category": "SALVAMENTO E REGISTROS",
+      "title": "Quando salvar não está disponível",
+      "body": "O jogo só grava um save quando a campanha está em um estado seguro. Durante uma transição, uma escolha pendente ou outra etapa que ainda precisa terminar, Salvar jogo pode ficar indisponível. Conclua a ação aberta e tente novamente. O aviso na tela indica quando a gravação não pôde ser feita; não trate um clique sem confirmação como um save pronto.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_configuracoes_graficos",
+      "category": "CONFIGURAÇÕES",
+      "title": "Gráficos e interface",
+      "body": "Em Configurações → Gráficos e interface, ajuste a resolução, o modo da janela e o tamanho da interface. As escalas disponíveis são 80%, 100%, 125% e 150%. A escala afeta a leitura e o espaço ocupado pelos painéis; experimente a que fica mais confortável na sua tela. Ela não muda as regras da campanha.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_configuracoes_paletas",
+      "category": "CONFIGURAÇÕES",
+      "title": "Paletas visuais",
+      "body": "Ainda em Gráficos e interface, escolha entre as paletas Padrão, Azul neon, Rosa e branco e Acessível. A paleta muda as cores da interface para melhorar seu conforto visual; não altera itens, resultados ou vantagens no jogo. Se alguma cor estiver difícil de distinguir, teste Acessível e combine com uma escala de interface maior.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_configuracoes_acessibilidade",
+      "category": "CONFIGURAÇÕES",
+      "title": "Movimento e flashes",
+      "body": "As opções de reduzir movimento e flashes diminuem efeitos visuais que podem incomodar ou atrapalhar a leitura. Use-as sem receio: os acontecimentos continuam os mesmos. Se precisar de textos maiores, ajuste a escala da interface. Algumas opções exibidas como prévia ainda não mudam a imagem do jogo; observe o aviso do próprio controle antes de contar com ele.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_configuracoes_dificuldade",
+      "category": "CONFIGURAÇÕES",
+      "title": "Dificuldade",
+      "body": "Em Jogabilidade, a dificuldade pode ser Água com Açúcar, Padrão ou Caótico. Ela afeta regras de confronto e progressão, conforme a descrição de cada opção no menu. Se você trocar durante uma campanha, a escolha passa a valer na próxima Rodada, não no meio da atual. Salve a campanha para preservar essa alteração.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_configuracoes_audio",
+      "category": "CONFIGURAÇÕES",
+      "title": "Áudio",
+      "body": "Na aba Áudio, Volume geral ajusta tudo de uma vez. Música controla as trilhas; Efeitos/UI controla golpes, ambiente e interface. Você também pode abrir o painel ♪ na partida para ajustes rápidos e trocar de estação. M e N alternam o mudo geral.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Se o passarinho está mais alto que a luta, você sabe onde ajustar.”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_controles_menus",
+      "category": "CONTROLES E ATALHOS",
+      "title": "Navegando pelos menus",
+      "body": "Use Tab, as setas ou W, A, S e D para percorrer os botões conforme a disposição da caixa. O botão destacado ganha um brilho leve.\n\nEm menus como o principal e o de pausa, Enter ou Espaço confirma.\n\nEm caixas de escolha da partida, Enter ou Espaço primeiro destaca uma opção se ainda não houver nenhuma; pressione novamente para confirmar a opção destacada.",
+      "example": "",
+      "controls": "",
+      "face_line": "“O mouse continua funcionando.”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_controles_partida",
+      "category": "CONTROLES E ATALHOS",
+      "title": "Atalhos da partida",
+      "body": "Com a partida livre de caixas pendentes, I abre o inventário do grupo, R abre Registros e Q abre Informações. P abre o menu de pausa; P novamente, ou Voltar, retorna ao jogo.\n\nHome aproxima o zoom; End afasta.\n\nE abre a criação de Épicos quando algum personagem reúne os itens necessários. Essas teclas não substituem escolhas que estão esperando sua confirmação em uma janela.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Um atalho economiza cliques.”",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_controles_hud",
+      "category": "CONTROLES E ATALHOS",
+      "title": "Cards e barra superior",
+      "body": "No mapa, Tab alterna o foco entre os cards dos personagens e a barra superior.\n\nAo focar os cards, o personagem da vez já fica destacado; use cima/baixo ou W/S para consultar os demais. Q abre a ficha do card destacado. Enter ou Espaço abre as ações do personagem da vez, mesmo se outro card estiver destacado.\n\nNa barra superior, o primeiro botão à esquerda já fica destacado; use esquerda/direita ou A/D e confirme o botão disponível.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Olhar outro card não passa a vez. O foco e a vez são coisas diferentes.”",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_controles_mapa",
+      "category": "CONTROLES E ATALHOS",
+      "title": "Mapa e combate com o mouse",
+      "body": "Para escolher hexágonos do mapa, destinos de movimento, entidades-alvo e posições de ataque, use o mouse. Depois de abrir as ações com Enter ou Espaço, use cima/baixo para percorrê-las, esquerda para voltar um nível e Enter ou Espaço para confirmar uma ação disponível. Se houver um dado para rolar, destaque seu botão antes de confirmar.",
+      "example": "",
+      "controls": "",
+      "face_line": "",
+      "expression": "neutro."
+    },
+    {
+      "id": "tutorial_controles_cancelar",
+      "category": "CONTROLES E ATALHOS",
+      "title": "Fechar, cancelar e confirmar",
+      "body": "Esc fecha apenas caixas que permitem fechar pelo X. Se a saída exigir confirmação, Esc abre essa confirmação em vez de fechar direto. Uma escolha obrigatória de evento precisa ser resolvida com o botão correspondente; Esc não a descarta. Na seleção de distrito do Novo Dia, Esc volta ao mapa atual. Para desistir de uma recompensa, Esc inicia o pedido de desistência, que ainda precisa ser confirmado. Leia o botão destacado antes de apertar Enter ou Espaço.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Esc não é uma borracha universal. Ainda bem.”",
+      "expression": "sorriso discreto."
+    },
+    {
+      "id": "tutorial_controles_radio",
+      "category": "CONTROLES E ATALHOS",
+      "title": "Rádio e som pelo teclado",
+      "body": "M ou N alterna o mudo geral. Pressione as teclas de números no teclado para escolher uma das estações disponíveis. O botão ♪ abre os controles de rádio e volume.",
+      "example": "",
+      "controls": "",
+      "face_line": "“Se apertar 9 e nada mudar, talvez a nona estação ainda não exista.”",
+      "expression": "neutro."
+    }
+  ]
+}
+

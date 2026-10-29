@@ -51,7 +51,7 @@ func _scenario(information: Array[String], chance: int, accept: bool,
 		forced_chance: float, expected_recruited: bool,
 		mode: int = EventCampaignEligibility.Mode.COMPLETE,
 		endings: Array[StringName] = []) -> void:
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo

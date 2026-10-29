@@ -8,7 +8,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var game := scene.get_node("GerenciaJogo") as GerenciaJogo
@@ -119,12 +119,16 @@ func _run() -> void:
 		"Galinha muda só a aparência da instância.")
 	var party_view := scene.get_node("MapRoot/DepthSorted/PlayableActors") as PlayablePartyView
 	var actor_visual := party_view.visuals_by_slot.get(actor.playable_slot_id) as PlayableActorVisual
-	check(actor_visual != null and not actor_visual.animated_sprite.visible,
-		"A silhueta provisória substitui o sprite normal da Galinha.")
+	check(actor_visual != null and actor_visual.animated_sprite.visible
+		and actor_visual._animation_data() == PlayableActorVisual.CHICKEN_ANIMATION
+		and is_equal_approx(actor_visual.animated_sprite.scale.y,
+			SpriteOrientationReference.chicken_reference_scale()),
+		"A galinha usa seus sprites reais na escala da cena de orientação.")
 	campaign.round_period += 1
 	campaign.expire_temporary_events_for_clock()
-	check(actor.temporary_appearance == &"" and actor_visual.animated_sprite.visible,
-		"Galinha expira visualmente na virada da Rodada.")
+	check(actor.temporary_appearance == &"" and actor_visual.animated_sprite.visible
+		and actor_visual._animation_data() == actor_visual.data.playable_animation,
+		"Galinha expira e devolve a animação original na virada da Rodada.")
 
 	var wagon := load("res://resources/events/random_events/53-carreta_da_alegria.tres") as EventData
 	context["resource"] = wagon
@@ -270,8 +274,14 @@ func _run() -> void:
 	check(solo_visual._dialog_layer.visible and not solo_visual._banner_layer.visible,
 		"O terceiro turno real abre o aviso de retorno e esconde a faixa.")
 
+	root.remove_child(scene)
+	scene.free()
 	print("TIMED_RANDOM_EVENTS_OK" if failures == 0 else
 		"TIMED_RANDOM_EVENTS_FAILED: %d" % failures)
+	_finish_test.call_deferred()
+
+
+func _finish_test() -> void:
 	quit(0 if failures == 0 else 1)
 
 

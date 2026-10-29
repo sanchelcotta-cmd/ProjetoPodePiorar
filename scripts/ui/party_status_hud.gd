@@ -3,6 +3,7 @@ extends CanvasLayer
 
 const DIALOG_STYLE := preload("res://scripts/ui/game_dialog_style.gd")
 const NARRATIVE_FONT := preload("res://scripts/ui/ui_narrative_font.gd")
+const KEYBOARD_BUTTON_NAVIGATION := preload("res://scripts/ui/keyboard_button_navigation.gd")
 
 ## Três quadros idênticos, sempre nas vagas Playable_1/2/3. A posição é de
 ## tela (CanvasLayer), então o painel não anda junto com o mapa.
@@ -76,6 +77,8 @@ var _stat_hover_key := ""
 var _future_vision_targeting_actor: EntityState
 var _future_vision_is_premonition := false
 var _open_card: PartyCharacterCard
+var _keyboard_card_index := -1
+var _action_keyboard_navigation := KEYBOARD_BUTTON_NAVIGATION.new()
 var _action_tween: Tween
 var _inventory_tween: Tween
 var _details_tween: Tween
@@ -125,6 +128,7 @@ var _initiative_action_link: Line2D
 var _combat_pass_button: Button
 var _combat_ally_roll_button: Button
 var _combat_roll_animating := false
+var _combat_roll_tween: Tween
 var _revive_dialog: ConfirmationDialog
 var _attune_dialog: ConfirmationDialog
 var _attune_owner: EntityState
@@ -361,15 +365,35 @@ func _input(event: InputEvent) -> void:
 	if hex_choice.visible and event is InputEventKey and event.pressed \
 			and event.keycode == KEY_ESCAPE:
 		_hide_hex_choice()
-		_hide_ally_owner_badge()
 		get_viewport().set_input_as_handled()
 		return
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-		_hide_ally_owner_badge()
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE \
-			and _future_vision_targeting_actor != null:
-		_end_future_vision_targeting()
-		return
+	if event is InputEventKey and event.pressed and not event.echo \
+			and action_drawer.visible and not get_tree().paused:
+		var activation := get_parent().get_node_or_null("BlockActivationPopup") as BlockActivationPopup
+		if activation == null or not activation.overlay.visible:
+			var key := (event as InputEventKey).keycode
+			if key == KEY_I:
+				_on_inventory_pressed()
+				get_viewport().set_input_as_handled()
+				return
+			if key in [KEY_LEFT, KEY_A]:
+				if item_details_panel.visible:
+					_close_item_details()
+				elif inventory_panel.visible:
+					_close_inventory()
+				elif hex_choice.visible:
+					_hide_hex_choice()
+				elif ally_drawer.visible:
+					ally_drawer.hide()
+				else:
+					_close_actions()
+				get_viewport().set_input_as_handled()
+				return
+			if not inventory_panel.visible and not hex_choice.visible \
+					and not ally_drawer.visible \
+					and _action_keyboard_navigation.handle(event, action_scroll):
+				get_viewport().set_input_as_handled()
+				return
 	if not event is InputEventMouseButton or event.button_index != MOUSE_BUTTON_LEFT:
 		return
 	if not event.pressed and _drag_pet_visual != null:
@@ -460,6 +484,7 @@ func _process(delta: float) -> void:
 
 
 func _on_map_generated(_map: HexGrid) -> void:
+	_cancel_combat_die_animation()
 	_walk_target_actor = null
 	_future_vision_targeting_actor = null
 	_last_inspected_coord = Vector2i(-999, -999)
@@ -470,6 +495,7 @@ func _on_map_generated(_map: HexGrid) -> void:
 
 
 func _on_map_entered(_map: HexGrid) -> void:
+	_cancel_combat_die_animation()
 	_walk_target_actor = null
 	_sync_slots()
 
@@ -519,6 +545,7 @@ func _on_combat_die_rolled(actor: EntityState, result: int) -> void:
 
 
 func _animate_combat_die_result(actor: EntityState, result: int) -> void:
+	_cancel_combat_die_animation()
 	_combat_roll_animating = true
 	var button := _combat_ally_roll_button if gerencia != null \
 		and actor in gerencia.campaign.companion_states else walk_button
@@ -526,13 +553,33 @@ func _animate_combat_die_result(actor: EntityState, result: int) -> void:
 		_combat_roll_animating = false
 		return
 	button.disabled = true
-	for index in 12:
-		button.text = "DADO: %d" % randi_range(1, 6)
-		await get_tree().create_timer(0.05).timeout
-		if not is_inside_tree() or not is_instance_valid(button):
-			return
-	button.text = "DADO: %d" % result
+	# O tween pertence à HUD. Fechar a cena cancela a animação e não deixa
+	# SceneTreeTimers segurando botões, personagens e recursos em memória.
+	_combat_roll_tween = create_tween()
+	for _index in 12:
+		_combat_roll_tween.tween_callback(_preview_combat_die.bind(button))
+		_combat_roll_tween.tween_interval(0.05)
+	_combat_roll_tween.tween_callback(_finish_combat_die.bind(button, result))
+
+
+func _cancel_combat_die_animation() -> void:
+	if _combat_roll_tween != null and _combat_roll_tween.is_valid():
+		_combat_roll_tween.kill()
+	_combat_roll_tween = null
 	_combat_roll_animating = false
+
+
+func _preview_combat_die(button: Button) -> void:
+	if is_instance_valid(button):
+		button.text = "DADO: %d" % randi_range(1, 6)
+
+
+func _finish_combat_die(button: Button, result: int) -> void:
+	_combat_roll_tween = null
+	_combat_roll_animating = false
+	if not is_inside_tree() or not is_instance_valid(button):
+		return
+	button.text = "DADO: %d" % result
 	if _open_card != null:
 		_rebuild_action_buttons()
 	_refresh_companion_action_choice()
@@ -547,6 +594,7 @@ func _on_combat_turn_finished(_actor: EntityState) -> void:
 
 
 func _on_combat_finished(_result: Dictionary) -> void:
+	_cancel_combat_die_animation()
 	_close_actions()
 	_update_turn_border()
 
@@ -1415,6 +1463,60 @@ func _on_card_sheet_requested(card: PartyCharacterCard) -> void:
 			card.get_global_rect().get_center())
 
 
+func keyboard_focus_active_card() -> void:
+	var actor := combat_manager.current_actor if _in_combat() and combat_manager != null \
+		else exploration.current_actor if exploration != null else null
+	var index := -1
+	for candidate in cards.size():
+		if cards[candidate].state == actor:
+			index = candidate
+			break
+	if index < 0:
+		for candidate in cards.size():
+			if cards[candidate].state != null:
+				index = candidate
+				break
+	_keyboard_set_card_index(index)
+
+
+func keyboard_focus_card_delta(delta: int) -> void:
+	var candidates: Array[int] = []
+	for index in cards.size():
+		if cards[index].state != null:
+			candidates.append(index)
+	if candidates.is_empty():
+		return
+	var position := candidates.find(_keyboard_card_index)
+	_keyboard_set_card_index(candidates[posmod(position + delta, candidates.size())])
+
+
+func keyboard_clear_card_focus() -> void:
+	_keyboard_set_card_index(-1)
+
+
+func keyboard_open_highlighted_sheet() -> void:
+	if _keyboard_card_index >= 0 and cards[_keyboard_card_index].state != null:
+		_on_card_sheet_requested(cards[_keyboard_card_index])
+
+
+func keyboard_toggle_active_actions() -> void:
+	var actor := combat_manager.current_actor if _in_combat() and combat_manager != null \
+		else exploration.current_actor if exploration != null else null
+	for card in cards:
+		if card.state != actor:
+			continue
+		_on_action_toggle_requested(card)
+		if action_drawer.visible:
+			_action_keyboard_navigation.reset(action_scroll)
+		return
+
+
+func _keyboard_set_card_index(index: int) -> void:
+	_keyboard_card_index = index
+	for candidate in cards.size():
+		cards[candidate].set_keyboard_highlight(candidate == index)
+
+
 func _open_character_sheet(actor: EntityState, anchor: Vector2) -> void:
 	inspect_bubble.hide()
 	bubble_hint.hide()
@@ -1508,6 +1610,7 @@ func _on_action_toggle_requested(card: PartyCharacterCard) -> void:
 
 
 func _close_actions() -> void:
+	_action_keyboard_navigation.reset(action_scroll)
 	_end_future_vision_targeting()
 	if _action_tween != null and _action_tween.is_running():
 		_action_tween.kill()
@@ -3188,11 +3291,9 @@ func _confirm_taming() -> void:
 		_rebuild_action_buttons()
 
 
-func _on_tame_result_window_input(event: InputEvent) -> void:
-	if _tame_result_dialog != null and _tame_result_dialog.visible \
-			and event is InputEventKey and event.pressed and not event.echo \
-			and event.keycode == KEY_ESCAPE:
-		_tame_result_dialog.hide()
+func _on_tame_result_window_input(_event: InputEvent) -> void:
+	# O resultado tem OK, não um X: Esc não o dispensa.
+	pass
 
 
 func _on_recruitment_choice_requested(enemy: EntityState, chance: float,
@@ -3228,11 +3329,9 @@ func _on_recruitment_confirmed() -> void:
 	_recruitment_result_dialog.popup_centered(Vector2i(480, 155))
 
 
-func _on_recruitment_result_window_input(event: InputEvent) -> void:
-	if _recruitment_result_dialog != null and _recruitment_result_dialog.visible \
-			and event is InputEventKey and event.pressed and not event.echo \
-			and event.keycode == KEY_ESCAPE:
-		_on_recruitment_result_closed()
+func _on_recruitment_result_window_input(_event: InputEvent) -> void:
+	# A confirmação visível é obrigatória para concluir o retorno ao combate.
+	pass
 
 
 func _on_recruitment_result_closed() -> void:

@@ -42,6 +42,11 @@ var ppp_map_mode: int = PPPMapMode.EXPLORATION
 # O cenário escolhido faz parte deste mapa. Assim redimensionar a janela ou
 # recarregar a campanha não sorteia outra fachada para os mesmos 40 blocos.
 var ppp_background_path: String = ""
+## A decoração usa semente própria para não mudar com resize, save ou zoom.
+var ppp_decoration_seed: int = 0
+var ppp_anomaly_planned: bool = false
+var ppp_anomaly_kind: StringName = &""
+var ppp_anomaly_triggered: bool = false
 # O céu é escolhido junto com o mapa e permanece igual ao redimensionar.
 # A Áurea Fúnebre usa a variante cinzenta já sorteada para este mapa.
 var ppp_parallax_path: String = ""
@@ -56,6 +61,10 @@ func generate_ppp_exploration_map() -> void:
 	revealed_by_skill_ids.clear()
 	ppp_map_mode = PPPMapMode.EXPLORATION
 	ppp_background_path = ""
+	ppp_decoration_seed = 0
+	ppp_anomaly_planned = false
+	ppp_anomaly_kind = &""
+	ppp_anomaly_triggered = false
 	ppp_parallax_path = ""
 	ppp_aura_parallax_path = ""
 	ppp_snow_parallax_path = ""
@@ -295,6 +304,10 @@ func serialize() -> Dictionary:
 		"format_version": 1,
 		"map_mode": ppp_map_mode,
 		"background_path": ppp_background_path,
+		"decoration_seed": ppp_decoration_seed,
+		"anomaly_planned": ppp_anomaly_planned,
+		"anomaly_kind": str(ppp_anomaly_kind),
+		"anomaly_triggered": ppp_anomaly_triggered,
 		"parallax_path": ppp_parallax_path,
 		"aura_parallax_path": ppp_aura_parallax_path,
 		"snow_parallax_path": ppp_snow_parallax_path,
@@ -314,6 +327,10 @@ static func deserialize(data: Dictionary) -> HexGrid:
 				grid.cells[cell.coord] = cell
 	grid.ppp_map_mode = int(data.get("map_mode", PPPMapMode.EXPLORATION))
 	grid.ppp_background_path = str(data.get("background_path", ""))
+	grid.ppp_decoration_seed = int(data.get("decoration_seed", 0))
+	grid.ppp_anomaly_planned = bool(data.get("anomaly_planned", false))
+	grid.ppp_anomaly_kind = StringName(str(data.get("anomaly_kind", "")))
+	grid.ppp_anomaly_triggered = bool(data.get("anomaly_triggered", false))
 	grid.ppp_parallax_path = str(data.get("parallax_path", ""))
 	grid.ppp_aura_parallax_path = str(data.get("aura_parallax_path", ""))
 	grid.ppp_snow_parallax_path = str(data.get("snow_parallax_path", ""))

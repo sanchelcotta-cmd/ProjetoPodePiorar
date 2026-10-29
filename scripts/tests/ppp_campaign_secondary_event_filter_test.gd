@@ -40,7 +40,7 @@ func _run() -> void:
 		and not standby_generator._events_on_standby.has(needed_good.resource_path),
 		"Standby libera o mais antigo da valência necessária, não outro mais antigo.")
 
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo

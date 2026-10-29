@@ -212,7 +212,7 @@ func _run_test() -> void:
 			"Retorno ao Padrão não conserva regras do fácil.")
 
 	root.size = Vector2i(1600, 900)
-	var scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(scene)
 	await process_frame
 	var live := scene.get_node("GerenciaJogo") as GerenciaJogo

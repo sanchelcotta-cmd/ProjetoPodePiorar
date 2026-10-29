@@ -62,7 +62,7 @@ func _run() -> void:
 	for path in ["res://resources/encounters/enc_dama_elemental.tres",
 			"res://resources/encounters/enc_planta_carnivora.tres",
 			"res://resources/encounters/enc_raizes_mutantes.tres"]:
-		var scene := load("res://teste.tscn").instantiate() as PPPMapView
+		var scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 		root.add_child(scene)
 		await process_frame
 		var gerencia := scene.get_node("GerenciaJogo") as GerenciaJogo
@@ -107,7 +107,7 @@ func _run() -> void:
 				"Convidado de %s não chama mais ninguém." % encounter.id)
 		scene.queue_free()
 		await process_frame
-	var zombie_scene := load("res://teste.tscn").instantiate() as PPPMapView
+	var zombie_scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 	root.add_child(zombie_scene)
 	await process_frame
 	var zombie_gerencia := zombie_scene.get_node("GerenciaJogo") as GerenciaJogo
@@ -167,7 +167,7 @@ func _run() -> void:
 		{"path": "res://resources/encounters/enc_vilao_tipicamente_do_mal.tres",
 			"summoner": &"en_00032", "trigger": ActiveSkillData.AutomaticTrigger.ON_TURN_START},
 	]:
-		var turn_scene := load("res://teste.tscn").instantiate() as PPPMapView
+		var turn_scene := load("res://scenes/game/campaign_game.tscn").instantiate() as PPPMapView
 		root.add_child(turn_scene)
 		await process_frame
 		var turn_gerencia := turn_scene.get_node("GerenciaJogo") as GerenciaJogo

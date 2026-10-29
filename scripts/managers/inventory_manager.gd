@@ -361,6 +361,14 @@ func use_consumable(owner: EntityState, entry: InventoryItemState,
 			or campaign == null or entry not in owner.inventory_items \
 			or entry.data.item_type != ItemData.ItemType.CONSUMABLE:
 		return {"success": false, "reason": "Consumível indisponível."}
+	var mode := campaign.current_map.ppp_map_mode if campaign.current_map != null \
+		else HexGrid.PPPMapMode.EXPLORATION
+	# Sem o combate ativo, a passiva pós-consumo não sabe a qual turno pertence.
+	# Recusar antes de gastar evita perder o item e o segundo ataque em silêncio.
+	if mode == HexGrid.PPPMapMode.COMBAT \
+			and (combat == null or combat._combat_id == &""):
+		return {"success": false,
+			"reason": "Combate indisponível para consumir este item agora."}
 	if not skill_manager.debuff_manager.can_use_consumable(owner):
 		return {"success": false, "reason": "Este personagem não pode usar consumíveis agora."}
 	var target := recipient if recipient != null else owner
@@ -474,8 +482,6 @@ func use_consumable(owner: EntityState, entry: InventoryItemState,
 	if entry.data.consumed_on_use:
 		owner.inventory_items.erase(entry)
 		item_lost.emit(entry.data)
-	var mode := campaign.current_map.ppp_map_mode if campaign.current_map != null \
-		else HexGrid.PPPMapMode.EXPLORATION
 	var combat_id := &""
 	var combat_turn_number := 0
 	if mode == HexGrid.PPPMapMode.COMBAT and combat != null \

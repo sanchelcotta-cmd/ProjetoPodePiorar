@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="PlayableAnimationData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/entities/playable_animation_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://sprites/playable/galinha/galinha_idle.png" id="2_idle"]
+[ext_resource type="Texture2D" path="res://sprites/playable/galinha/galinha_walk.png" id="3_walk"]
+[ext_resource type="Texture2D" path="res://sprites/playable/galinha/galinha_hurt.png" id="4_hurt"]
+[ext_resource type="Texture2D" path="res://sprites/playable/galinha/galinha_attack.png" id="5_attack"]
+
+[resource]
+script = ExtResource("1_script")
+idle_sheet = ExtResource("2_idle")
+walk_sheet = ExtResource("3_walk")
+hurt_sheet = ExtResource("4_hurt")
+blade_attack_sheet = ExtResource("5_attack")
+impact_attack_sheet = ExtResource("5_attack")
+ranged_attack_sheet = ExtResource("5_attack")
+frame_size = Vector2i(64, 64)
+idle_frames = 8
+walk_frames = 4
+hurt_frames = 6
+attack_frames = 6
+death_hurt_frame = 3

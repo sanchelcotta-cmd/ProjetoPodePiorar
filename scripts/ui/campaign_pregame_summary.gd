@@ -3,7 +3,7 @@ extends Control
 
 ## Cena independente: mantém a escolha já sorteada; não há mapa nem HUD
 ## instanciados enquanto o jogador lê a confirmação.
-const GAME_SCENE_PATH := "res://teste.tscn"
+const GAME_SCENE_PATH := "res://scenes/game/campaign_game.tscn"
 const ENDING_NAMES := {
 	&"khainokata": "Khainokata", &"orchestra": "Orchestra",
 	&"homens_de_preto": "Homens de Preto", &"controle_da_mente": "Controle da Mente",
@@ -14,14 +14,14 @@ const ENDING_NAMES := {
 var prepared_campaign: CampaignState
 var _loading_step := 0
 
-@onready var _mode: Label = $Center/Summary/Mode
-@onready var _endings: Label = $Center/Summary/Endings
-@onready var _characters: Label = $Center/Summary/Characters
-@onready var _status: Label = $Center/Summary/Status
-@onready var _start: Button = $Center/Summary/Start
-@onready var _artwork: TextureRect = $Center/Summary/Artwork
-@onready var _loading: Control = $Loading
-@onready var _progress: TextureProgressBar = $Loading/Content/Progress
+@onready var _mode: Label = $Presentation/Center/Summary/Mode
+@onready var _endings: Label = $Presentation/Center/Summary/Endings
+@onready var _characters: Label = $Presentation/Center/Summary/Characters
+@onready var _status: Label = $Presentation/Center/Summary/Status
+@onready var _start: Button = $Presentation/Center/Summary/Start
+@onready var _artwork: TextureRect = $Presentation/Center/Summary/Artwork
+@onready var _loading: Control = $Presentation/Loading
+@onready var _progress: TextureProgressBar = $Presentation/Loading/Content/Progress
 
 
 func _ready() -> void:
@@ -65,7 +65,7 @@ func _start_campaign() -> void:
 	_loading.show()
 	get_node("/root/GameCursor").call("begin_loading", self)
 	_loading_step = 0
-	_progress.max_value = 31
+	_progress.max_value = 42
 	_progress.value = 0
 	await _show_loading_frame()
 	var packed := load(GAME_SCENE_PATH) as PackedScene
@@ -110,13 +110,19 @@ func _start_campaign() -> void:
 		game.queue_free()
 		_loading_failed("Não foi possível desenhar o mapa. Tente novamente.")
 		return
+	# O resumo mora numa CanvasLayer acima de toda a HUD. Só retire a tela
+	# depois que mapa, interface e paralaxe terminaram de preparar seus nós.
 	get_tree().current_scene = game
 	get_node("/root/UISFX").call("play", &"start_game")
 	game.visible = true
 	_advance_loading_step()
+	_progress.value = _progress.max_value
 	prepared_campaign = null
 	get_node("/root/GameCursor").call("end_loading", self)
 	queue_free()
+	var top_bar := game.get_node_or_null("CampaignTopBar") as CampaignTopBar
+	if top_bar != null:
+		top_bar.maybe_show_initial_tutorial.call_deferred()
 
 
 func _show_loading_frame() -> void:

@@ -6,11 +6,12 @@ signal playable_catalog_ready
 ## A imagem de fundo fica vazia até recebermos os futuros slides. Os botões
 ## usam uma única paleta para não competir com as cores do cenário brasileiro.
 const SELECTION_SCENE := "res://scenes/ui/playable_selection.tscn"
-const GAME_SCENE_PATH := "res://teste.tscn"
+const GAME_SCENE_PATH := "res://scenes/game/campaign_game.tscn"
 const LOAD_PANEL_SCRIPT := preload("res://scripts/ui/campaign_load_panel.gd")
 const ARCHIVE_LIBRARY_SCRIPT := preload("res://scripts/ui/campaign_archive_library.gd")
 const SETTINGS_MENU_SCRIPT := preload("res://scripts/ui/campaign_settings_menu.gd")
 const LOADING_OVERLAY_SCRIPT := preload("res://scripts/ui/scene_loading_overlay.gd")
+const KEYBOARD_NAV := preload("res://scripts/ui/keyboard_button_navigation.gd")
 
 @onready var menu_area: VBoxContainer = $MenuArea
 @onready var background_image: TextureRect = $BackgroundImage
@@ -29,6 +30,7 @@ var _catalog_prepared := false
 var _catalog_files := PackedStringArray()
 var _catalog_next_index := 0
 var _selection_loading: CanvasLayer
+var _keyboard_navigation := KEYBOARD_NAV.new()
 
 
 func _ready() -> void:
@@ -70,6 +72,17 @@ func _ready() -> void:
 	_settings_menu = SETTINGS_MENU_SCRIPT.new() as Control
 	add_child(_settings_menu)
 	_build_placeholder()
+	_keyboard_navigation.reset(menu_area)
+
+
+func _input(event: InputEvent) -> void:
+	if _busy or (_load_panel != null and _load_panel.visible) \
+			or (_archive_library != null and _archive_library.visible) \
+			or (_settings_menu != null and _settings_menu.visible) \
+			or (_placeholder != null and _placeholder.visible):
+		return
+	if _keyboard_navigation.handle(event, menu_area):
+		get_viewport().set_input_as_handled()
 
 
 func _layout_menu() -> void:
@@ -174,7 +187,12 @@ func _press_button(button: Button, action: String) -> void:
 		"CampaignRecords": _open_archive_library(false)
 		"Settings": _settings_menu.call("open")
 		"Credits": _show_placeholder("CRÉDITOS")
-		"Quit": get_tree().quit()
+		"Quit":
+			var ui_sfx := get_node_or_null("/root/UISFX") as GameUISFX
+			if ui_sfx != null:
+				ui_sfx.quit_game()
+			else:
+				get_tree().quit()
 
 
 func _prewarm_playable_catalog() -> void:

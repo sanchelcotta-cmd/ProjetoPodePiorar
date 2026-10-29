@@ -10,6 +10,7 @@ extends Node
 signal combat_prepared(encounter: EncounterData, enemies: Array[EntityState], initiative: Array[Dictionary])
 signal enemy_summoned(enemy: EntityState, summoner: EntityState, acts_immediately: bool)
 signal ally_revived(ally: EntityState)
+signal initiative_order_changed
 signal conclusion_requested(title: String, narrative: String, rewards: Array[Resource])
 signal combat_finished(result: Dictionary)
 signal turn_started(actor: EntityState, cycle_number: int)
@@ -37,6 +38,7 @@ const LOOT_RESOLVER = preload("res://scripts/combat/combat_loot_resolver.gd")
 
 var enemies: Array[EntityState] = []
 var initiative_order: Array[Dictionary] = []
+var _observed_initiative: Array[EntityState] = []
 var current_encounter: EncounterData
 var pending_conclusion: Dictionary = {}
 var current_actor: EntityState
@@ -98,6 +100,10 @@ func _ready() -> void:
 		gerencia.map_generated.connect(func(_map: HexGrid) -> void: _clear_session())
 	# A HUD recebe o clique e oferece a escolha contextual; esta classe expõe
 	# player_move/player_attack, sem antecipar a escolha do jogador.
+
+
+func _exit_tree() -> void:
+	_clear_initiative_observers()
 
 
 func _on_combat_requested(context: Dictionary) -> void:
@@ -292,6 +298,7 @@ func finish_recruitment_feedback() -> bool:
 		_check_combat_end()
 		return true
 	initiative_order.clear()
+	_clear_initiative_observers()
 	_build_initiative(gerencia.campaign)
 	combat_prepared.emit(current_encounter, enemies, initiative_order)
 	if auto_start_turns:
@@ -507,7 +514,9 @@ func spawn_summoned_enemy(enemy_data: EntityData, summoner: EntityState,
 		initiative_order.insert(_turn_index + 1, initiative_entry)
 	else:
 		initiative_order.append(initiative_entry)
+	_observe_initiative_actor(enemy)
 	_sync_combat_view()
+	initiative_order_changed.emit()
 	enemy_summoned.emit(enemy, summoner, enemy.summoned_acts_immediately)
 	return enemy
 
@@ -2161,7 +2170,9 @@ func place_revived_ally(target: EntityState, owner: EntityState) -> void:
 		return entry.get("entity") == target):
 		target.turn_state = EntityState.TurnState.AVAILABLE
 		initiative_order.append(_roll_initiative_entry(target))
-		ally_revived.emit(target)
+		_observe_initiative_actor(target)
+		initiative_order_changed.emit()
+	ally_revived.emit(target)
 
 
 func _opponents_of(actor: EntityState) -> Array[EntityState]:
@@ -2347,6 +2358,7 @@ func _sync_combat_view() -> void:
 
 
 func _clear_session() -> void:
+	_clear_initiative_observers()
 	_loot_participant_ids.clear()
 	_loot_entry_max_health = 0
 	_loot_damage_taken = 0
@@ -2594,6 +2606,68 @@ func _build_initiative(campaign: CampaignState) -> void:
 			return a_player
 		return a["registration_order"] < b["registration_order"]
 	)
+	bind_initiative_health()
+
+
+func bind_initiative_health() -> void:
+	# Também é chamado ao restaurar um combate salvo: os sinais não são
+	# serializados. Observar também os mortos evita perder uma ressurreição
+	# depois de carregar, quando eles já não constam na fila.
+	for entry in initiative_order:
+		_observe_initiative_actor(entry.get("entity") as EntityState)
+	for enemy in enemies:
+		_observe_initiative_actor(enemy)
+	if gerencia != null and gerencia.campaign != null:
+		for roster in [gerencia.campaign.active_entity_states,
+				gerencia.campaign.companion_states,
+				gerencia.campaign.dead_playable_states]:
+			for actor in roster:
+				_observe_initiative_actor(actor)
+
+
+func _observe_initiative_actor(actor: EntityState) -> void:
+	if actor == null or actor in _observed_initiative:
+		return
+	actor.health_changed.connect(_on_initiative_health_changed.bind(actor))
+	_observed_initiative.append(actor)
+
+
+func _clear_initiative_observers() -> void:
+	for actor in _observed_initiative:
+		if actor == null:
+			continue
+		var callback := Callable(self, "_on_initiative_health_changed").bind(actor)
+		if actor.health_changed.is_connected(callback):
+			actor.health_changed.disconnect(callback)
+	_observed_initiative.clear()
+
+
+func _on_initiative_health_changed(previous: int, current: int,
+		actor: EntityState) -> void:
+	if current_encounter == null or actor == null:
+		return
+	if previous > 0 and current <= 0:
+		for index in initiative_order.size():
+			if initiative_order[index].get("entity") != actor:
+				continue
+			initiative_order.remove_at(index)
+			# A próxima chamada de _advance_turn incrementa o índice. Se
+			# alguém anterior ou o próprio ativo morreu, compensar a remoção.
+			if index <= _turn_index:
+				_turn_index -= 1
+			initiative_order_changed.emit()
+			break
+	elif previous <= 0 and current > 0 and actor.position != EntityState.UNPLACED \
+			and gerencia != null and gerencia.campaign != null \
+			and (actor in enemies or actor in _combat_playables() \
+			or actor in _combat_companions()) \
+			and not initiative_order.any(func(entry: Dictionary) -> bool:
+				return entry.get("entity") == actor):
+		# Ressuscitados nunca recuperam a posição antiga, mesmo que a
+		# ressurreição venha de uma habilidade futura ou de um hostil.
+		actor.turn_state = EntityState.TurnState.AVAILABLE
+		initiative_order.append(_roll_initiative_entry(actor))
+		initiative_order_changed.emit()
 
 
 func _companion_is_fetching(companion: EntityState, campaign: CampaignState) -> bool:

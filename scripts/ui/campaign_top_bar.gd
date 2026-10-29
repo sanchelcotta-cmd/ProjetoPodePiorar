@@ -53,10 +53,21 @@ const AUDIO_QUICK_PANEL_SCRIPT = preload("res://scripts/ui/audio_quick_panel.gd"
 const DIALOG_STYLE = preload("res://scripts/ui/game_dialog_style.gd")
 const DAY_TRANSITION_SCENE = preload("res://scenes/ui/campaign_day_transition.tscn")
 const FINAL_CENTER_TRANSITION_SCENE = preload("res://scenes/ui/campaign_final_center_transition.tscn")
+const KEYBOARD_BUTTON_NAVIGATION = preload("res://scripts/ui/keyboard_button_navigation.gd")
+const TUTORIAL_WINDOW_SCRIPT = preload("res://scripts/ui/tutorial_window.gd")
+const TUTORIAL_SHORTCUT_SCRIPT = preload("res://scripts/ui/tutorial_shortcut.gd")
+const TUTORIAL_INVITATION_SCRIPT = preload("res://scripts/ui/tutorial_invitation.gd")
 var pause_menu
 var _audio_quick_panel
+var _keyboard_region := &"none"
+var _topbar_keyboard_navigation := KEYBOARD_BUTTON_NAVIGATION.new()
 var _initial_ui_ready := false
 var _initial_ui_preparing := false
+var _tutorial_shortcut: TutorialShortcut
+var _tutorial_window: TutorialWindow
+var _tutorial_invitation: TutorialInvitation
+var _tutorial_session_active := false
+var _tutorial_was_paused := false
 
 
 func is_initial_ui_ready() -> bool:
@@ -82,7 +93,9 @@ func _ready() -> void:
 		_audio_quick_panel.close()
 		pause_menu.open())
 	sound_button.pressed.connect(_toggle_sound)
+	_create_tutorial_shortcut()
 	_refresh_sound()
+	_refresh_tutorial_shortcut()
 	if gerencia != null:
 		gerencia.map_generated.connect(func(_map: HexGrid) -> void: refresh())
 		bind_campaign(gerencia.campaign)
@@ -158,15 +171,25 @@ func _create_journal() -> void:
 	journal_ui = CampaignJournalUI.new()
 	add_child(journal_ui)
 	journal_ui.bind_campaign(gerencia.campaign if gerencia != null else null)
+	journal_ui.set_tutorial_shortcut_visible(
+		_tutorial_shortcut != null and _tutorial_shortcut.visible)
 
 
 func _create_group_inventory() -> void:
 	group_inventory = GROUP_INVENTORY_SCENE.instantiate() as GroupInventoryPanel
-	add_child(group_inventory)
 	group_inventory.gerencia = gerencia
 	group_inventory.skill_manager = get_parent().get_node_or_null("SkillManager") as SkillManager
 	group_inventory.combat_manager = get_parent().get_node_or_null("CombatManager") as CombatManager
 	group_inventory.exploration = get_parent().get_node_or_null("ExplorationManager") as ExplorationManager
+	# _ready() cria o menu de itens e copia essas referências. Elas precisam
+	# existir antes de o painel entrar na árvore, inclusive durante o loading.
+	add_child(group_inventory)
+	var hud := get_parent().get_node_or_null("PartyStatusHUD") as PartyStatusHUD
+	if hud != null:
+		# A rolagem extra deve surgir no card assim que o item for consumido,
+		# sem esperar a próxima atualização periódica da HUD.
+		group_inventory.item_menu.inventory_changed.connect(
+			hud._on_item_inventory_changed)
 	if group_inventory.combat_manager != null:
 		group_inventory.death_cleanup_completed.connect(
 			group_inventory.combat_manager.on_promotion_cleanup_confirmed)
@@ -321,6 +344,116 @@ func refresh() -> void:
 		palette.call("color", "on_button") if palette != null \
 		else Color(1.0, 0.38, 0.39) if in_combat else _exploration_mode_text_color)
 	combat_border.visible = in_combat
+	_refresh_tutorial_shortcut()
+
+
+func _create_tutorial_shortcut() -> void:
+	_tutorial_shortcut = TUTORIAL_SHORTCUT_SCRIPT.new() as TutorialShortcut
+	_tutorial_shortcut.name = "DayOneTutorialShortcut"
+	_tutorial_shortcut.opened.connect(open_tutorial)
+	_tutorial_shortcut.presentation_changed.connect(_on_tutorial_shortcut_changed)
+	add_child(_tutorial_shortcut)
+	_refresh_tutorial_shortcut()
+
+
+func _refresh_tutorial_shortcut() -> void:
+	if _tutorial_shortcut == null:
+		return
+	var campaign := gerencia.campaign if gerencia != null else null
+	_tutorial_shortcut.visible = campaign != null and campaign.day == 1 \
+		and not campaign.tutorial_day_one_shortcut_dismissed
+	if campaign != null:
+		_tutorial_shortcut.set_presentation(campaign.tutorial_shortcut_y_ratio,
+			campaign.tutorial_shortcut_collapsed)
+	if journal_ui != null:
+		journal_ui.set_tutorial_shortcut_visible(_tutorial_shortcut.visible)
+
+
+func _on_tutorial_shortcut_changed(y_ratio: float, collapsed: bool) -> void:
+	var campaign := gerencia.campaign if gerencia != null else null
+	if campaign == null:
+		return
+	campaign.tutorial_shortcut_y_ratio = y_ratio
+	campaign.tutorial_shortcut_collapsed = collapsed
+	_request_tutorial_autosave()
+
+
+func maybe_show_initial_tutorial() -> void:
+	# A chamada ocorre depois que a tela de carregamento sai da árvore.
+	await get_tree().process_frame
+	if not is_instance_valid(self) or gerencia == null or gerencia.campaign == null:
+		return
+	var campaign := gerencia.campaign
+	if campaign.day != 1 or campaign.tutorial_invitation_seen \
+			or campaign.tutorial_day_one_shortcut_dismissed:
+		return
+	campaign.tutorial_invitation_seen = true
+	_request_tutorial_autosave()
+	_begin_tutorial_session()
+	_ensure_tutorial_invitation()
+	_tutorial_invitation.open_invitation()
+
+
+func _ensure_tutorial_invitation() -> void:
+	if _tutorial_invitation != null:
+		return
+	_tutorial_invitation = TUTORIAL_INVITATION_SCRIPT.new() as TutorialInvitation
+	_tutorial_invitation.confirmed.connect(open_tutorial)
+	_tutorial_invitation.canceled.connect(_end_tutorial_session)
+	add_child(_tutorial_invitation)
+
+
+func _ensure_tutorial_window() -> void:
+	if _tutorial_window != null:
+		return
+	_tutorial_window = TUTORIAL_WINDOW_SCRIPT.new() as TutorialWindow
+	add_child(_tutorial_window)
+	_tutorial_window.closed.connect(_end_tutorial_session)
+	_tutorial_window.day_one_dismiss_requested.connect(
+		_on_tutorial_day_one_dismiss_requested)
+
+
+func open_tutorial() -> void:
+	_begin_tutorial_session()
+	_ensure_tutorial_window()
+	var campaign := gerencia.campaign if gerencia != null else null
+	_tutorial_window.open(campaign != null and campaign.day == 1 \
+		and not campaign.tutorial_day_one_shortcut_dismissed)
+
+
+func open_tutorial_from_settings() -> void:
+	open_tutorial()
+
+
+func _on_tutorial_day_one_dismiss_requested() -> void:
+	var campaign := gerencia.campaign if gerencia != null else null
+	if campaign != null:
+		campaign.tutorial_day_one_shortcut_dismissed = true
+		_request_tutorial_autosave()
+	_refresh_tutorial_shortcut()
+	if _tutorial_window != null:
+		_tutorial_window.close()
+
+
+func _begin_tutorial_session() -> void:
+	if _tutorial_session_active:
+		return
+	_tutorial_was_paused = get_tree().paused
+	_tutorial_session_active = true
+	get_tree().paused = true
+
+
+func _end_tutorial_session() -> void:
+	if not _tutorial_session_active:
+		return
+	get_tree().paused = _tutorial_was_paused
+	_tutorial_session_active = false
+
+
+func _request_tutorial_autosave() -> void:
+	var autosave := get_parent().get_node_or_null("CampaignAutosaveController")
+	if autosave != null:
+		autosave.call("request_autosave", &"tutorial")
 
 
 func _bind_palette() -> void:
@@ -369,14 +502,150 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		_audio_quick_panel.close()
 		get_viewport().set_input_as_handled()
 		return
-	if not event.is_action_pressed("ui_cancel") or pause_menu.is_open():
+	if not (event is InputEventKey and event.pressed and not event.echo) \
+			or pause_menu.is_open():
 		return
-	if information_archive.visible or group_inventory.visible \
-			or journal_ui.is_book_open() \
+	var key := (event as InputEventKey).keycode
+	var block_popup := get_parent().get_node_or_null("BlockActivationPopup") as BlockActivationPopup
+	if get_tree().paused or (block_popup != null and block_popup.overlay.visible) \
 			or (round_manager != null and round_manager.is_destination_choice_open()):
 		return
-	pause_menu.open()
-	get_viewport().set_input_as_handled()
+	if key == KEY_P:
+		_keyboard_region = &"none"
+		_topbar_keyboard_navigation.clear()
+		var hud := get_parent().get_node_or_null("PartyStatusHUD") as PartyStatusHUD
+		if hud != null:
+			hud.keyboard_clear_card_focus()
+		_audio_quick_panel.close()
+		pause_menu.open()
+		get_viewport().set_input_as_handled()
+		return
+	if key == KEY_E and _craft_shortcut_available():
+		var hud := get_parent().get_node_or_null("PartyStatusHUD") as PartyStatusHUD
+		if hud != null:
+			hud.close_expandable_boxes()
+		close_expandable_boxes()
+		group_inventory.open_craft_for(group_inventory.preferred_craft_actor())
+		get_viewport().set_input_as_handled()
+		return
+	if not _map_shortcuts_available():
+		return
+	var audio := get_node_or_null("/root/GameAudio")
+	if key in [KEY_M, KEY_N] and audio != null:
+		audio.call("toggle_mute", &"master")
+		get_viewport().set_input_as_handled()
+		return
+	if key in [KEY_HOME, KEY_END] and gerencia != null \
+			and gerencia.map_view != null:
+		gerencia.map_view.keyboard_zoom(1 if key == KEY_HOME else -1)
+		get_viewport().set_input_as_handled()
+		return
+	var station_number := 0
+	if key >= KEY_1 and key <= KEY_9:
+		station_number = key - KEY_1 + 1
+	elif key >= KEY_KP_1 and key <= KEY_KP_9:
+		station_number = key - KEY_KP_1 + 1
+	if station_number > 0 and audio != null \
+			and bool(audio.call("select_station_number", station_number)):
+		get_viewport().set_input_as_handled()
+
+
+func _input(event: InputEvent) -> void:
+	if not _initial_ui_ready or not event is InputEventKey \
+			or not event.pressed or event.echo or get_tree().paused \
+			or not _map_shortcuts_available():
+		return
+	var focus_owner := get_viewport().gui_get_focus_owner()
+	if focus_owner is LineEdit or focus_owner is TextEdit:
+		return
+	var activation := get_parent().get_node_or_null("BlockActivationPopup") as BlockActivationPopup
+	if activation != null and activation.overlay.visible:
+		return
+	if round_manager != null and round_manager.is_destination_choice_open():
+		return
+	var key := (event as InputEventKey).keycode
+	var hud := get_parent().get_node_or_null("PartyStatusHUD") as PartyStatusHUD
+	if key == KEY_T and _tutorial_shortcut != null and _tutorial_shortcut.visible:
+		open_tutorial()
+		get_viewport().set_input_as_handled()
+		return
+	if key == KEY_TAB:
+		_keyboard_region = &"hud" if _keyboard_region != &"hud" else &"topbar"
+		if _keyboard_region == &"hud":
+			_topbar_keyboard_navigation.clear()
+			if hud != null:
+				hud.keyboard_focus_active_card()
+		else:
+			if hud != null:
+				hud.keyboard_clear_card_focus()
+			_topbar_keyboard_navigation.highlight(information_button)
+		get_viewport().set_input_as_handled()
+		return
+	if key == KEY_I:
+		_toggle_group_inventory()
+		get_viewport().set_input_as_handled()
+		return
+	if key == KEY_R:
+		_toggle_journal()
+		get_viewport().set_input_as_handled()
+		return
+	if key == KEY_Q:
+		if _keyboard_region == &"hud" and hud != null:
+			hud.keyboard_open_highlighted_sheet()
+		else:
+			_toggle_information_archive()
+		get_viewport().set_input_as_handled()
+		return
+	if _keyboard_region == &"hud" and hud != null:
+		if key in [KEY_UP, KEY_W, KEY_DOWN, KEY_S]:
+			hud.keyboard_focus_card_delta(-1 if key in [KEY_UP, KEY_W] else 1)
+			get_viewport().set_input_as_handled()
+			return
+		if key in [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE]:
+			hud.keyboard_toggle_active_actions()
+			get_viewport().set_input_as_handled()
+			return
+	if _keyboard_region == &"topbar":
+		if _topbar_keyboard_navigation.handle_buttons(event,
+				[information_button, group_inventory_button, journal_button]):
+			get_viewport().set_input_as_handled()
+			return
+	elif key in [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE] and hud != null:
+		hud.keyboard_toggle_active_actions()
+		get_viewport().set_input_as_handled()
+
+
+func _map_shortcuts_available() -> bool:
+	if _audio_quick_panel.visible or information_archive.visible \
+			or group_inventory.visible or journal_ui.is_book_open():
+		return false
+	if _day_transition != null and _day_transition.is_open():
+		return false
+	if _final_center_transition != null and _final_center_transition.is_open():
+		return false
+	for dialog in [_save_dialog, _overwrite_dialog, _exit_dialog,
+			_save_feedback, _terminal_dialog]:
+		if dialog != null and dialog.visible:
+			return false
+	var hud := get_parent().get_node_or_null("PartyStatusHUD") as PartyStatusHUD
+	if hud != null and (hud.action_drawer.visible or hud.character_sheet.visible \
+			or hud.hex_choice.visible or hud.inventory_panel.visible):
+		return false
+	return true
+
+
+func _craft_shortcut_available() -> bool:
+	if group_inventory == null or not group_inventory.can_open_craft():
+		return false
+	if _day_transition != null and _day_transition.is_open():
+		return false
+	if _final_center_transition != null and _final_center_transition.is_open():
+		return false
+	for dialog in [_save_dialog, _overwrite_dialog, _exit_dialog,
+			_save_feedback, _terminal_dialog]:
+		if dialog != null and dialog.visible:
+			return false
+	return true
 
 
 func show_recovery_save_prompt() -> void:

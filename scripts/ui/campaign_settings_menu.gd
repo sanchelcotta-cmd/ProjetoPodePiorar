@@ -4,6 +4,7 @@ extends Control
 ## Vídeo, escala, paleta, conforto visual e áudio são preferências reais. Os
 ## demais controles permanecem em prévia até terem subsistemas próprios.
 signal back_requested
+signal tutorial_requested
 signal contents_prepared
 
 const CYAN := Color(0.35, 0.83, 0.94)
@@ -21,6 +22,7 @@ const PALETTE_IDS := ["padrao", "azul", "rosa_branco", "acessivel"]
 const PALETTE_NAMES := ["Padrão", "Azul neon", "Rosa e branco", "Acessível"]
 const AUDIO_VOLUME_CONTROLS_SCRIPT := preload("res://scripts/ui/audio_volume_controls.gd")
 const DIALOG_STYLE := preload("res://scripts/ui/game_dialog_style.gd")
+const KEYBOARD_NAV := preload("res://scripts/ui/keyboard_button_navigation.gd")
 
 static var _video_loaded_for_session := false
 
@@ -47,6 +49,7 @@ var _difficulty_controls: Array[Button] = []
 var _difficulty_note: Label
 var _contents_ready := false
 var _contents_preparing := false
+var _keyboard_navigation := KEYBOARD_NAV.new()
 
 
 func _ready() -> void:
@@ -129,6 +132,7 @@ func open() -> void:
 	_sync_difficulty_ui()
 	show()
 	_show_tab(_current_tab)
+	_keyboard_navigation.reset(self)
 
 
 func close() -> void:
@@ -152,9 +156,10 @@ func _process(_delta: float) -> void:
 		_revert_video()
 
 
-func _unhandled_key_input(event: InputEvent) -> void:
-	if visible and event.is_action_pressed("ui_cancel"):
-		close()
+func _input(event: InputEvent) -> void:
+	if not visible or (_video_confirmation != null and _video_confirmation.visible):
+		return
+	if _keyboard_navigation.handle(event, self):
 		get_viewport().set_input_as_handled()
 
 
@@ -374,6 +379,11 @@ func _build_gameplay(page: VBoxContainer) -> void:
 	_difficulty_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	page.add_child(_difficulty_note)
 	_sync_difficulty_ui()
+	_section(page, "TUTORIAL")
+	page.add_child(_label("Consulte as regras e os controles quando quiser, mesmo após fechar o convite do Dia 1.", 14, WHITE))
+	var tutorial_button := _button("VER TUTORIAL", CYAN)
+	tutorial_button.pressed.connect(func() -> void: tutorial_requested.emit())
+	page.add_child(tutorial_button)
 
 
 func _on_difficulty_selected(mode: int) -> void:

@@ -12,6 +12,7 @@ const CYAN := Color(0.10, 0.85, 0.96)
 const WHITE := Color(0.94, 0.96, 0.97)
 const BOLD := preload("res://fonts/UbuntuSans-Bold.ttf")
 const DETAILS_SCENE := preload("res://scenes/ui/item_details_panel.tscn")
+const KEYBOARD_NAV := preload("res://scripts/ui/keyboard_button_navigation.gd")
 
 var campaign: CampaignState
 var inventory: InventoryManager
@@ -43,6 +44,7 @@ var _selected_result: ItemData
 var _crafted_entry: InventoryItemState
 var _crafted_actor: EntityState
 var _dragging := false
+var _keyboard_navigation := KEYBOARD_NAV.new()
 
 
 func _ready() -> void:
@@ -97,6 +99,7 @@ func open_for(game_campaign: CampaignState, items: InventoryManager,
 	dialog.position = (get_viewport_rect().size - dialog.size) * 0.5
 	dialog.position = _clamp(dialog.position)
 	dialog.grab_focus()
+	_keyboard_navigation.reset(dialog)
 
 
 func close() -> void:
@@ -118,6 +121,8 @@ func _input(event: InputEvent) -> void:
 			details.hide()
 		else:
 			close()
+		get_viewport().set_input_as_handled()
+	elif _keyboard_navigation.handle(event, details if details.visible else dialog):
 		get_viewport().set_input_as_handled()
 	elif _dragging and event is InputEventMouseMotion:
 		dialog.position = _clamp(dialog.position + event.relative)
